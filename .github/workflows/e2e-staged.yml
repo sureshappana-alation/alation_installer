@@ -100,7 +100,7 @@ jobs:
           path: ./archive2
 
       - name: List files
-        run: ls -al
+        run: find .
           
       - name: Compress files
         run: |
