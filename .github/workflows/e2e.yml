@@ -7,8 +7,8 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -32,7 +32,7 @@ jobs:
           aws-region: us-east-2
       - name: Get list of file
         run: |
-          aws s3 cp ${{ secrets.S3_BUCKET_URL }}aa-0.1.0.tgz
+          aws s3 cp ${{ secrets.S3_BUCKET_URL }}aa-0.1.0.tgz .
           echo "hello" >> hi.txt
           ls -al
 #       - name: Create zip
