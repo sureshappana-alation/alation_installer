@@ -21,7 +21,6 @@ on:
 #         description: 'Test scenario tags'
 
 jobs:
-  generate-image:
   build:
     runs-on: ubuntu-latest
     steps:
