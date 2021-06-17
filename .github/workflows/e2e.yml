@@ -30,12 +30,20 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
+
       - name: Get list of file
         run: |
           mkdir -p archive
           aws s3 cp ${{ secrets.S3_BUCKET_URL }}aa-0.1.0.tgz ./archive
           aws s3 cp ${{ secrets.S3_BUCKET_URL }}ocf-0.1.0.tgz ./archive
           ls -al ./archive
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: ./installer
+          push: false
+          tags: alation/installer:latest
 
 #       - name: Create zip
 #         uses: ihiroky/archive-action@v1
