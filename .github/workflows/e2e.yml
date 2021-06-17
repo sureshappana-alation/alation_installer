@@ -48,7 +48,7 @@ jobs:
           context: ./installer
           push: false
           tags: alation/installer:latest
-          outputs: type=docker,dest=.
+          outputs: type=docker,dest=./out.tar
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
