@@ -38,6 +38,9 @@ jobs:
           aws s3 cp ${{ secrets.S3_BUCKET_URL }}ocf-0.1.0.tgz ./archive
           ls -al ./archive
 
+      - name: Checkout code
+        uses: actions/checkout@v2
+
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
