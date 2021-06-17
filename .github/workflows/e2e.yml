@@ -31,4 +31,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Get list of file
-        run: aws s3 ls
+        run: |
+          aws s3 cp ${{ secrets.S3_BUCKET_URL }}aa-0.1.0.tgz
+          echo "hello" >> hi.txt
+          ls -al
+#       - name: Create zip
+#         uses: ihiroky/archive-action@v1
+#         with:
+#           root_dir: path_to_arhive_root_directory
+#           file_path: path_to_archive.zip
