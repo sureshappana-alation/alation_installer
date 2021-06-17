@@ -29,6 +29,7 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v2
+      - run: mkdir -p archive
       
       - name: Build and store docker tarball
         id: docker_build
@@ -83,7 +84,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: docker-artifact
-          path: ./archive
+          path: ./archive1
+      
+      - name: Retrieve saved downloads
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts
+          path: ./archive2
       - name: Compress files
         run: tar -cvzf alation-0.1.0.tgz ./archive
 
