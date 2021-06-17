@@ -21,6 +21,7 @@ on:
 #         description: 'Test scenario tags'
 
 jobs:
+  generate-image:
   build:
     runs-on: ubuntu-latest
     steps:
@@ -47,6 +48,7 @@ jobs:
           context: ./installer
           push: false
           tags: alation/installer:latest
+          outputs: type=docker,dest=./archive/installer-latest.tar
 
 #       - name: Create zip
 #         uses: ihiroky/archive-action@v1
