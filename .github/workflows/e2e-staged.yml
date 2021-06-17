@@ -92,7 +92,16 @@ jobs:
           name: artifacts
           path: ./archive2
       - name: Compress files
-        run: tar -cvzf alation-0.1.0.tgz ./archive
+        run: |
+          aws s3 cp ./archive1 ${{ secrets.S3_BUCKET_URL }}/archive1
+          aws s3 cp ./archive2 ${{ secrets.S3_BUCKET_URL }}/archive1
 
-      - name: Upload to final artifact to S3
-        run: aws s3 cp alation-0.1.0.tgz ${{ secrets.S3_BUCKET_URL }}alation-0.1.0.tgz
+      - name: List of files
+        run: ls -al
+#       - name: Compress files
+#         run: tar -cvzf alation-0.1.0.tgz ./archive          
+#       - name: Compress files
+#         run: tar -cvzf alation-0.1.0.tgz ./archive
+
+#       - name: Upload to final artifact to S3
+#         run: aws s3 cp alation-0.1.0.tgz ${{ secrets.S3_BUCKET_URL }}alation-0.1.0.tgz
