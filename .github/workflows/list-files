@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: unified-build
+name: list-files
 on:
   workflow_dispatch:
 jobs:
