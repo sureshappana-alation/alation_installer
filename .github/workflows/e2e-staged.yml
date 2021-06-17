@@ -91,26 +91,19 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: docker-artifact
-          path: ./archive1
+          path: ./archive
       
       - name: Retrieve saved downloads
         uses: actions/download-artifact@v2
         with:
           name: artifacts
-          path: ./archive2
+          path: ./archive
 
       - name: List files
         run: find .
-          
+                  
       - name: Compress files
-        run: |
-          aws s3 cp ./archive1 ${{ secrets.S3_BUCKET_URL }}/archive1
-          aws s3 cp ./archive2 ${{ secrets.S3_BUCKET_URL }}/archive1
+        run: tar -cvzf alation-0.2.0.tgz ./archive
 
-#       - name: Compress files
-#         run: tar -cvzf alation-0.1.0.tgz ./archive          
-#       - name: Compress files
-#         run: tar -cvzf alation-0.1.0.tgz ./archive
-
-#       - name: Upload to final artifact to S3
-#         run: aws s3 cp alation-0.1.0.tgz ${{ secrets.S3_BUCKET_URL }}alation-0.1.0.tgz
+      - name: Upload to final artifact to S3
+        run: aws s3 cp alation-0.2.0.tgz ${{ secrets.S3_BUCKET_URL }}alation-0.2.0.tgz
