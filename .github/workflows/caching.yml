@@ -9,6 +9,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: List of file
+      run: ls -al
+
     - name: Cache Primes
       id: cache-primes
       uses: actions/cache@v2
@@ -16,7 +19,9 @@ jobs:
         path: prime-numbers
         key: ${{ runner.os }}-hi
 
-    - name: Generate Prime Numbers
+    - name: Create file
       if: steps.cache-primes.outputs.cache-hit != 'true'
       run: echo hi >> ./hi.txt
 
+    - name: List of file
+      run: ls -al
