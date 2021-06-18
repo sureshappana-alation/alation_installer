@@ -47,8 +47,9 @@ jobs:
       - name: Run environment versions files
         run: |
           for f in ${{ github.workspace }}/versions/*.sh; do
-            cat "$f" >> $GITHUB_ENV
-          done
+            cat "$f"
+            echo
+          done >> $GITHUB_ENV
       # - name: Print environment variables
       #   run: |
       #     cat ${{ github.workspace }}/versions/ocf.sh >> $GITHUB_ENV
