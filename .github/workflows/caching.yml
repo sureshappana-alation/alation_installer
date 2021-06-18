@@ -12,16 +12,23 @@ jobs:
     - name: List of file
       run: ls -al
 
+    - name: File content
+      run: cat ./hi1.txt
+
     - name: Cache Primes
       id: cache-primes
       uses: actions/cache@v2
       with:
         path: prime-numbers
-        key: ${{ runner.os }}-hi
+        key: ${{ runner.os }}-hi1
 
     - name: Create file
       if: steps.cache-primes.outputs.cache-hit != 'true'
-      run: echo hi >> ./hi.txt
+      run: echo hi >> ./hi1.txt
 
     - name: List of file
       run: ls -al
+
+    - name: File content
+      run: cat ./hi1.txt
+
