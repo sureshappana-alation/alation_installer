@@ -19,7 +19,7 @@ jobs:
       id: cache-primes
       uses: actions/cache@v2
       with:
-        path: prime-numbers
+        path: hi1
         key: ${{ runner.os }}-hi1
 
     - name: Create file
