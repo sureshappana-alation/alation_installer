@@ -13,21 +13,19 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
-      alation_analytics:
+      ALATION_ANALYTICS:
         description: 'Alation Analytics version'
         required: false
-      ocf:
+      OCF:
         description: 'OCF version'
         required: false
 
 
 jobs:
-  versions:
-    runs-on: ubuntu-latest
-    steps:
-
   build:
     runs-on: ubuntu-latest
+    env:
+      SERVICES: ("ALATION_ANALYTICS"  "OCF") >> $GITHUB_ENV
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -42,10 +40,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       
-      - name: Define env variables
-        env:
-          SERVICES: ("alation_analytics"  "ocf") >> $GITHUB_ENV
-
+        
       # - name: Print github environment variables
       #   run: ls ${{ github.workspace }}/versions/
 
