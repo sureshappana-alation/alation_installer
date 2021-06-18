@@ -47,7 +47,7 @@ jobs:
         run: printenv
 
       - name: Print github environment variables
-        run: ${{ github.workspace }}
+        run: ls ${{ github.workspace }}/versions/
 
       # - name: Download files from S3
       #   run: |
