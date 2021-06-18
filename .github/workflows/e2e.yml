@@ -57,7 +57,7 @@ jobs:
         run: echo $OCF          
       
       - name: Print environment variables
-        run: echo ${{ env.OCF }} {{ env.ALATION_ANALYTICS }}
+        run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
 
       - name: Print all
         run: printenv
