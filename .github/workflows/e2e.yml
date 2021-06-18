@@ -49,6 +49,10 @@ jobs:
           for f in ${{ github.workspace }}/versions/*.sh; do
             source "$f" 
           done
+      - name: Print environment variables
+        run: |
+          source ${{ github.workspace }}/versions/ocf.sh
+          printenv
 
       - name: Print environment variables
         run: echo $OCF          
