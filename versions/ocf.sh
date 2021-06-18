@@ -1,1 +1,1 @@
-export OCF=1.0.0
+OCF=1.0.0

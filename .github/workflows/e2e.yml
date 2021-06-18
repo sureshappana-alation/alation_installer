@@ -44,20 +44,20 @@ jobs:
       # - name: Print github environment variables
       #   run: ls ${{ github.workspace }}/versions/
 
-      # - name: Run environment versions files
-      #   run: |
-      #     for f in ${{ github.workspace }}/versions/*.sh; do
-      #       source "$f" 
-      #     done
-      - name: Print environment variables
+      - name: Run environment versions files
         run: |
-          cat ${{ github.workspace }}/versions/ocf.sh >> $GITHUB_ENV
+          for f in ${{ github.workspace }}/versions/*.sh; do
+            cat "$f" >> $GITHUB_ENV
+          done
+      # - name: Print environment variables
+      #   run: |
+      #     cat ${{ github.workspace }}/versions/ocf.sh >> $GITHUB_ENV
 
       - name: Print environment variables
         run: echo $OCF          
       
       - name: Print environment variables
-        run: echo ${{env.OCF}}
+        run: echo ${{ env.OCF }} {{ env.ALATION_ANALYTICS }}
 
       - name: Print all
         run: printenv
