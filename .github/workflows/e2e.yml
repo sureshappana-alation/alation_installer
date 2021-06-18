@@ -38,16 +38,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
 
-      # - name: Run environment versions files
-      #   run: |
-      #     for f in ${{ github.workspace }}/versions/*.sh; do
-      #       bash "$f" 
-      #     done
       - name: Print environment variables
         run: printenv
 
       - name: Print github environment variables
         run: ls ${{ github.workspace }}/versions/
+
+      - name: Run environment versions files
+        run: |
+          for f in ${{ github.workspace }}/versions/*.sh; do
+            bash "$f" 
+          done
 
       # - name: Download files from S3
       #   run: |
