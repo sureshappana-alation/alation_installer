@@ -50,6 +50,9 @@ jobs:
             bash "$f" 
           done
 
+      - name: Print environment variables
+        run: printenv          
+
       # - name: Download files from S3
       #   run: |
       #     mkdir -p archive
