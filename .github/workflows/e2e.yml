@@ -40,7 +40,7 @@ jobs:
       
       - name: Run environment versions files
         run: |
-          for f in ${{ github/workspace }}/versions/*.sh; do
+          for f in ${{ github.workspace }}/versions/*.sh; do
             bash "$f" 
           done
       - name: Print environment variables
