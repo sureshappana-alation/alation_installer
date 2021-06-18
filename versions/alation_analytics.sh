@@ -1,0 +1,1 @@
+export ALATION_ANALYTICS=1.0.0
