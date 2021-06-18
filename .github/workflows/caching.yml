@@ -12,8 +12,8 @@ jobs:
     - name: List of file
       run: ls -al
 
-    - name: File content
-      run: cat ./hi1.txt
+#     - name: File content
+#       run: cat ./hi1.txt
 
     - name: Cache Primes
       id: cache-primes
