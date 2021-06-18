@@ -47,11 +47,11 @@ jobs:
       - name: Run environment versions files
         run: |
           for f in ${{ github.workspace }}/versions/*.sh; do
-            bash "$f" 
+            source "$f" 
           done
 
       - name: Print environment variables
-        run: printenv          
+        run: echo $OCF          
 
       # - name: Download files from S3
       #   run: |
