@@ -24,7 +24,9 @@ jobs:
 
     - name: Create file
       if: steps.cache-primes.outputs.cache-hit != 'true'
-      run: echo hi >> ./hi/hi1.txt
+      run: |
+        mkdir -p ./hi
+        echo hi >> ./hi/hi1.txt
 
     - name: List of file
       run: find .
