@@ -39,10 +39,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      
-        
-      # - name: Print github environment variables
-      #   run: ls ${{ github.workspace }}/versions/
 
       - name: Run environment versions files
         run: |
@@ -50,9 +46,6 @@ jobs:
             cat "$f"
             echo
           done >> $GITHUB_ENV
-      # - name: Print environment variables
-      #   run: |
-      #     cat ${{ github.workspace }}/versions/ocf.sh >> $GITHUB_ENV
 
       - name: Print environment variables
         run: echo $OCF          
@@ -60,9 +53,8 @@ jobs:
       - name: Print environment variables
         run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
 
-      - name: Print all
-        run: printenv
-
+      - name: Print environment variables input
+        run:  ${{ github.event.inputs }}
 
       # - name: Download files from S3
       #   run: |
