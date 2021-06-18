@@ -14,11 +14,9 @@ jobs:
       uses: actions/cache@v2
       with:
         path: prime-numbers
-        key: ${{ runner.os }}-primes
+        key: ${{ runner.os }}-hi
 
     - name: Generate Prime Numbers
       if: steps.cache-primes.outputs.cache-hit != 'true'
-      run: /generate-primes.sh -d prime-numbers
+      run: echo hi >> ./hi.txt
 
-    - name: Use Prime Numbers
-      run: /primes.sh -d prime-numbers
