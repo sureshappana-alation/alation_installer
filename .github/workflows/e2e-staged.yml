@@ -60,11 +60,24 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Create download directory
+        run: mkdir -p archive
+
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: 
+
+      - name: Download application files from S3
+        run: |
+          aws s3 cp ${{ secrets.S3_BUCKET_URL }}aa-0.1.0.tgz ./archive
+          aws s3 cp ${{ secrets.S3_BUCKET_URL }}ocf-0.1.0.tgz ./archive
+          ls -al ./archive
           aws-region: us-east-2
 
-      - name: Download files from S3
+      - name: Download application files from S3
         run: |
-          mkdir -p archive
           aws s3 cp ${{ secrets.S3_BUCKET_URL }}aa-0.1.0.tgz ./archive
           aws s3 cp ${{ secrets.S3_BUCKET_URL }}ocf-0.1.0.tgz ./archive
           ls -al ./archive
