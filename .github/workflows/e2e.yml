@@ -72,8 +72,9 @@ jobs:
         run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
       
       - name: Services vars
-        run: | 
+        run: |
           echo ${{env.SERVICES[1]}}
+          printenv
       # - name: Services vars1
       #   run: echo ${{ env[$SERVICES[0]] }}
 
