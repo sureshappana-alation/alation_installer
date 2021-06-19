@@ -94,9 +94,9 @@ jobs:
       - name: Set env variables
         run: |
           echo INSTALLER_DIR=./archive >> $GITHUB_ENV
-          echo SERVICES_DIR=$INSTALLER_DIR/services >> $GITHUB_ENV
+          echo SERVICES_DIR=./archive/services >> $GITHUB_ENV
           echo ALATION_OUTPUT=alation-$GITHUB_RUN_NUMBER.tgz
-          mkdir -p $SERVICES_DIR
+          mkdir -p ./archive/services
 
       - name: Download files from S3
         run: |
