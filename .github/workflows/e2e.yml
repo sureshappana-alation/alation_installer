@@ -69,7 +69,7 @@ jobs:
               ARRAY+=(${strarr[1]})
             done < "${i}"
           done >> $GITHUB_ENV
-          echo ${ARRAY}
+          echo "SERVICES"="${ARRAY}" << $GITHUB_ENV
       - name: Print environment variables
         run: echo $OCF          
       
