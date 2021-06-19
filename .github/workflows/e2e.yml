@@ -74,7 +74,6 @@ jobs:
       - name: Services vars
         run: | 
           echo $SERVICES[0]
-          echo "${{ env[$SERVICES[0]] }}"
           echo "${{ env["$SERVICES[0]""] }}"
       # - name: Services vars1
       #   run: echo ${{ env[$SERVICES[0]] }}
