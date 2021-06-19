@@ -84,16 +84,15 @@ jobs:
         run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
       
       - name: Print all env
-        run: printenv
-      
-      - name: Print outputs
-        run: |
-          mkdir -p archive
-          for i in ${{ steps.services.outputs.arr }}; do
-            echo ${{ format('{0}.{1}', env $i) }}
-          done
-        
-      
+        run: echo $ENVIRONMENT
+        env:
+          ENVIRONMENT: ${{ toJson(env) }}
+      # - name: Print outputs
+      #   run: |
+      #     mkdir -p archive
+      #     for i in ${{ steps.services.outputs.arr }}; do
+      #       echo ${{ format('{0}.{1}', env $i) }}
+      #     done
       # - name: Services vars1
       #   run: echo ${{ env[$SERVICES[0]] }}
 
@@ -111,7 +110,7 @@ jobs:
       #     context: ./installer
       #     push: false
       #     tags: alation/installer:latest
-      #     outputs: type=docker,dest=./archive/out.tar
+      #     outputs: type=docker,dest=./archive/installer.tar
 
       # - name: Image digest
       #   run: echo ${{ steps.docker_build.outputs.digest }}
