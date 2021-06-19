@@ -63,6 +63,16 @@ jobs:
             cat "$f"
             echo
           done >> $GITHUB_ENV
+      - name: Testing
+        run: |
+          services=()
+          for i in ./versions/*.sh; do
+            while read line || [ -n "$line" ];
+            do
+                services+=($(echo $line | awk '{split($0,a,"="); printf a[1]}'))
+            done < "${i}"
+          done
+          echo "${services[@]}"
       - name: Print environment variables
         run: echo $OCF          
       
@@ -72,12 +82,12 @@ jobs:
       # - name: Services vars1
       #   run: echo ${{ env[$SERVICES[0]] }}
 
-      # - name: Download files from S3
-      #   run: |
-      #     mkdir -p archive
-      #     aws s3 cp ${{ secrets.S3_BUCKET_URL }}aa-0.1.0.tgz ./archive
-      #     aws s3 cp ${{ secrets.S3_BUCKET_URL }}ocf-0.1.0.tgz ./archive
-      #     ls -al ./archive
+      - name: Download files from S3
+        run: |
+          mkdir -p archive
+          aws s3 cp ${{ secrets.S3_DEV_BUCKET_URL }}aa-0.1.0.tgz ./archive
+          aws s3 cp ${{ secrets.S3_DEV_BUCKET_URL }}ocf-0.1.0.tgz ./archive
+          ls -al ./archive
 
       # - name: Build and store docker tarball
       #   id: docker_build
