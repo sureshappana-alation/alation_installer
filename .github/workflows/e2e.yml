@@ -114,7 +114,10 @@ jobs:
           push: false
           tags: alation/installer:latest
           outputs: type=docker,dest=${{env.INSTALLER_DIR}}/installer.tar.gz
-      
+     
+      - name: List of files
+        run: find ./archive      
+     
       - name: Compress files
         run: tar -cvzf ${{ env.ALATION_OUTPUT }} ./archive
       
