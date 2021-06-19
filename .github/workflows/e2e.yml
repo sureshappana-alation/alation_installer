@@ -70,9 +70,10 @@ jobs:
       
       - name: Print environment variables
         run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
+      
+      - name: Services vars
+        run: echo ${{ env["${{ env.SERVICES[0]}}"]}}
 
-      - name: Print environment variable section
-        run: echo ${{ env }}
       # - name: Download files from S3
       #   run: |
       #     mkdir -p archive
