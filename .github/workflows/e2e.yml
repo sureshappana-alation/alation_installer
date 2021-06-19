@@ -64,12 +64,15 @@ jobs:
             do
               echo $line
             done < "${i}"
-          done
+          done >> $GITHUB_ENV
       - name: Print environment variables
         run: echo $OCF          
       
       - name: Print environment variables
         run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
+
+      - name: Print environment variable section
+        run: echo ${{ env }}
       # - name: Download files from S3
       #   run: |
       #     mkdir -p archive
