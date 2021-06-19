@@ -24,8 +24,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      SERVICES: ("ALATION_ANALYTICS"  "OCF")
     steps:
       # - name: Set up Docker Buildx
       #   uses: docker/setup-buildx-action@v1
@@ -55,7 +53,9 @@ jobs:
       #     done)
       # - name: Print output
       #   run: echo ${{ steps.data.outputs.data}}
-
+      - name: Set services list
+        id: service-list
+        run: echo SERVICES=("ALATION_ANALYTICS" "OCF" ) >> $GITHUB_ENV
 
       - name: Split string
         run: |
@@ -73,7 +73,7 @@ jobs:
       
       - name: Services vars
         run: | 
-          echo $SERVICES[1]
+          echo ${{env.SERVICES[1]}}
       # - name: Services vars1
       #   run: echo ${{ env[$SERVICES[0]] }}
 
