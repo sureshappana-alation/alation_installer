@@ -48,13 +48,12 @@ jobs:
       - name: Run environment versions files
         id: data
         run: |
-          for f in ${{ github.workspace }}/versions/*.sh; do
+          echo ::set-output name=data::$(for f in ${{ github.workspace }}/versions/*.sh; do
             cat "$f"
             echo
-          done > data1
-          echo ::set-output name=data::data1
+          done)
       - name: Print output
-        run: ${{ steps.data.outputs.data}}
+        run: echo ${{ steps.data.outputs.data}}
 
       # - name: Print environment variables
       #   run: echo $OCF          
