@@ -65,10 +65,11 @@ jobs:
             do
               echo $line
               readarray -d : -t strarr <<< "$line"
+              echo ${strarr[1]}
               ARRAY+=(${strarr[1]})
             done < "${i}"
           done >> $GITHUB_ENV
-          echo $ARRAY
+          echo ${ARRAY}
       - name: Print environment variables
         run: echo $OCF          
       
