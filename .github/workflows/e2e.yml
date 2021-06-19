@@ -64,6 +64,7 @@ jobs:
             echo
           done >> $GITHUB_ENV
       - name: Testing
+        id: services
         run: |
           services=()
           for i in ./versions/*.sh; do
@@ -73,7 +74,7 @@ jobs:
             done < "${i}"
           done
           echo "${services[@]}"
-          echo ::set-env name=data::${services[@]}
+          echo ::set-output name=arr::${services[@]}
       - name: Print environment variables
         run: echo $OCF
       
@@ -82,6 +83,9 @@ jobs:
       
       - name: Print all env
         run: printenv
+      
+      - name: Print outputs
+        run: echo ${{ steps.id.outputs.arr }}
         
       
       # - name: Services vars1
