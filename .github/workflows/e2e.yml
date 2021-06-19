@@ -53,18 +53,23 @@ jobs:
       #     done)
       # - name: Print output
       #   run: echo ${{ steps.data.outputs.data}}
-      - name: Set services list
-        id: service-list
-        run: export SERVICES=(alation_analytics ocf) >> $GITHUB_ENV
+      # - name: Set services list
+      #   id: service-list
+      #   run: export SERVICES=(alation_analytics ocf) >> $GITHUB_ENV
 
       - name: Split string
         run: |
+          ARRAY=()
           for i in ./versions/*.sh; do
+            IFS='='
             while read line || [ -n "$line" ];
             do
               echo $line
+              read -a strarr <<< "$line"
+              ARRAY+=(${strarr[1]})
             done < "${i}"
           done >> $GITHUB_ENV
+          echo $ARRAY
       - name: Print environment variables
         run: echo $OCF          
       
