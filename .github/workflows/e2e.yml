@@ -84,7 +84,7 @@ jobs:
         run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
       
       - name: Print all env
-        run: echo ${{ fromJson($ENVIRONMENT).ALATION_ANALYTICS }}
+        run: echo ${{ toJson(env).ALATION_ANALYTICS }}
         env:
           ENVIRONMENT: ${{ toJson(env) }}
           xx: ALATION_ANALYTICS
