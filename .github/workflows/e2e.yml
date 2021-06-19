@@ -73,8 +73,9 @@ jobs:
                 services+=($(echo $line | awk '{split($0,a,"="); printf a[1]}'))
             done < "${i}"
             cat "$i"
+            source "$i"
             echo
-          done  >> $GITHUB_ENV
+          done 
           echo "${services[@]}"
           echo ::set-output name=arr::${services[@]}
       - name: Print environment variables
@@ -90,8 +91,9 @@ jobs:
         run: |
           mkdir -p archive
           for i in ${{ steps.services.outputs.arr }}; do
-            echo $i
-            echo $($i)
+            # echo $i
+            echo $OCF
+            # echo $($i)
           done
         
       
