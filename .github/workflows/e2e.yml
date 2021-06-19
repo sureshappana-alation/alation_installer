@@ -89,7 +89,7 @@ jobs:
           services=${{ steps.services.outputs.arr }}
           mkdir -p archive
           for i in services; do
-            echo env["${i}"]
+            echo ${{ env["${i}"] }}
           done
         
       
