@@ -90,7 +90,7 @@ jobs:
         run: |
           echo services=${{ steps.services.outputs.arr }}
           mkdir -p archive
-          echo $env.OCF
+          echo ${{ env.* }}
         
       
       # - name: Services vars1
