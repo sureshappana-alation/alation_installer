@@ -45,30 +45,31 @@ jobs:
       #       cat "$f"
       #       echo
       #     done >> $GITHUB_ENV
-      - name: Run environment versions files
-        id: data
-        run: |
-          echo ::set-output name=data::$(for f in ${{ github.workspace }}/versions/*.sh; do
-            cat "$f"
-            echo
-          done)
-      - name: Print output
-        run: echo ${{ steps.data.outputs.data}}
 
-      # - name: Print environment variables
-      #   run: echo $OCF          
-      
-      # - name: Print environment variables
-      #   run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
-
-      # - name: Split string
+      # - name: Run environment versions files
+      #   id: data
       #   run: |
-      #     for i in ./versions/*.sh; do
-      #       while read line || [ -n "$line" ];
-      #       do
-      #         echo $line
-      #       done < "${i}"
-      #     done
+      #     echo ::set-output name=data::$(for f in ${{ github.workspace }}/versions/*.sh; do
+      #       cat "$f"
+      #       echo
+      #     done)
+      # - name: Print output
+      #   run: echo ${{ steps.data.outputs.data}}
+
+
+      - name: Split string
+        run: |
+          for i in ./versions/*.sh; do
+            while read line || [ -n "$line" ];
+            do
+              echo $line
+            done < "${i}"
+          done
+      - name: Print environment variables
+        run: echo $OCF          
+      
+      - name: Print environment variables
+        run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
       # - name: Download files from S3
       #   run: |
       #     mkdir -p archive
