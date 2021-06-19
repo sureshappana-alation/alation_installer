@@ -91,6 +91,7 @@ jobs:
           mkdir -p archive
           for i in ${{ steps.services.outputs.arr }}; do
             echo $i
+            echo ${{ env.$i}}
           done
         
       
