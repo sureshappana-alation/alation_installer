@@ -90,7 +90,10 @@ jobs:
         run: |
           echo services=${{ steps.services.outputs.arr }}
           mkdir -p archive
-          echo ${{ env.* }}
+          # echo ${{ (env.) }}
+          for i in $services; do
+            echo $i
+          done
         
       
       # - name: Services vars1
