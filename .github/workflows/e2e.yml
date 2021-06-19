@@ -61,11 +61,10 @@ jobs:
         run: |
           ARRAY=()
           for i in ./versions/*.sh; do
-            IFS='='
             while read line || [ -n "$line" ];
             do
               echo $line
-              read -a strarr <<< "$line"
+              readarray -d : -t strarr <<< "$line"
               ARRAY+=(${strarr[1]})
             done < "${i}"
           done >> $GITHUB_ENV
