@@ -73,7 +73,7 @@ jobs:
       
       - name: Services vars
         run: | 
-          echo $SERVICES[0]
+          echo $SERVICES[1]
       # - name: Services vars1
       #   run: echo ${{ env[$SERVICES[0]] }}
 
