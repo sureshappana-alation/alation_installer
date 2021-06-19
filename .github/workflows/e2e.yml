@@ -57,12 +57,12 @@ jobs:
       #   id: service-list
       #   run: export SERVICES=(alation_analytics ocf) >> $GITHUB_ENV
 
-      - name: Read version files
-        run: |
-          for f in ./versions/*.sh; do
-            cat "$f"
-            echo
-          done >> $GITHUB_ENV
+      # - name: Read version files
+      #   run: |
+      #     for f in ./versions/*.sh; do
+      #       cat "$f"
+      #       echo
+      #     done >> $GITHUB_ENV
       - name: Testing
         id: services
         run: |
@@ -72,7 +72,9 @@ jobs:
             do
                 services+=($(echo $line | awk '{split($0,a,"="); printf a[1]}'))
             done < "${i}"
-          done
+            cat "$i"
+            echo
+          done  >> $GITHUB_ENV
           echo "${services[@]}"
           echo ::set-output name=arr::${services[@]}
       - name: Print environment variables
@@ -88,9 +90,11 @@ jobs:
         run: |
           services=${{ steps.services.outputs.arr }}
           mkdir -p archive
-          for i in services; do
-            echo ${{ env["${i}"] }}
-          done
+          echo ${{ env.OCF }}
+          echo ${{ env["OCF"] }}
+          # for i in services; do
+          #   echo ${{ env["${i}"] }}
+          # done
         
       
       # - name: Services vars1
