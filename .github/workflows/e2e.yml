@@ -91,7 +91,7 @@ jobs:
           services=${{ steps.services.outputs.arr }}
           mkdir -p archive
           echo ${{ env.OCF }}
-          echo ${{ env[OCF] }}
+          # echo ${{ env[OCF] }}
           # for i in services; do
           #   echo ${{ env["${i}"] }}
           # done
