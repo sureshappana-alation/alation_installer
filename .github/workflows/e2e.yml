@@ -73,11 +73,16 @@ jobs:
             done < "${i}"
           done
           echo "${services[@]}"
+          echo ::set-env name=data::${services[@]}
       - name: Print environment variables
-        run: echo $OCF          
+        run: echo $OCF
       
       - name: Print environment variables
         run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
+      
+      - name: Print all env
+        run: printenv
+        
       
       # - name: Services vars1
       #   run: echo ${{ env[$SERVICES[0]] }}
