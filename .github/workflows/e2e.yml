@@ -53,9 +53,6 @@ jobs:
       - name: Print environment variables
         run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
 
-      - name: Print environment variables input
-        run:  ${{ github.event.inputs }}
-        
       - name: Split string
         run: |
           for i in ./versions/*.sh; do
