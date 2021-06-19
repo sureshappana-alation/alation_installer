@@ -48,10 +48,11 @@ jobs:
       - name: Run environment versions files
         id: data
         run: |
-          echo ::set-output name=data:: (for f in ${{ github.workspace }}/versions/*.sh; do
+          for f in ${{ github.workspace }}/versions/*.sh; do
             cat "$f"
             echo
-          done)
+          done > data1
+          echo ::set-output name=data::data1
       - name: Print output
         run: ${{ steps.data.outputs.data}}
 
