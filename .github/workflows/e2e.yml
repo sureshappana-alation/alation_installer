@@ -55,7 +55,7 @@ jobs:
       #   run: echo ${{ steps.data.outputs.data}}
       - name: Set services list
         id: service-list
-        run: echo SERVICES=("ALATION_ANALYTICS" "OCF" ) >> $GITHUB_ENV
+        run: echo SERVICES=(alation_analytics ocf) >> $GITHUB_ENV
 
       - name: Split string
         run: |
