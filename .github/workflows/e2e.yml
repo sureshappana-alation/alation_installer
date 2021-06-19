@@ -85,18 +85,23 @@ jobs:
         run: printenv
       
       - name: Print outputs
-        run: echo ${{ steps.services.outputs.arr }}
+        run: |
+          services=${{ steps.services.outputs.arr }}
+          mkdir -p archive
+          for i in services; do
+            echo env["${i}"]
+          done
         
       
       # - name: Services vars1
       #   run: echo ${{ env[$SERVICES[0]] }}
 
-      - name: Download files from S3
-        run: |
-          mkdir -p archive
-          aws s3 cp ${{ secrets.S3_DEV_BUCKET_URL }}aa-0.1.0.tgz ./archive
-          aws s3 cp ${{ secrets.S3_DEV_BUCKET_URL }}ocf-0.1.0.tgz ./archive
-          ls -al ./archive
+      # - name: Download files from S3
+      #   run: |
+      #     mkdir -p archive
+      #     aws s3 cp ${{ secrets.S3_DEV_BUCKET_URL }}aa-0.1.0.tgz ./archive
+      #     aws s3 cp ${{ secrets.S3_DEV_BUCKET_URL }}ocf-0.1.0.tgz ./archive
+      #     ls -al ./archive
 
       # - name: Build and store docker tarball
       #   id: docker_build
