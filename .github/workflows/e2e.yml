@@ -72,7 +72,7 @@ jobs:
         run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
       
       - name: Services vars
-        run: echo "${{ env[env.SERVICES[0] }}"
+        run: echo "${{ env[env.SERVICES[0]] }}"
 
       # - name: Download files from S3
       #   run: |
