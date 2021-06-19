@@ -27,40 +27,48 @@ jobs:
     env:
       SERVICES: ("ALATION_ANALYTICS"  "OCF") >> $GITHUB_ENV
     steps:
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v1
 
-      - name: Checkout code
-        uses: actions/checkout@v2
+      # - name: Checkout code
+      #   uses: actions/checkout@v2
       
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
-
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: us-east-2
+      # - name: Run environment versions files
+      #   run: |
+      #     for f in ${{ github.workspace }}/versions/*.sh; do
+      #       cat "$f"
+      #       echo
+      #     done >> $GITHUB_ENV
       - name: Run environment versions files
+        id: data
         run: |
-          for f in ${{ github.workspace }}/versions/*.sh; do
+          echo ::set-output name=data:: (for f in ${{ github.workspace }}/versions/*.sh; do
             cat "$f"
             echo
-          done >> $GITHUB_ENV
+          done)
+      - name: Print output
+        run: ${{ steps.data.outputs.data}}
 
-      - name: Print environment variables
-        run: echo $OCF          
+      # - name: Print environment variables
+      #   run: echo $OCF          
       
-      - name: Print environment variables
-        run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
+      # - name: Print environment variables
+      #   run: echo ${{ env.OCF }} ${{ env.ALATION_ANALYTICS }}
 
-      - name: Split string
-        run: |
-          for i in ./versions/*.sh; do
-            while read line || [ -n "$line" ];
-            do
-              echo $line
-            done < "${i}"
-          done
+      # - name: Split string
+      #   run: |
+      #     for i in ./versions/*.sh; do
+      #       while read line || [ -n "$line" ];
+      #       do
+      #         echo $line
+      #       done < "${i}"
+      #     done
       # - name: Download files from S3
       #   run: |
       #     mkdir -p archive
