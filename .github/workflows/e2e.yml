@@ -51,8 +51,8 @@ jobs:
       - name: Check if Kurl Package exists in S3
         run: |
           export not_exists=false
-          aws s3api head-object --bucket ${{ secrets.S3_DEV_BUCKET_NAME }} --key kurl-${{env.KURL}}.tar.gz || not_exists=true
-          if [ $not_exist ]; then
+          exists=$(aws s3api list-objects-v2 --bucket ${{ secrets.S3_DEV_BUCKET_NAME }} --query "contains(Contents[].Key, 'kurl-${{env.KURL}}.tar.gz')
+          if [ $exists ]; then
             echo "Kurl Package with version ${{env.KURL}} does not exists in S3. Downloading it"
             curl https://kurl.sh/${{env.KURL}} | sudo bash
             echo "Uploading Kurl Package with version ${{env.KURL}} to S3"
