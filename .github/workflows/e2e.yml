@@ -123,9 +123,12 @@ jobs:
           mkdir -p ${{ env.BASE_DIR }}
           mkdir -p ${{ env.MODULES_DIR }}
           mkdir -p ${{ env.KURL_PATCH_DIR }}
+      - name: Print all files
+        run: find .
+
       - name: Copy content from source code to archiving directory
         run: |
-          cp -r ${{ github.workspace }}/res $BASE_DIR/
+          cp -r ${{ github.workspace }}/res ${{ env.BASE_DIR }}/
 
       - name: Download files from S3
         run: |
