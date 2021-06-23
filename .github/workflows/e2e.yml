@@ -38,8 +38,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_S3_REGION }}
 
+      - name: Run environment versions files
+        run: |
+          for f in ${{ github.workspace }}/versions/*.sh; do
+            cat "$f"
+            echo
+          done >> $GITHUB_ENV
+
       - name: Check if Kurl Package exists in S3
         run: |
+          echo "Bucket name is: ${{ secrets.S3_DEV_BUCKET_URL }}"         
           aws s3api head-object --bucket ${{ secrets.S3_DEV_BUCKET_URL }} --key kurl-${{env.KURL}}.tar.gz || not_exists=true
           if [ $not_exist ]; then
             echo "Kurl Package with version ${{env.KURL}} does not exists in S3. Downloading it"
@@ -49,13 +57,6 @@ jobs:
           else
             echo "Kurl Package with version ${{env.KURL}} exists in S3."
           fi
-
-      # - name: Run environment versions files
-      #   run: |
-      #     for f in ${{ github.workspace }}/versions/*.sh; do
-      #       cat "$f"
-      #       echo
-      #     done >> $GITHUB_ENV
 
       # - name: Run environment versions files
       #   id: data
