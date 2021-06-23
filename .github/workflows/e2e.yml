@@ -24,6 +24,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      S3_DEV_BUCKET_URL: "s3://${{ secrets.S3_DEV_BUCKET_NAME }}"
+      S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -47,14 +50,13 @@ jobs:
 
       - name: Check if Kurl Package exists in S3
         run: |
-          export bucket_name=${{ secrets.S3_DEV_BUCKET_URL }}
-          echo "Bucket name is: $bucket_name"
-          aws s3api head-object --bucket ${{ secrets.S3_DEV_BUCKET_URL }} --key kurl-${{env.KURL}}.tar.gz || not_exists=true
+          export not_exists=false
+          aws s3api head-object --bucket ${{ secrets.S3_DEV_BUCKET_NAME }} --key kurl-${{env.KURL}}.tar.gz || not_exists=true
           if [ $not_exist ]; then
             echo "Kurl Package with version ${{env.KURL}} does not exists in S3. Downloading it"
             curl https://kurl.sh/${{env.KURL}} | sudo bash
             echo "Uploading Kurl Package with version ${{env.KURL}} to S3"
-            aws s3 cp kurl-${{env.KURL}}.tar.gz ${{ secrets.S3_DEV_BUCKET_URL }}/kurl-${{env.KURL}}.tar.gz
+            aws s3 cp kurl-${{env.KURL}}.tar.gz ${{ env.S3_DEV_BUCKET_URL }}/kurl-${{env.KURL}}.tar.gz
           else
             echo "Kurl Package with version ${{env.KURL}} exists in S3."
           fi
@@ -117,9 +119,9 @@ jobs:
       - name: Download files from S3
         run: |
           mkdir -p archive/services
-          aws s3 cp ${{ secrets.S3_DEV_BUCKET_URL }}/aa-${{env.ALATION_ANALYTICS}}.tgz ${{env.SERVICES_DIR}}
-          aws s3 cp ${{ secrets.S3_DEV_BUCKET_URL }}/ocf-${{env.OCF}}.tgz ${{env.SERVICES_DIR}}
-          aws s3 cp ${{ secrets.S3_DEV_BUCKET_URL }}/kurl-${{env.KURL}}.tar.gz ${{env.INSTALLER_DIR}}
+          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/aa-${{env.ALATION_ANALYTICS}}.tgz ${{env.SERVICES_DIR}}
+          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/ocf-${{env.OCF}}.tgz ${{env.SERVICES_DIR}}
+          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/kurl-${{env.KURL}}.tar.gz ${{env.INSTALLER_DIR}}
           ls -al ${{env.INSTALLER_DIR}}
 
       - name: Build and store docker tarball
@@ -138,7 +140,7 @@ jobs:
         run: tar -cvzf ${{ env.ALATION_OUTPUT }} ./archive
       
       - name: Upload the final artifact to S3
-        run: aws s3 cp ${{ env.ALATION_OUTPUT }} ${{ secrets.S3_RELEASE_BUCKET_URL }}/${{ env.ALATION_OUTPUT }}
+        run: aws s3 cp ${{ env.ALATION_OUTPUT }} ${{ env.S3_RELEASE_BUCKET_URL }}/${{ env.ALATION_OUTPUT }}
 
       # - name: Image digest
       #   run: echo ${{ steps.docker_build.outputs.digest }}
