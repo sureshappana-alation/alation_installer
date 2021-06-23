@@ -54,7 +54,7 @@ jobs:
       - name: Check if Kurl Package exists in S3
         run: |
           exists=$(aws s3api list-objects-v2 --bucket ${{ secrets.S3_DEV_BUCKET_NAME }} --query "contains(Contents[].Key, '{{ env.KURL_FILE_NAME }}')")
-          if [ $exists ]; then
+          if [ not $exists ]; then
             echo "Kurl Package ${{ env.KURL_FILE_NAME }} does not exists in S3. Downloading it"
             curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL_FILE_NAME }}
             echo "Uploading Kurl Package with version ${{ env.KURL_FILE_NAME }} to S3"
@@ -121,7 +121,7 @@ jobs:
       - name: Download files from S3
         run: |
           mkdir -p archive/services
-          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/aa-${{ env.ALATION_ANALYTICS }}.tar.gz ${{env.SERVICES_DIR}}
+          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/alation_analytics-${{ env.ALATION_ANALYTICS }}.tar.gz ${{env.SERVICES_DIR}}
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/ocf-${{ env.OCF }}.tar.gz ${{env.SERVICES_DIR}}
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/kurl-${{ env.KURL }}.tar.gz ${{env.INSTALLER_DIR}}
           ls -al ${{env.INSTALLER_DIR}}
