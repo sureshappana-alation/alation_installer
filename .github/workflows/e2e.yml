@@ -82,20 +82,20 @@ jobs:
       #       cat "$f"
       #       echo
       #     done >> $GITHUB_ENV
-      - name: Testing
-        id: services
-        run: |
-          services=()
-          for i in ./versions/*.sh; do
-            while read line || [ -n "$line" ];
-            do
-                services+=($(echo $line | awk '{split($0,a,"="); printf a[1]}'))
-            done < "${i}"
-            cat "$i"
-            echo
-          done  >> $GITHUB_ENV
-          echo "${services[@]}"
-          echo ::set-output name=arr::${services[@]}
+      # - name: Testing
+      #   id: services
+      #   run: |
+      #     services=()
+      #     for i in ./versions/*.sh; do
+      #       while read line || [ -n "$line" ];
+      #       do
+      #           services+=($(echo $line | awk '{split($0,a,"="); printf a[1]}'))
+      #       done < "${i}"
+      #       cat "$i"
+      #       echo
+      #     done  >> $GITHUB_ENV
+      #     echo "${services[@]}"
+      #     echo ::set-output name=arr::${services[@]}
       
       # - name: Print environment variables
       #   run: echo $OCF
@@ -115,15 +115,15 @@ jobs:
         run: |
           echo INSTALLER_DIR=./archive >> $GITHUB_ENV
           echo SERVICES_DIR=./archive/services >> $GITHUB_ENV
-          echo ALATION_OUTPUT=alation-$GITHUB_RUN_NUMBER.tgz >> $GITHUB_ENV
+          echo ALATION_OUTPUT=alation-$GITHUB_RUN_NUMBER.tar.gz >> $GITHUB_ENV
           mkdir -p ./archive/services
 
       - name: Download files from S3
         run: |
           mkdir -p archive/services
-          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/aa-${{env.ALATION_ANALYTICS}}.tgz ${{env.SERVICES_DIR}}
-          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/ocf-${{env.OCF}}.tgz ${{env.SERVICES_DIR}}
-          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/kurl-${{env.KURL}}.tar.gz ${{env.INSTALLER_DIR}}
+          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/aa-${{ env.ALATION_ANALYTICS }}.tar.gz ${{env.SERVICES_DIR}}
+          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/ocf-${{ env.OCF }}.tar.gz ${{env.SERVICES_DIR}}
+          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/kurl-${{ env.KURL }}.tar.gz ${{env.INSTALLER_DIR}}
           ls -al ${{env.INSTALLER_DIR}}
 
       - name: Build and store docker tarball
@@ -151,7 +151,7 @@ jobs:
       #   run: ls -al ./archive
 
       # - name: Compress files
-      #   run: tar -cvzf alation-0.3.0.tgz ./archive
+      #   run: tar -cvzf alation-0.3.0.tar.gz ./archive
 
 #       - name: Create zip
 #         uses: ihiroky/archive-action@v1
