@@ -1,1 +1,1 @@
-nginx-ingress-controller=0.1.0
+ALATION_ANALYTICS=0.1.0
