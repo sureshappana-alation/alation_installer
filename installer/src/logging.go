@@ -12,21 +12,21 @@ import (
 	. "github.com/sirupsen/logrus"
 )
 
-const log_directory = "./logs"
+const logDirectory = "./logs"
 
-var log_file = fmt.Sprintf("installer%d.log", time.Now().Unix())
+var logFile = fmt.Sprintf("installer%d.log", time.Now().Unix())
 
 var LOGGER *logrus.Logger = newLogger()
 
 func newLogger() *Logger {
 	logger := logrus.New()
 	logger.SetLevel(logrus.DebugLevel)
-	mkerr := os.MkdirAll(log_directory, os.ModePerm)
+	mkerr := os.MkdirAll(logDirectory, os.ModePerm)
 	if mkerr != nil {
 		panic(mkerr)
 	}
 
-	var filePath = fmt.Sprintf("%s/%s", log_directory, log_file)
+	var filePath = fmt.Sprintf("%s/%s", logDirectory, logFile)
 	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0640)
 
 	if err != nil {

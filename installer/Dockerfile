@@ -6,11 +6,12 @@ COPY go.mod go.mod
 COPY go.sum go.sum
 RUN go build -o /out/installer *.go
 
-FROM golang:1.16.4-buster AS compressor
+FROM golang:1.16.4-buster AS compress
 COPY --from=build /out/installer /installer/installer
 COPY ./res /installer/res
+COPY kurl_downloader.sh /installer
+
 RUN tar -czf /installer.tar.gz /installer
 
-
 FROM scratch AS export
-COPY --from=compressor /installer.tar.gz /
+COPY --from=compress /installer.tar.gz /

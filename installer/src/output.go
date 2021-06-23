@@ -8,22 +8,21 @@ import (
 	. "github.com/logrusorgru/aurora"
 )
 
-func print(messages ...interface{}) {
-	fmt.Println(messages...)
+func logAndShowMsg(msg string) {
+	LOGGER.Info(msg)
+	output := fmt.Sprintf(" %s %s", Black("\u2714"), msg)
+	fmt.Println(output)
+}
+func logAndShowSuccess(check string) {
+	tmplMsg := "[ %s %s ] %s"
+	output := fmt.Sprintf(tmplMsg, Green("\u2714"), Green("Success"), check)
+	logOutput := fmt.Sprintf(tmplMsg, "\u2714", "Success", check)
+	LOGGER.Info(logOutput)
+	fmt.Println(output)
 }
 
-func show_result(check string) {
-	tmpl_msg := "[ %s %s ] %s"
-	output := fmt.Sprintf(tmpl_msg, Green("\u2714"), Green("Success"), check)
-	log_output := fmt.Sprintf(tmpl_msg, "\u2714", "Success", check)
-	LOGGER.Info(log_output)
-	print(output)
-}
-
-func show_error(check string, msg string) {
-	tmpl_msg := "[ %s %s  ] %s. Failure Reason => %v"
-	output := fmt.Sprintf(tmpl_msg, Red("\u2716"), Red("Failed"), check, Red(msg))
-	log_output := fmt.Sprintf(tmpl_msg, "\u2716", "Failed", check, msg)
-	LOGGER.Error(log_output)
-	print(output)
+func logAndShowError(failure string, reason string) {
+	output := fmt.Sprintf("[ %s %s ] %s. Failure Reason => %v", Red("\u2716"), Red("Failed"), failure, Red(reason))
+	LOGGER.Error(fmt.Sprintf("%s %s", failure, reason))
+	fmt.Println(output)
 }

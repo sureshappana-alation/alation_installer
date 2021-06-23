@@ -2,12 +2,23 @@ package main
 
 import (
 	"fmt"
-	"os/exec"
+	"os"
 	"strings"
 )
 
 const (
-	KURL_BUILD_HASH = "d2b213e"
+	// spec of the build is available at https://kurl.sh/d2b213e
+	// and https://alationcorp.atlassian.net/wiki/spaces/ENG/pages/5595541243/Alation+kURL+build
+	kurlBuildHash = "d2b213e"
+)
+
+const ( // Bash commands used in this file
+	kubeClusterInfoCmd = "kubectl cluster-info"
+	workingDirCmd      = "pwd"
+	deleteDirCmd       = "if [ -d \"%s\" ]; then rm -Rf %s; fi"
+	makeKurlDirCmd     = "mkdir %s/res/kurl-%s"
+	kurlDecompressCmd  = "tar xvzf %s/res/kurl-%s.tar.gz -C %s/res/kurl-%s"
+	kurlInstallCmd     = "cd %s && cat install.sh | sudo bash -s airgap"
 )
 
 var (
@@ -15,60 +26,67 @@ var (
 	kurlDirectory    string
 )
 
+// This function bootstraps Kubernetes cluster using kURL.sh air gap solution if not already installed/configured.
+// Current implementation support only single node clusters.
+func BootstrapKubernetesCluster() {
+	kubernetesInstalled, _ := RunBashCmd(kubeClusterInfoCmd) // TODO - the check logic could improve
+
+	if !kubernetesInstalled { // TODO - improve this logic to check version
+		decompressKurlPackage()
+
+		logAndShowMsg("Kubernetes installation started. This could take several minutes...")
+		bootstrapKubernetes()
+
+	} else {
+		logAndShowMsg("Kubernetes platform is already installed. Alation Setup will be continued.")
+	}
+
+	// extra config needed to run cluster plugins after kurl installation
+	configClusterPlugins()
+}
+
 func decompressKurlPackage() {
 	// get working directory
-	_, cmdOut := run_command(exec.Command("pwd"))
+	_, cmdOut := RunBashCmd(workingDirCmd)
 	workingDirectory = strings.TrimSpace(cmdOut)
 	LOGGER.Info("Working directory is", workingDirectory)
 
-	kurlDirectory = fmt.Sprintf("%s/res/kurl-%s", workingDirectory, KURL_BUILD_HASH)
+	kurlDirectory = fmt.Sprintf("%s/res/kurl-%s", workingDirectory, kurlBuildHash)
 	LOGGER.Info("Desired path for decompressed kurl package is ", workingDirectory)
 
-	// delete the kurl decompress directory if exist - in case of installer re-run
-	run_command(exec.Command("/bin/sh", "-c", fmt.Sprintf("if [ -d \"%s\" ]; then rm -Rf %s; fi", kurlDirectory, kurlDirectory)))
+	// delete decompress kurl directory if exist - in case of installer re-run
+	RunBashCmd(fmt.Sprintf(deleteDirCmd, kurlDirectory, kurlDirectory))
 
 	// create directory to decompress kURL package into
-	kurlDirectoryCreated, cmdOut := run_command(exec.Command("/bin/sh", "-c", fmt.Sprintf("mkdir %s/res/kurl-%s", workingDirectory, KURL_BUILD_HASH)))
+	kurlDirectoryCreated, cmdOut := RunBashCmd(fmt.Sprintf(makeKurlDirCmd, workingDirectory, kurlBuildHash))
 	if !kurlDirectoryCreated {
-		LOGGER.Error(cmdOut)
-		panic(fmt.Sprintf("Could not create new directory for Kubernetes bootstraper, Error: %s", cmdOut))
+		logAndShowError("Could not create new directory for Kubernetes bootstrapper.", cmdOut)
+		os.Exit(1)
 	}
-	LOGGER.Info(cmdOut)
 
 	// Decompress kURL package
-	decompressed, cmdOut := run_command(exec.Command("/bin/sh", "-c", fmt.Sprintf("tar xvzf %s/res/kurl-%s.tar.gz -C %s/res/kurl-%s", workingDirectory, KURL_BUILD_HASH, workingDirectory, KURL_BUILD_HASH)))
+	decompressed, cmdOut :=
+		RunBashCmd(fmt.Sprintf(kurlDecompressCmd, workingDirectory, kurlBuildHash, workingDirectory, kurlBuildHash))
 	if !decompressed {
-		LOGGER.Error(cmdOut)
-		panic(fmt.Sprintf("Could not decompress Kubernetes bootstraper package, Error: %s", cmdOut))
+		logAndShowError("Could not decompress Kubernetes bootstrapper package.", cmdOut)
+		os.Exit(1)
 	}
-	LOGGER.Info(cmdOut)
-	show_result("Kubernetes Bootstrapper package decompressed.")
+	logAndShowMsg("Kubernetes Bootstrapper package decompressed.")
 }
 
-func installKubernetes() {
-	kurlInstallerSucceed, cmdOut := run_command(exec.Command("/bin/sh", "-c", fmt.Sprintf("cd %s && cat install.sh | sudo bash -s airgap", kurlDirectory)))
+func bootstrapKubernetes() {
+
+	kurlInstallerSucceed, cmdOut := RunBashCmd(fmt.Sprintf(kurlInstallCmd, kurlDirectory))
 
 	if !kurlInstallerSucceed {
-		LOGGER.Error(cmdOut)
-		show_error("Kubernetes platform installation", "failed")
-		panic("Kubernetes platform installation failed")
+		LOGGER.Error("Kurl install out: \n" + cmdOut)
+		logAndShowError("Kubernetes platform installation", "failed")
+		os.Exit(1)
 	}
-	LOGGER.Info(cmdOut)
-	show_result("Kubernetes Cluster installed.")
-}
 
-func setupLocalStorageClass() {
-	_, out := run_command(exec.Command("/bin/sh", "-c", "sudo kubectl apply -f res/manifests/local-storage.yaml"))
-	LOGGER.Info(out)
-}
+	// This environment variable is needed for next commands which work with kubectl
+	os.Setenv("KUBECONFIG", "/etc/kubernetes/admin.conf")
 
-func run_command(cmd *exec.Cmd) (bool, string) {
-	LOGGER.Info(fmt.Sprintf("running cmd: %s", cmd))
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		err_str := fmt.Sprintf("%s%s", out, err)
-		LOGGER.Error(fmt.Sprintf("running cmd: %s", cmd))
-		return false, err_str
-	}
-	return true, fmt.Sprintf("%s", out)
+	LOGGER.Info("Kurl install out: \n" + cmdOut)
+	logAndShowSuccess("Kubernetes Cluster installed.")
 }
