@@ -94,9 +94,8 @@ jobs:
             cat "$i"
             echo
           done  >> $GITHUB_ENV
-          echo "${services[@]}"
           echo SERVICES="${services[@]}" >> $GITHUB_ENV
-          echo ::set-output name=arr::${services[@]}
+          # echo ::set-output name=arr::${services[@]}
       
       # - name: Print environment variables
       #   run: echo $OCF
@@ -130,9 +129,14 @@ jobs:
       - name: Copy content from source code to archiving directory
         run: |
           cp -a ${{ github.workspace }}/installer/res/. ${{ env.BASE_DIR }}/res/
+      
 
       - name: Download files from S3
         run: |
+          for i in "${SERVICES[@]}"
+          do
+            echo "$i version is: $($i)"
+          done
           echo "OCF version is: $OCF"
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/alation_analytics-${{ env.ALATION_ANALYTICS }}.tar.gz ${{env.MODULES_DIR}}/alation_analytics/
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/ocf-${{ env.OCF }}.tar.gz ${{env.MODULES_DIR}}/ocf/
