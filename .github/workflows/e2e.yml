@@ -134,10 +134,10 @@ jobs:
       - name: Download files from S3
         run: |
           for i in ${{ steps.services.outputs.arr }}; do
-            echo "$i version is: $($i)"
+            echo "$i version is: ${$i}"
           done
           for i in $SERVICES; do
-            echo "aaa $i version is: $($i)"
+            echo "aaa $i version is: ${$i}"
           done
           
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/alation_analytics-${{ env.ALATION_ANALYTICS }}.tar.gz ${{env.MODULES_DIR}}/alation_analytics/
