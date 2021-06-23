@@ -36,7 +36,20 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-2
+          aws-region: ${{ secrets.AWS_S3_REGION }}
+
+      - name: Check if Kurl Package exists in S3
+        run: |
+          aws s3api head-object --bucket ${{ secrets.S3_DEV_BUCKET_URL }} --key kurl-${{env.KURL}}.tar.gz || not_exists=true
+          if [ $not_exist ]; then
+            echo "Kurl Package with version ${{env.KURL}} does not exists in S3. Downloading it"
+            curl https://kurl.sh/${{env.KURL}} | sudo bash
+            echo "Uploading Kurl Package with version ${{env.KURL}} to S3"
+            aws s3 cp kurl-${{env.KURL}}.tar.gz ${{ secrets.S3_DEV_BUCKET_URL }}/kurl-${{env.KURL}}.tar.gz
+          else
+            echo "Kurl Package with version ${{env.KURL}} exists in S3."
+          fi
+
       # - name: Run environment versions files
       #   run: |
       #     for f in ${{ github.workspace }}/versions/*.sh; do
@@ -77,6 +90,7 @@ jobs:
           done  >> $GITHUB_ENV
           echo "${services[@]}"
           echo ::set-output name=arr::${services[@]}
+      
       # - name: Print environment variables
       #   run: echo $OCF
       
@@ -121,7 +135,7 @@ jobs:
       - name: Compress files
         run: tar -cvzf ${{ env.ALATION_OUTPUT }} ./archive
       
-      - name: Upload to final artifact to S3
+      - name: Upload the final artifact to S3
         run: aws s3 cp ${{ env.ALATION_OUTPUT }} ${{ secrets.S3_RELEASE_BUCKET_URL }}/${{ env.ALATION_OUTPUT }}
 
       # - name: Image digest
