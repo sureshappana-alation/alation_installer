@@ -114,15 +114,15 @@ jobs:
       - name: Set env variables
         run: |
           echo BASE_DIR=./alation >> $GITHUB_ENV
-          echo RESOURCE_DIR=./alation/res >> $GITHUB_ENV
-          echo MODULES_DIR=./alation/res/modules >> $GITHUB_ENV
-          echo KURL_PATCH_DIR=./alation/res/kurl_patch >> $GITHUB_ENV
+          echo RESOURCE_DIR=$BASE_DIR/res >> $GITHUB_ENV
+          echo MODULES_DIR=$RESOURCE_DIR/modules >> $GITHUB_ENV
+          echo KURL_PATCH_DIR=$RESOURCE_DIR/kurl_patch >> $GITHUB_ENV
           echo ALATION_OUTPUT=alation-$GITHUB_RUN_NUMBER.tar.gz >> $GITHUB_ENV
       - name: Creating required directories
         run: |
           mkdir -p ${{ env.BASE_DIR }}
-          mkdir -p ${{ MODULES_DIR }}
-          mkdir -p ${{ KURL_PATCH_DIR }}
+          mkdir -p ${{ env.MODULES_DIR }}
+          mkdir -p ${{ env.KURL_PATCH_DIR }}
       - name: Copy content from source code to archiving directory
         run: |
           cp -r ${{ github.workspace }}/res $BASE_DIR/
