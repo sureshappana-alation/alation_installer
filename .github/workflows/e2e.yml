@@ -82,20 +82,21 @@ jobs:
       #       cat "$f"
       #       echo
       #     done >> $GITHUB_ENV
-      # - name: Testing
-      #   id: services
-      #   run: |
-      #     services=()
-      #     for i in ./versions/*.sh; do
-      #       while read line || [ -n "$line" ];
-      #       do
-      #           services+=($(echo $line | awk '{split($0,a,"="); printf a[1]}'))
-      #       done < "${i}"
-      #       cat "$i"
-      #       echo
-      #     done  >> $GITHUB_ENV
-      #     echo "${services[@]}"
-      #     echo ::set-output name=arr::${services[@]}
+      - name: Testing
+        id: services
+        run: |
+          services=()
+          for i in ./versions/*.sh; do
+            while read line || [ -n "$line" ];
+            do
+                services+=($(echo $line | awk '{split($0,a,"="); printf a[1]}'))
+            done < "${i}"
+            cat "$i"
+            echo
+          done  >> $GITHUB_ENV
+          echo "${services[@]}"
+          echo SERVICES="$services" >> $GITHUB_ENV
+          echo ::set-output name=arr::${services[@]}
       
       # - name: Print environment variables
       #   run: echo $OCF
@@ -145,7 +146,7 @@ jobs:
           context: ./installer
           push: false
           tags: alation/installer:latest
-          outputs: type=docker,dest=.
+          outputs: type=docker,dest=${{env.RESOURCE_DIR}}
       
       - name: List of files
         run: find ${{ env.BASE_DIR }}
