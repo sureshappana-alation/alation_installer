@@ -133,8 +133,7 @@ jobs:
 
       - name: Download files from S3
         run: |
-          for i in "${SERVICES[@]}"
-          do
+          for i in alation_analytics ocf; do
             echo "$i version is: $($i)"
           done
           echo "OCF version is: $OCF"
