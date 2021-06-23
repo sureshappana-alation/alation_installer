@@ -128,7 +128,7 @@ jobs:
 
       - name: Copy content from source code to archiving directory
         run: |
-          cp -r ${{ github.workspace }}/res ${{ env.BASE_DIR }}/
+          cp -a ${{ github.workspace }}/installer/res/. ${{ env.BASE_DIR }}/res/
 
       - name: Download files from S3
         run: |
