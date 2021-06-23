@@ -48,8 +48,8 @@ jobs:
             echo
           done >> $GITHUB_ENV
       - name: Set environment variables
-        env:
-          KURL_FILE_NAME: kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
+        run: |
+          echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
 
       - name: Check if Kurl Package exists in S3
         run: |
