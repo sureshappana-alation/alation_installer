@@ -95,7 +95,7 @@ jobs:
             cat "$i"
             echo
           done  >> $GITHUB_ENV
-          for key in "${ !serviceVersions[@] }"; do echo "$key => ${serviceVersions[$key]}"; done
+          for key in "${!serviceVersions[@]}"; do echo "$key => ${serviceVersions[$key]}"; done
           # echo SERVICES="${services[@]}" >> $GITHUB_ENV
           echo SERVICE_VERSIONS=${serviceVersions[@]} >> $GITHUB_ENV
           echo ::set-output name=serviceVersions::${serviceVersions[@]}
