@@ -101,14 +101,14 @@ jobs:
       #     echo ::set-output name=serviceVersions::${serviceVersions[@]}
       - name: Identify Versions of the applications or services
         run: |
-          declare -A applicationList
-          declare -A applicationVersions
+          applicationList=()
+          applicationVersions=()
           for i in ./versions/*.sh; do
             while read line || [ -n "$line" ];
             do
                 set -f; IFS="="; application=($line)
-                applicationList+=("${service[0]}")
-                applicationVersions+=("${service[1]}")
+                applicationList+=($service[0])
+                applicationVersions+=($service[1])
             done < "${i}"
             cat "$i"
             echo
