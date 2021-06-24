@@ -124,8 +124,8 @@ jobs:
             echo "NULL"
           fi
           echo ${{ github.event }}
-          echo ${{ github.event.inputs }}
-
+          echo ${{ github.event.inputs['ALATION_ANALYTICS'] }}
+          echo ${{ github.event.inputs["ALATION_ANALYTICS"] }}
 
       # - name: Print environment variables
       #   run: echo $OCF
