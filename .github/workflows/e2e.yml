@@ -133,6 +133,7 @@ jobs:
 
       - name: Download files from S3
         run: |
+          bash --version
           for i in ${{ steps.services.outputs.arr }}; do
             echo "$i version is: $$i"
           done
