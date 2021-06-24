@@ -85,17 +85,18 @@ jobs:
       - name: Testing
         id: services
         run: |
-          services=()
+          declare -A serviceVersions
           for i in ./versions/*.sh; do
             while read line || [ -n "$line" ];
             do
-                services+=($(echo $line | awk '{split($0,a,"="); printf a[1]}'))
+                set -f; IFS="="; service=($line)
+                serviceVersions["${service[0]}"]="${service[1]}"
             done < "${i}"
             cat "$i"
             echo
           done  >> $GITHUB_ENV
-          echo SERVICES="${services[@]}" >> $GITHUB_ENV
-          echo ::set-output name=arr::${services[@]}
+          # echo SERVICES="${services[@]}" >> $GITHUB_ENV
+          echo ::set-output name=serviceVersions::${serviceVersions[@]}
       
       # - name: Print environment variables
       #   run: echo $OCF
@@ -133,22 +134,7 @@ jobs:
 
       - name: Download files from S3
         run: |
-          bash --version
-          for i in ${{ steps.services.outputs.arr }}; do
-            echo "$i version is: $$i"
-          done
-          for i in $SERVICES; do
-            echo "aaa $i version is: $$i"
-          done
-          arr["key1"]=val1
-
-          declare -A assArray1
-          assArray1[fruit]=Mango
-          assArray1[bird]=Cockatail
-          assArray1[flower]=Rose
-          assArray1[animal]=Tiger
-
-          for key in "${!assArray1[@]}"; do echo "$key => ${assArray1[$key]}"; done
+          for key in "${!serviceVersions[@]}"; do echo "$key => ${assArray1[$key]}"; done
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/alation_analytics-${{ env.ALATION_ANALYTICS }}.tar.gz ${{env.MODULES_DIR}}/alation_analytics/
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/ocf-${{ env.OCF }}.tar.gz ${{env.MODULES_DIR}}/ocf/
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/kurl-${{ env.KURL }}.tar.gz ${{env.RESOURCE_DIR}}
