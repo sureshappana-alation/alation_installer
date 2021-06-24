@@ -118,7 +118,7 @@ jobs:
       - name: Find the versions of the services
         run: |
           x="ALATION_ANALYTICS"
-          echo "${!i}"
+          echo "${!x}"
 
       # - name: Print environment variables
       #   run: echo $OCF
