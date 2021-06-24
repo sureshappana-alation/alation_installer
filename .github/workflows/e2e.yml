@@ -122,6 +122,10 @@ jobs:
           for i in ${{ steps.serviceList.outputs.applicationList }}; do
             echo $i
           done
+          echo y="ALATION_ANALYTICS"
+          echo x="github.event.inputs."+$y
+          echo x_in=${{$x}}
+          echo $x_in
       - name: Find the versions of the services
         run: |
           x="ALATION_ANALYTICS"
