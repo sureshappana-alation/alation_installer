@@ -135,9 +135,9 @@ jobs:
 
       - name: Download files from S3
         run: |
-          echo "${{ env.SERVICE_VERSIONS }}"
-          echo "${env.SERVICE_VERSIONS[@]}"
-          echo "$serviceVersions[@]"
+          echo "aa1 is: ${{ env.SERVICE_VERSIONS }}"
+          echo "aa2 is: ${env.SERVICE_VERSIONS['ALATION_ANALYTICS']}"
+          echo "aa3 is: $serviceVersions['ALATION_ANALYTICS']"
           for key in "${ !steps.services.outputs.serviceVersions[@] }"; do echo "$key => ${serviceVersions[$key]}"; done
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/alation_analytics-${{ env.ALATION_ANALYTICS }}.tar.gz ${{env.MODULES_DIR}}/alation_analytics/
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/ocf-${{ env.OCF }}.tar.gz ${{env.MODULES_DIR}}/ocf/
