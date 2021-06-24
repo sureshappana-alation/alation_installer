@@ -101,22 +101,24 @@ jobs:
       #     echo ::set-output name=serviceVersions::${serviceVersions[@]}
       - name: Identify Versions of the applications or services
         run: |
-          applicationList=()
-          applicationVersions=()
+          # applicationList=()
+          # applicationVersions=()
           for i in ./versions/*.sh; do
             while read line || [ -n "$line" ];
             do
                 set -f; IFS="="; application=($line)
-                applicationList+=(${application[0]})
-                applicationVersions+=(${application[1]})
+                # applicationList+=(${application[0]})
+                # applicationVersions+=(${application[1]})
             done < "${i}"
             cat "$i"
             echo
           done  >> $GITHUB_ENV
-          echo APPLICATION_LIST=${applicationList[@]} >> $GITHUB_ENV
-          echo APPLICATION_VERSIONS=${applicationVersions[@]} >> $GITHUB_ENV
-          echo ::set-output name=serviceVersions::${serviceVersions[@]}
-      
+          # echo APPLICATION_LIST=${applicationList[@]} >> $GITHUB_ENV
+          # echo APPLICATION_VERSIONS=${applicationVersions[@]} >> $GITHUB_ENV
+      - name: Find the versions of the services
+        run: |
+          echo ${{ github.event.inputs.logLevel }}
+
       # - name: Print environment variables
       #   run: echo $OCF
       
