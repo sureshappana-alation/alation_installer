@@ -135,8 +135,8 @@ jobs:
 
       - name: Download files from S3
         run: |
-          echo "${{ env.SERVICE_VERSIONS[@] }}"
-          echo "${{ env.SERVICE_VERSIONS[@] }}"
+          echo "${{ env.SERVICE_VERSIONS }}"
+          echo "${env.SERVICE_VERSIONS[@]}"
           echo "$serviceVersions[@]"
           for key in "${{ !steps.services.outputs.serviceVersions[@] }}"; do echo "$key => ${serviceVersions[$key]}"; done
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/alation_analytics-${{ env.ALATION_ANALYTICS }}.tar.gz ${{env.MODULES_DIR}}/alation_analytics/
