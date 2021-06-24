@@ -82,22 +82,39 @@ jobs:
       #       cat "$f"
       #       echo
       #     done >> $GITHUB_ENV
-      - name: Testing
-        id: services
+      # - name: Testing
+      #   id: services
+      #   run: |
+      #     declare -A serviceVersions
+      #     for i in ./versions/*.sh; do
+      #       while read line || [ -n "$line" ];
+      #       do
+      #           set -f; IFS="="; service=($line)
+      #           serviceVersions["${service[0]}"]="${service[1]}"
+      #       done < "${i}"
+      #       cat "$i"
+      #       echo
+      #     done  >> $GITHUB_ENV
+      #     for key in "${!serviceVersions[@]}"; do echo "$key => ${serviceVersions[$key]}"; done
+      #     # echo SERVICES="${services[@]}" >> $GITHUB_ENV
+      #     echo SERVICE_VERSIONS=${serviceVersions[@]} >> $GITHUB_ENV
+      #     echo ::set-output name=serviceVersions::${serviceVersions[@]}
+      - name: Identify Versions of the applications or services
         run: |
-          declare -A serviceVersions
+          declare -A applicationList
+          declare -A applicationVersions
           for i in ./versions/*.sh; do
             while read line || [ -n "$line" ];
             do
-                set -f; IFS="="; service=($line)
-                serviceVersions["${service[0]}"]="${service[1]}"
+                set -f; IFS="="; application=($line)
+                applicationList+=("${service[0]}")
+                applicationVersions+=("${service[1]}")
             done < "${i}"
             cat "$i"
             echo
           done  >> $GITHUB_ENV
-          for key in "${!serviceVersions[@]}"; do echo "$key => ${serviceVersions[$key]}"; done
-          # echo SERVICES="${services[@]}" >> $GITHUB_ENV
-          echo SERVICE_VERSIONS=${serviceVersions[@]} >> $GITHUB_ENV
+          echo APPLICATION_LIST=${applicationList[@]} >> $GITHUB_ENV
+          echo APPLICATION_VERSIONS=${applicationVersions[@]} >> $GITHUB_ENV
           echo ::set-output name=serviceVersions::${serviceVersions[@]}
       
       # - name: Print environment variables
@@ -136,10 +153,8 @@ jobs:
 
       - name: Download files from S3
         run: |
-          echo "aa1 is: ${{ env.SERVICE_VERSIONS }}"
-          echo "aa2 is: ${env.SERVICE_VERSIONS['ALATION_ANALYTICS']}"
-          echo "aa3 is: $serviceVersions['ALATION_ANALYTICS']"
-          for key in "${ !steps.services.outputs.serviceVersions[@] }"; do echo "$key => ${serviceVersions[$key]}"; done
+          echo "aa1 is: ${{ env.APPLICATION_LIST }}"
+          echo "aa2 is: ${{ env.APPLICATION_VERSIONS }}"
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/alation_analytics-${{ env.ALATION_ANALYTICS }}.tar.gz ${{env.MODULES_DIR}}/alation_analytics/
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/ocf-${{ env.OCF }}.tar.gz ${{env.MODULES_DIR}}/ocf/
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/kurl-${{ env.KURL }}.tar.gz ${{env.RESOURCE_DIR}}
