@@ -119,6 +119,7 @@ jobs:
         run: |
           if test ! -z ${{ github.event.inputs.logLevel }}
           then
+            echo "NOT NULL"
           else
             echo "NULL"
           fi
