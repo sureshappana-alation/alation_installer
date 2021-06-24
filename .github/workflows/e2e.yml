@@ -117,7 +117,12 @@ jobs:
           # echo APPLICATION_VERSIONS=${applicationVersions[@]} >> $GITHUB_ENV
       - name: Find the versions of the services
         run: |
-          if[ -z ${{ github.event.inputs.logLevel }} ]; then echo "NULL"; else echo "Not NULL"; fi
+          if[ -z ${{ github.event.inputs.logLevel }} ];
+          then
+            echo "NULL"
+          else
+            echo "Not NULL"
+          fi
 
 
       # - name: Print environment variables
