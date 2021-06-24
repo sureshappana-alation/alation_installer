@@ -117,7 +117,7 @@ jobs:
           echo APPLICATION_VERSIONS=${applicationVersions[@]} >> $GITHUB_ENV
       - name: Find the versions of the services
         run: |
-          for i in "${APPLICATION_LIST[@]}"
+          for i in "${(APPLICATION_LIST[@])}"
           do
             echo "${!i}"
           done
