@@ -126,8 +126,6 @@ jobs:
           echo x="github.event.inputs."$y
           echo x_in=${{env.x}}
           echo $x_in
-          echo y_in=${{!x}}
-          echo $y_in
       - name: Find the versions of the services
         run: |
           x="ALATION_ANALYTICS"
