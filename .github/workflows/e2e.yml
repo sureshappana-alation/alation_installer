@@ -138,7 +138,7 @@ jobs:
           echo "${{ env.SERVICE_VERSIONS }}"
           echo "${env.SERVICE_VERSIONS[@]}"
           echo "$serviceVersions[@]"
-          for key in "${{ !steps.services.outputs.serviceVersions[@] }}"; do echo "$key => ${serviceVersions[$key]}"; done
+          for key in "${ !steps.services.outputs.serviceVersions[@] }"; do echo "$key => ${serviceVersions[$key]}"; done
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/alation_analytics-${{ env.ALATION_ANALYTICS }}.tar.gz ${{env.MODULES_DIR}}/alation_analytics/
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/ocf-${{ env.OCF }}.tar.gz ${{env.MODULES_DIR}}/ocf/
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/kurl-${{ env.KURL }}.tar.gz ${{env.RESOURCE_DIR}}
