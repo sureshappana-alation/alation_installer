@@ -100,6 +100,7 @@ jobs:
       #     echo SERVICE_VERSIONS=${serviceVersions[@]} >> $GITHUB_ENV
       #     echo ::set-output name=serviceVersions::${serviceVersions[@]}
       - name: Identify Versions of the applications or services
+        id: serviceList
         run: |
           applicationList=()
           applicationVersions=()
@@ -115,9 +116,10 @@ jobs:
           done  >> $GITHUB_ENV
           echo APPLICATION_LIST=${applicationList[@]} >> $GITHUB_ENV
           echo APPLICATION_VERSIONS=${applicationVersions[@]} >> $GITHUB_ENV
+          echo ::set-output name=applicationList::${applicationList[@]}
       - name: Apply overrides
         run: |
-          for i in ${{ env.applicationList }}; do
+          for i in ${{ steps.serviceList.outputs.applicationList }}; do
             echo $i
           done
       - name: Find the versions of the services
