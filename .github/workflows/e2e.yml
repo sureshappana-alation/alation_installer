@@ -119,18 +119,6 @@ jobs:
         run: |
           x="ALATION_ANALYTICS"
           echo "${!i}"
-          # for i in "${{ APPLICATION_LIST[@] }}"
-          # do
-          #   echo "${!i}"
-          # done
-          # if test ! -z ${{ github.event.inputs.logLevel }}
-          # then
-          #   echo "NOT NULL"
-          # else
-          #   echo "NULL"
-          # fi
-          # echo ${{ github.event }}
-          # echo ${{ github.event.inputs['ALATION_ANALYTICS'] }}
 
       # - name: Print environment variables
       #   run: echo $OCF
