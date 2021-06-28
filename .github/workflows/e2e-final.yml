@@ -83,8 +83,8 @@ jobs:
           for i in ./versions/*.sh; do
             while read line || [ -n "$line" ];
             do
-                if [[ "${applicationName,,}" != *"kurl"* ]];then
-                  set -f; IFS="="; application=($line)
+                set -f; IFS="="; application=($line)
+                if [[ "${application[0],,}" != *"kurl"* ]];then
                   applicationList+=(${application[0]})
                 fi
             done < "${i}"
@@ -120,6 +120,7 @@ jobs:
             cd ${{ env.RESOURCE_DIR }}
             curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL }} -o ${{env.KURL_FILE_NAME}}
             echo "Uploading Kurl Package ${{ env.KURL_FILE_NAME }} to S3"
+            find .
             aws s3 cp ${{env.KURL_FILE_NAME}} ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}}
           fi
 
