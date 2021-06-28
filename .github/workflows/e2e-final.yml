@@ -43,6 +43,19 @@ jobs:
           push: false
           tags: alation/installer:latest
           outputs: type=docker,dest=installer.tar.gz
+      
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+      - name: List of files
+        run: find ${{ env.BASE_DIR }}
+
+      - name: Temporarily save Docker image
+        uses: actions/upload-artifact@v2
+        with:
+          name: docker-artifact
+          path: ${{ env.BASE_DIR }}
+          retention-days: 1
 
   download:
     runs-on: ubuntu-latest
@@ -84,22 +97,6 @@ jobs:
           mkdir -p ${{ env.KURL_PATCH_DIR }}
 
 
-      # - name: Verify Kurl Package ${{ env.KURL_FILE_NAME }} exists in the S3 bucket
-      #   run: |
-      #     exists=$(aws s3api list-objects-v2 --bucket ${{ secrets.S3_DEV_BUCKET_NAME }} --query "contains(Contents[].Key, '{{ env.KURL_FILE_NAME }}')")
-      #     if [ not $exists ]; then
-      #       echo "Kurl Package ${{ env.KURL_FILE_NAME }} does not exists in S3. Downloading it"
-      #       curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL_FILE_NAME }}
-      #       echo "Uploading Kurl Package with ${{ env.KURL_FILE_NAME }} to S3"
-      #       aws s3 cp ${{env.KURL_FILE_NAME}} ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}}
-      #       if [ $? -eq 0 ]; then
-      #         echo "Successfully uploaded Kurl package ${{ env.KURL_FILE_NAME }} to S3"
-      #       else
-      #         echo FAIL
-      #       fi
-      #     else
-      #       echo "Kurl Package ${{ env.KURL_FILE_NAME }} exists in S3. Skipping downloading"
-      #     fi
       - name: Download files from S3
         run: |
           for i in ${{ steps.read_env.outputs.applicationList }}; do
@@ -118,3 +115,32 @@ jobs:
             echo "$applicationName and version $applicationTag"            
             aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application ${{env.MODULES_DIR}}/$applicationName/
           done
+
+      - name: Print list files
+        run: find .
+      
+      - name: Temporarily save downloaded files
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifacts
+          path: ${{ env.BASE_DIR }}
+          retention-days: 1
+
+  package:
+    needs: [build, download]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Retrieve saved Docker image
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-artifact
+          path: ${{ env.BASE_DIR }}
+      
+      - name: Retrieve saved downloads
+        uses: actions/download-artifact@v2
+        with:
+          name: artifacts
+          path: ${{ env.BASE_DIR }}
+
+      - name: Print list files
+        run: find .
