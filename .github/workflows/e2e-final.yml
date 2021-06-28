@@ -111,7 +111,7 @@ jobs:
       - name: Check if Kurl Package exists in S3
         run: |
           echo "Trying to download Kurl ${{env.KURL_FILE_NAME}} from S3"
-          exists=$(aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }})
+          exists=$(aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }} 2>&1)
           if [[ $exists == *"404"* ]]; then
             echo "Kurl Package ${{ env.KURL_FILE_NAME }} does not exists in S3. Downloading it"
             cd ${{ env.RESOURCE_DIR }}
