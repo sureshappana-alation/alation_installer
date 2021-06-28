@@ -24,6 +24,7 @@ env:
   MODULES_DIR: ./alation/res/modules
   KURL_PATCH_DIR: ./alation/res/kurl_patch
   ALATION_BUILD_OUTPUT: alation-$GITHUB_RUN_NUMBER.tar.gz
+  ALATION_OUTPUT: alation-$GITHUB_RUN_NUMBER.tar.gz
 
 jobs:
   build:
