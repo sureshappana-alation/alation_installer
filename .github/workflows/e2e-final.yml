@@ -1,4 +1,4 @@
-name: unified-installer
+name: unified-installer-final
 
 on:
   push:
