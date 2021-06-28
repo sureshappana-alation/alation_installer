@@ -114,23 +114,22 @@ jobs:
           done
       - name: Generate install-config.yaml file
         run: |
-          touch ${{ env.BASE_DIR }}/install-config.yaml
-          cd ${{ env.MODULES_DIR }}
-          for dir in */; do
+          installConfigFile=${{ env.BASE_DIR }}/install-config.yaml
+          touch $installConfigFile
+          for dir in $(ls -d  $MODULES_DIR/*/ ); do
             directory=${dir%*/}
             files=$(ls $directory/*.tar.gz)
             if [ "${#files}" -gt 1 ]; then
-                echo "Found ${files[0]}"
                 moduleFile=${files[0]}
-                echo "Extracting module $moduleFile"
+                echo "Found $moduleFile. Extracting..."
                 tar -xzf $moduleFile -C $directory  --strip-components=2
                 if test -f "$directory/install.yaml"; then
-                  echo "$directory/install.yaml" exists
-                  echo "Appending $directory/install.yaml content to install-config.yaml file"
-                  echo "$directory:" >> ${{ env.BASE_DIR }}/install-config.yaml
-                  sed -e 's/^/  /' $directory/install.yaml >> ${{ env.BASE_DIR }}/install-config.yaml
+                  echo "Found $directory/install.yaml"
+                  echo "Appending $directory/install.yaml content to $installConfigFile file"
+                  echo "$directory:" >> $installConfigFile
+                  sed -e 's/^/  /' $directory/install.yaml >> $installConfigFile
                 else
-                  echo "$directory/install.yaml" doesn\'t exists
+                  echo "$directory/install.yaml" doesn\'t exists. Ignoring...
                 fi
             else
               echo "No tar files found in $directory"
