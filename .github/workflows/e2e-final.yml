@@ -54,7 +54,7 @@ jobs:
             cat "$i"
             echo
           done  >> $GITHUB_ENV
-          echo APPLICATION_LIST=${applicationList[@]} >> $GITHUB_ENV
+          # echo APPLICATION_LIST=${applicationList[@]} >> $GITHUB_ENV
           echo ::set-output name=applicationList::${applicationList[@]}
 
       - name: Set environment variables
@@ -85,6 +85,6 @@ jobs:
       #     fi
       - name: Download files from S3
         run: |
-          for i in (${{ env.APPLICATION_LIST }}); do
+          for i in ${{ steps.serviceList.outputs.applicationList }}; do
             echo $i
           done
