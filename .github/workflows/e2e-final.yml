@@ -120,10 +120,10 @@ jobs:
         run: |
           installConfigFile=${{ env.BASE_DIR }}/install-config.yaml
           touch $installConfigFile
-          for dir in $(ls -d  $MODULES_DIR/*/ ); do
+          for dir in $(find $MODULES_DIR -mindepth 1 -maxdepth 1 -type d); do
             directory=${dir%*/}
             echo "Processing $directory"
-            files=$(ls $directory/*.tar.gz)
+            files=$(find $directory -mindepth 1 -maxdepth 1 -iname "*.tar.gz")
             if [ "${#files}" -gt 1 ]; then
                 moduleFile=${files[0]}
                 echo "Found $moduleFile. Extracting..."
