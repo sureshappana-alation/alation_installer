@@ -67,22 +67,22 @@ jobs:
           mkdir -p ${{ env.KURL_PATCH_DIR }}
 
 
-      - name: Verify Kurl Package ${{ env.KURL_FILE_NAME }} exists in the S3 bucket
-        run: |
-          exists=$(aws s3api list-objects-v2 --bucket ${{ secrets.S3_DEV_BUCKET_NAME }} --query "contains(Contents[].Key, '{{ env.KURL_FILE_NAME }}')")
-          if [ not $exists ]; then
-            echo "Kurl Package ${{ env.KURL_FILE_NAME }} does not exists in S3. Downloading it"
-            curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL_FILE_NAME }}
-            echo "Uploading Kurl Package with ${{ env.KURL_FILE_NAME }} to S3"
-            aws s3 cp ${{env.KURL_FILE_NAME}} ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}}
-            if [ $? -eq 0 ]; then
-              echo "Successfully uploaded Kurl package ${{ env.KURL_FILE_NAME }} to S3"
-            else
-              echo FAIL
-            fi
-          else
-            echo "Kurl Package ${{ env.KURL_FILE_NAME }} exists in S3. Skipping downloading"
-          fi
+      # - name: Verify Kurl Package ${{ env.KURL_FILE_NAME }} exists in the S3 bucket
+      #   run: |
+      #     exists=$(aws s3api list-objects-v2 --bucket ${{ secrets.S3_DEV_BUCKET_NAME }} --query "contains(Contents[].Key, '{{ env.KURL_FILE_NAME }}')")
+      #     if [ not $exists ]; then
+      #       echo "Kurl Package ${{ env.KURL_FILE_NAME }} does not exists in S3. Downloading it"
+      #       curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL_FILE_NAME }}
+      #       echo "Uploading Kurl Package with ${{ env.KURL_FILE_NAME }} to S3"
+      #       aws s3 cp ${{env.KURL_FILE_NAME}} ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}}
+      #       if [ $? -eq 0 ]; then
+      #         echo "Successfully uploaded Kurl package ${{ env.KURL_FILE_NAME }} to S3"
+      #       else
+      #         echo FAIL
+      #       fi
+      #     else
+      #       echo "Kurl Package ${{ env.KURL_FILE_NAME }} exists in S3. Skipping downloading"
+      #     fi
       - name: Download files from S3
         run: |
           for i in (${{ env.APPLICATION_LIST }}); do
