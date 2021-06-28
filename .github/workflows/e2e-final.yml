@@ -109,9 +109,9 @@ jobs:
           for i in ${{ steps.read_env.outputs.applicationList }}; do
             applicationName="${i,,}"
             application="${applicationName}-${!i}.tar.gz"
-            echo "Downloading $application"
+            echo "Downloading $application from S3"
             outputDir="${{env.MODULES_DIR}}/$applicationName/"
-            if [[ "$file" == *"kurl"* ]];then
+            if [[ "$applicationName" == *"kurl"* ]];then
               outputDir="${{env.RESOURCE_DIR}}/"
             fi
             aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application $outputDir
@@ -136,6 +136,8 @@ jobs:
                 else
                   echo "$directory/install.yaml" doesn\'t exists. Ignoring...
                 fi
+                echo "Deleting $moduleFile"
+                rm -f $moduleFile
             else
               echo "No tar files found in $directory"
             fi
