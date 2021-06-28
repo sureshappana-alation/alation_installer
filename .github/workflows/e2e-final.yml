@@ -116,8 +116,7 @@ jobs:
             echo "Kurl package ${{env.KURL_FILE_NAME}} exists in S3. Downloading..."
             aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }}            
           else
-            echo "Kurl package ${{ env.KURL_FILE_NAME }} does not exists in S3. Fetching it from Kurl repo..."
-            cd ${{ env.RESOURCE_DIR }}
+            echo "Kurl package ${{ env.KURL_FILE_NAME }} does not exists in S3. Fetching it from Kurl.sh repo..."
             curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL }}
             find .
             ls -al
