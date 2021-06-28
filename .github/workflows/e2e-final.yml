@@ -119,9 +119,9 @@ jobs:
             echo "Kurl package ${{ env.KURL_FILE_NAME }} does not exists in S3. Fetching it from Kurl repo..."
             cd ${{ env.RESOURCE_DIR }}
             curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL }}
-            mv ${{ env.KURL }} ${{ env.BASE_DIR}}/${{env.KURL_FILE_NAME}}
             find .
-            ls -al            
+            ls -al
+            mv ${{ env.KURL }} ${{ env.BASE_DIR}}/${{env.KURL_FILE_NAME}}
             echo "Uploading Kurl Package ${{ env.BASE_DIR}}/${{ env.KURL_FILE_NAME }} to S3"
             aws s3 cp ${{env.KURL_FILE_NAME}} ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}}
           fi
@@ -164,7 +164,7 @@ jobs:
       - name: print list of files
         run: find .
       
-      - name: Upload ${{ env.BASE_DIR }}/ for package job
+      - name: Upload artifacts for package job
         uses: actions/upload-artifact@v2
         with:
           name: artifacts
