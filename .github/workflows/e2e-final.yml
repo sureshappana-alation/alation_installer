@@ -114,8 +114,8 @@ jobs:
           done
       - name: Generate install-config.yaml file
         run: |
-          touch $BASE_DIR/install-config.yaml
-          cd $BASE_DIR
+          touch ${{ env.BASE_DIR }}/install-config.yaml
+          cd ${{ env.MODULES_DIR }}
           for dir in */; do
             directory=${dir%*/}
             files=$(ls $directory/*.tar.gz)
