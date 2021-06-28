@@ -132,7 +132,7 @@ jobs:
                 if test -f "$directory/install.yaml"; then
                   echo "Found $directory/install.yaml"
                   echo "Appending $directory/install.yaml content to $installConfigFile file"
-                  echo "$directory:" >> $installConfigFile
+                  echo "${directory##*/}:" >> $installConfigFile
                   sed -e 's/^/  /' $directory/install.yaml >> $installConfigFile
                 else
                   echo "$directory/install.yaml" doesn\'t exists. Ignoring...
