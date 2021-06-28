@@ -111,8 +111,8 @@ jobs:
       - name: Check if Kurl Package exists in S3
         run: |
           echo "Checking if kurl package ${{env.KURL_FILE_NAME}} exists in S3"
-          error=$(aws s3api head-object --bucket ${{ env.S3_DEV_BUCKET_URL }} --key ${{ env.KURL_FILE_NAME }} 2>&1)
-          if [[ $error == *"404"* ]]; then
+          exists=$(aws s3api list-objects-v2 --bucket ${{ env.S3_DEV_BUCKET_URL }} --query "contains(Contents[].Key, '{{ env.KURL_FILE_NAME }}')" || false)
+          if $exists; then
             echo "Kurl package ${{ env.KURL_FILE_NAME }} does not exists in S3. Fetching it from Kurl repo..."
             cd ${{ env.RESOURCE_DIR }}
             curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL_FILE_NAME }}
