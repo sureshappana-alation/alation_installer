@@ -83,8 +83,10 @@ jobs:
           for i in ./versions/*.sh; do
             while read line || [ -n "$line" ];
             do
-                set -f; IFS="="; application=($line)
-                applicationList+=(${application[0]})
+                if [[ "$applicationName" != *"kurl"* ]];then
+                  set -f; IFS="="; application=($line)
+                  applicationList+=(${application[0]})
+                fi
             done < "${i}"
             cat "$i"
             echo
@@ -92,9 +94,6 @@ jobs:
           # echo APPLICATION_LIST=${applicationList[@]} >> $GITHUB_ENV
           echo ::set-output name=applicationList::${applicationList[@]}
 
-      - name: Set environment variables
-        run: |
-          echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
       - name: Creating required directories
         run: |
           mkdir -p ${{ env.BASE_DIR }}
@@ -105,17 +104,28 @@ jobs:
         run: |
           cp -a ${{ github.workspace }}/installer/res/. ${{ env.BASE_DIR }}/res/
 
+      - name: Check if Kurl Package exists in S3
+        run: |
+          KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz
+          exists=$(aws s3api list-objects-v2 --bucket ${{ secrets.S3_DEV_BUCKET_NAME }} --query "contains(Contents[].Key, '{{ env.KURL_FILE_NAME }}')")
+          if [ not $exists ]; then
+            echo "Kurl Package ${{ env.KURL_FILE_NAME }} does not exists in S3. Downloading it"
+            cd ${{ env.RESOURCE_DIR }}
+            curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL_FILE_NAME }}
+            echo "Uploading Kurl Package ${{ env.KURL_FILE_NAME }} to S3"
+            aws s3 cp ${{env.KURL_FILE_NAME}} ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}}
+          else
+            echo "Kurl Package ${{env.KURL_FILE_NAME}} exists in S3. Downloading"
+            aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }} 
+          fi
+
       - name: Download files from S3
         run: |
           for i in ${{ steps.read_env.outputs.applicationList }}; do
             applicationName="${i,,}"
             application="${applicationName}-${!i}.tar.gz"
             echo "Downloading $application from S3"
-            outputDir="${{env.MODULES_DIR}}/$applicationName/"
-            if [[ "$applicationName" == *"kurl"* ]];then
-              outputDir="${{env.RESOURCE_DIR}}/"
-            fi
-            aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application $outputDir
+            aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application ${{env.MODULES_DIR}}/$applicationName/
           done
       - name: Generate install-config.yaml file
         run: |
