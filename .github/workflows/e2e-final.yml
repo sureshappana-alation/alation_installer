@@ -120,11 +120,11 @@ jobs:
             curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL }}
             find .
             ls -al
-            mv ${{ env.KURL }} ${{ env.BASE_DIR}}/${{env.KURL_FILE_NAME}}
+            mv ${{ env.KURL }} ${{ env.BASE_DIR }}/${{env.KURL_FILE_NAME}}
             find .
             ls -al
             echo "Uploading Kurl Package ${{ env.BASE_DIR}}/${{ env.KURL_FILE_NAME }} to S3"
-            aws s3 cp ${{env.KURL_FILE_NAME}} ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}}
+            aws s3 cp ${{ env.BASE_DIR }}/${{ env.KURL_FILE_NAME }} ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }}
           fi
 
       - name: Download files from S3
