@@ -179,8 +179,8 @@ jobs:
       - name: print list of files
         run: find .
 
-      - name: Compress files
-        run: tar -cvzf -cvzf ${{ env.ALATION_OUTPUT }} ./alation
+      - name: Compress final bundle
+        run: tar -cvzf ${{ env.ALATION_OUTPUT }} ./alation
 
       - name: Upload to final artifact to S3
         run: |
