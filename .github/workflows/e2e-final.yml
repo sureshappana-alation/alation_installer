@@ -83,7 +83,7 @@ jobs:
           for i in ./versions/*.sh; do
             while read line || [ -n "$line" ];
             do
-                if [[ "$applicationName" != *"kurl"* ]];then
+                if [[ "${applicationName,,}" != *"kurl"* ]];then
                   set -f; IFS="="; application=($line)
                   applicationList+=(${application[0]})
                 fi
@@ -103,10 +103,13 @@ jobs:
       - name: Copy res content from source code to archiving directory
         run: |
           cp -a ${{ github.workspace }}/installer/res/. ${{ env.BASE_DIR }}/res/
+      
+      - name: Set environment variables
+        run: |
+          echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
 
       - name: Check if Kurl Package exists in S3
         run: |
-          KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz
           exists=$(aws s3api list-objects-v2 --bucket ${{ secrets.S3_DEV_BUCKET_NAME }} --query "contains(Contents[].Key, '{{ env.KURL_FILE_NAME }}')")
           if [ not $exists ]; then
             echo "Kurl Package ${{ env.KURL_FILE_NAME }} does not exists in S3. Downloading it"
@@ -115,7 +118,7 @@ jobs:
             echo "Uploading Kurl Package ${{ env.KURL_FILE_NAME }} to S3"
             aws s3 cp ${{env.KURL_FILE_NAME}} ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}}
           else
-            echo "Kurl Package ${{env.KURL_FILE_NAME}} exists in S3. Downloading"
+            echo "Kurl Package ${{env.KURL_FILE_NAME}} exists in S3. Skipping downloading"
             aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }} 
           fi
 
