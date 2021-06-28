@@ -23,7 +23,7 @@ env:
   RESOURCE_DIR: ./alation/res
   MODULES_DIR: ./alation/res/modules
   KURL_PATCH_DIR: ./alation/res/kurl_patch
-  ALATION_OUTPUT: alation-$GITHUB_RUN_NUMBER.tar.gz
+  ALATION_BUILD_OUTPUT: alation-$GITHUB_RUN_NUMBER.tar.gz
 
 jobs:
   build:
@@ -35,7 +35,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Create directories
+      - name: Create output directory
         run: |
           mkdir -p ${{ env.BASE_DIR }}
       
@@ -54,7 +54,7 @@ jobs:
       - name: List of files
         run: find ${{ env.BASE_DIR }}
 
-      - name: Temporarily save Docker image
+      - name: Upload installer binary for package job
         uses: actions/upload-artifact@v2
         with:
           name: docker-artifact
@@ -100,13 +100,6 @@ jobs:
           mkdir -p ${{ env.MODULES_DIR }}
           mkdir -p ${{ env.KURL_PATCH_DIR }}
 
-
-      - name: Download files from S3
-        run: |
-          for i in ${{ steps.read_env.outputs.applicationList }}; do
-            echo $i
-          done
-
       - name: Copy res content from source code to archiving directory
         run: |
           cp -a ${{ github.workspace }}/installer/res/. ${{ env.BASE_DIR }}/res/
@@ -120,10 +113,10 @@ jobs:
             aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application ${{env.MODULES_DIR}}/$applicationName/
           done
 
-      - name: Print list files
+      - name: print list of files
         run: find .
       
-      - name: Temporarily save downloaded files
+      - name: Upload ${{ env.BASE_DIR }}/ for package job
         uses: actions/upload-artifact@v2
         with:
           name: artifacts
@@ -134,17 +127,24 @@ jobs:
     needs: [build, download]
     runs-on: ubuntu-latest
     steps:
-      - name: Retrieve saved Docker image
+      - name: Download installer from build job
         uses: actions/download-artifact@v2
         with:
           name: docker-artifact
           path: ${{ env.BASE_DIR }}
       
-      - name: Retrieve saved downloads
+      - name: Download application resources from download job
         uses: actions/download-artifact@v2
         with:
           name: artifacts
           path: ${{ env.BASE_DIR }}
 
-      - name: Print list files
+      - name: print list of files
         run: find .
+
+      - name: Compress files
+        run: tar -cvzf -cvzf ${{ env.ALATION_OUTPUT }} .
+
+      - name: Upload to final artifact to S3
+        run: |
+          aws s3 cp ${{ env.ALATION_OUTPUT }} ${{ env.S3_RELEASE_BUCKET_URL }}/${{ env.ALATION_OUTPUT }}
