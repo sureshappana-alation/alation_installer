@@ -1,8 +1,8 @@
-name: unified-installer-final
+name: unified-installer-final-single-job
 
 on:
-  # push:
-  #   branches: [main]
+  push:
+    branches: [main]
 
   workflow_dispatch:
     inputs:
@@ -65,6 +65,7 @@ jobs:
 
   app-setup:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -75,7 +76,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_S3_REGION }}
-
+      
+      - name: Download installer from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: docker-artifact
+          path: ${{ env.BASE_DIR }}
+      
       - name: Read environment versions files
         id: read_env
         run: |
@@ -131,6 +138,7 @@ jobs:
             echo "Downloading $application from S3"
             aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application ${{env.MODULES_DIR}}/$applicationName/
           done
+
       - name: Generate install-config.yaml file
         run: |
           installConfigFile=${{ env.BASE_DIR }}/install-config.yaml
@@ -159,40 +167,7 @@ jobs:
           done
 
       - name: print list of files
-        run: find .
-      
-      - name: Upload artifacts for package job
-        uses: actions/upload-artifact@v2
-        with:
-          name: artifacts
-          path: ${{ env.BASE_DIR }}
-          retention-days: 1
-
-  package:
-    needs: [build, app-setup]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_S3_REGION }}
-
-      - name: Download installer from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: docker-artifact
-          path: ${{ env.BASE_DIR }}
-      
-      - name: Download application resources from download job
-        uses: actions/download-artifact@v2
-        with:
-          name: artifacts
-          path: ${{ env.BASE_DIR }}
-
-      - name: print list of files
-        run: find .
+        run: find ${{ env.BASE_DIR }}
 
       - name: Compress final bundle
         run: tar -cvzf ${{ env.ALATION_OUTPUT }} ./alation
