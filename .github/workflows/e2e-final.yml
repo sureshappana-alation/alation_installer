@@ -110,14 +110,17 @@ jobs:
 
       - name: Check if Kurl Package exists in S3
         run: |
-          echo "Trying to download Kurl ${{env.KURL_FILE_NAME}} from S3"
-          exists=$(aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }} 2>&1)
-          if [[ $exists == *"404"* ]]; then
-            echo "Kurl Package ${{ env.KURL_FILE_NAME }} does not exists in S3. Downloading it"
+          echo "Checking if kurl package ${{env.KURL_FILE_NAME}} exists in S3"
+          error=$(aws s3api head-object --bucket ${{ env.S3_DEV_BUCKET_URL }} --key ${{ env.KURL_FILE_NAME }} 2>&1)
+          if [[ $error == *"404"* ]]; then
+            echo "Kurl package ${{ env.KURL_FILE_NAME }} does not exists in S3. Fetching it from Kurl repo..."
             cd ${{ env.RESOURCE_DIR }}
             curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL_FILE_NAME }}
             echo "Uploading Kurl Package ${{ env.KURL_FILE_NAME }} to S3"
             aws s3 cp ${{env.KURL_FILE_NAME}} ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}}
+          else
+            echo "Kurl package ${{env.KURL_FILE_NAME}} exists in S3. Downloading..."
+            aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }}
           fi
 
       - name: Download files from S3
