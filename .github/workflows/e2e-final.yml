@@ -110,7 +110,11 @@ jobs:
             applicationName="${i,,}"
             application="${applicationName}-${!i}.tar.gz"
             echo "Downloading $application"
-            aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application ${{env.MODULES_DIR}}/$applicationName/
+            outputDir="${{env.MODULES_DIR}}/$applicationName/"
+            if [[ "$file" == *"kurl"* ]];then
+              outputDir="${{env.RESOURCE_DIR}}/"
+            fi
+            aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application $outputDir
           done
       - name: Generate install-config.yaml file
         run: |
@@ -118,6 +122,7 @@ jobs:
           touch $installConfigFile
           for dir in $(ls -d  $MODULES_DIR/*/ ); do
             directory=${dir%*/}
+            echo "Processing $directory"
             files=$(ls $directory/*.tar.gz)
             if [ "${#files}" -gt 1 ]; then
                 moduleFile=${files[0]}
@@ -135,24 +140,24 @@ jobs:
               echo "No tar files found in $directory"
             fi
           done
-      - name: Generate install-config.yaml file
-        run: |
-          echo "" >> ${{ env.BASE_DIR }}/install-config.yaml
-          for directory in ${{ env.MODULES_DIR }}/; do
-            module="$directory.tar.gz"
-            moduleFile="${{ env.MODULES_DIR }}/$directory/$module"
-            if test -f "$moduleFile"; then
-              echo "Extracting module $moduleFile"
-              tar -tf $moduleFile
-              if test -f "$moduleFile/install.yaml"; then
+      # - name: Generate install-config.yaml file
+      #   run: |
+      #     echo "" >> ${{ env.BASE_DIR }}/install-config.yaml
+      #     for directory in ${{ env.MODULES_DIR }}/; do
+      #       module="$directory.tar.gz"
+      #       moduleFile="${{ env.MODULES_DIR }}/$directory/$module"
+      #       if test -f "$moduleFile"; then
+      #         echo "Extracting module $moduleFile"
+      #         tar -tf $moduleFile
+      #         if test -f "$moduleFile/install.yaml"; then
 
-              else
-                echo "$moduleFile/install.yaml" doesn't exists
-              fi
-            else
-              echo "$module not exists"
-            fi
-          done
+      #         else
+      #           echo "$moduleFile/install.yaml" doesn't exists
+      #         fi
+      #       else
+      #         echo "$module not exists"
+      #       fi
+      #     done
       - name: print list of files
         run: find .
       
