@@ -127,8 +127,8 @@ jobs:
                 if test -f "$directory/install.yaml"; then
                   echo "$directory/install.yaml" exists
                   echo "Appending $directory/install.yaml content to install-config.yaml file"
-                  echo "$directory:" >> $BASE_DIR/install-config.yaml
-                  sed -e 's/^/  /' $directory/install.yaml >> $BASE_DIR/install-config.yaml
+                  echo "$directory:" >> ${{ env.BASE_DIR }}/install-config.yaml
+                  sed -e 's/^/  /' $directory/install.yaml >> ${{ env.BASE_DIR }}/install-config.yaml
                 else
                   echo "$directory/install.yaml" doesn\'t exists
                 fi
