@@ -1,0 +1,90 @@
+name: unified-installer
+
+on:
+  push:
+    branches: [main]
+
+  workflow_dispatch:
+    inputs:
+      ALATION_ANALYTICS:
+        description: 'Alation analytics version'
+        required: false
+      OCF:
+        description: 'OCF version'
+        required: false
+      KURL:
+        description: 'KURL Version'
+        required: false
+
+
+env:
+  S3_DEV_BUCKET_URL: "s3://${{ secrets.S3_DEV_BUCKET_NAME }}"
+  S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
+  BASE_DIR: ./alation
+  RESOURCE_DIR: ./alation/res
+  MODULES_DIR: ./alation/res/modules
+  KURL_PATCH_DIR: ./alation/res/kurl_patch
+  ALATION_OUTPUT: alation-$GITHUB_RUN_NUMBER.tar.gz
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Read environment versions files
+        run: |
+          for f in ${{ github.workspace }}/versions/*.sh; do
+            cat "$f"
+            echo
+          done >> $GITHUB_ENV
+            # - name: Testing
+
+      - name: Read environment versions files
+        run: |
+          applicationList=()
+          for i in ./versions/*.sh; do
+            while read line || [ -n "$line" ];
+            do
+                set -f; IFS="="; application=($line)
+                applicationList+=(${application[0]})
+            done < "${i}"
+            cat "$i"
+            echo
+          done  >> $GITHUB_ENV
+          echo APPLICATION_LIST=${applicationList[@]} >> $GITHUB_ENV
+          echo ::set-output name=applicationList::${applicationList[@]}
+
+      - name: Set environment variables
+        run: |
+          echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
+      - name: Creating required directories
+        run: |
+          mkdir -p ${{ env.BASE_DIR }}
+          mkdir -p ${{ env.MODULES_DIR }}
+          mkdir -p ${{ env.KURL_PATCH_DIR }}
+
+
+      - name: Verify Kurl Package ${{ env.KURL_FILE_NAME }} exists in the S3 bucket
+        run: |
+          exists=$(aws s3api list-objects-v2 --bucket ${{ secrets.S3_DEV_BUCKET_NAME }} --query "contains(Contents[].Key, '{{ env.KURL_FILE_NAME }}')")
+          if [ not $exists ]; then
+            echo "Kurl Package ${{ env.KURL_FILE_NAME }} does not exists in S3. Downloading it"
+            curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL_FILE_NAME }}
+            echo "Uploading Kurl Package with ${{ env.KURL_FILE_NAME }} to S3"
+            aws s3 cp ${{env.KURL_FILE_NAME}} ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}}
+            if [ $? -eq 0 ]; then
+              echo "Successfully uploaded Kurl package ${{ env.KURL_FILE_NAME }} to S3"
+            else
+              echo FAIL
+            fi
+          else
+            echo "Kurl Package ${{ env.KURL_FILE_NAME }} exists in S3. Skipping downloading"
+          fi
+      - name: Download files from S3
+        run: |
+          for i in (${{ env.APPLICATION_LIST }}); do
+            echo $i
+          done
