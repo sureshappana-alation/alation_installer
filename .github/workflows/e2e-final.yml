@@ -142,24 +142,7 @@ jobs:
               echo "No tar files found in $directory"
             fi
           done
-      # - name: Generate install-config.yaml file
-      #   run: |
-      #     echo "" >> ${{ env.BASE_DIR }}/install-config.yaml
-      #     for directory in ${{ env.MODULES_DIR }}/; do
-      #       module="$directory.tar.gz"
-      #       moduleFile="${{ env.MODULES_DIR }}/$directory/$module"
-      #       if test -f "$moduleFile"; then
-      #         echo "Extracting module $moduleFile"
-      #         tar -tf $moduleFile
-      #         if test -f "$moduleFile/install.yaml"; then
 
-      #         else
-      #           echo "$moduleFile/install.yaml" doesn't exists
-      #         fi
-      #       else
-      #         echo "$module not exists"
-      #       fi
-      #     done
       - name: print list of files
         run: find .
       
@@ -174,6 +157,13 @@ jobs:
     needs: [build, download]
     runs-on: ubuntu-latest
     steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_S3_REGION }}
+
       - name: Download installer from build job
         uses: actions/download-artifact@v2
         with:
