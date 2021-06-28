@@ -120,7 +120,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ./dependencies
-          keys: ${{ env.KURL_FILE_NAME }}
+          key: ${{ env.KURL_FILE_NAME }}
 
 
       - name: Check if Kurl Package exists in S3
