@@ -172,7 +172,7 @@ jobs:
           retention-days: 1
 
   package:
-    needs: [build, download]
+    needs: [build, app-setup]
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS Credentials
