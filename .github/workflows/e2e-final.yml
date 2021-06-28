@@ -109,10 +109,51 @@ jobs:
           for i in ${{ steps.read_env.outputs.applicationList }}; do
             applicationName="${i,,}"
             application="${applicationName}-${!i}.tar.gz"
-            echo "$applicationName and version $applicationTag"            
+            echo "Downloading $application"
             aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application ${{env.MODULES_DIR}}/$applicationName/
           done
+      - name: Generate install-config.yaml file
+        run: |
+          touch $BASE_DIR/install-config.yaml
+          cd $BASE_DIR
+          for dir in */; do
+            directory=${dir%*/}
+            files=$(ls $directory/*.tar.gz)
+            if [ "${#files}" -gt 1 ]; then
+                echo "Found ${files[0]}"
+                moduleFile=${files[0]}
+                echo "Extracting module $moduleFile"
+                tar -xzf $moduleFile -C $directory  --strip-components=2
+                if test -f "$directory/install.yaml"; then
+                  echo "$directory/install.yaml" exists
+                  echo "Appending $directory/install.yaml content to install-config.yaml file"
+                  echo "$directory:" >> $BASE_DIR/install-config.yaml
+                  sed -e 's/^/  /' $directory/install.yaml >> $BASE_DIR/install-config.yaml
+                else
+                  echo "$directory/install.yaml" doesn\'t exists
+                fi
+            else
+              echo "No tar files found in $directory"
+            fi
+          done
+      - name: Generate install-config.yaml file
+        run: |
+          echo "" >> ${{ env.BASE_DIR }}/install-config.yaml
+          for directory in ${{ env.MODULES_DIR }}/; do
+            module="$directory.tar.gz"
+            moduleFile="${{ env.MODULES_DIR }}/$directory/$module"
+            if test -f "$moduleFile"; then
+              echo "Extracting module $moduleFile"
+              tar -tf $moduleFile
+              if test -f "$moduleFile/install.yaml"; then
 
+              else
+                echo "$moduleFile/install.yaml" doesn't exists
+              fi
+            else
+              echo "$module not exists"
+            fi
+          done
       - name: print list of files
         run: find .
       
@@ -143,7 +184,7 @@ jobs:
         run: find .
 
       - name: Compress files
-        run: tar -cvzf -cvzf ${{ env.ALATION_OUTPUT }} .
+        run: tar -cvzf -cvzf ${{ env.ALATION_OUTPUT }} ./alation
 
       - name: Upload to final artifact to S3
         run: |
