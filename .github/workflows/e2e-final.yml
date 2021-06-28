@@ -34,13 +34,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Read environment versions files
-        run: |
-          for f in ${{ github.workspace }}/versions/*.sh; do
-            cat "$f"
-            echo
-          done >> $GITHUB_ENV
-            # - name: Testing
+      # - name: Read environment versions files
+      #   run: |
+      #     for f in ${{ github.workspace }}/versions/*.sh; do
+      #       cat "$f"
+      #       echo
+      #     done >> $GITHUB_ENV
+      #       # - name: Testing
 
       - name: Read environment versions files
         id: read_env
