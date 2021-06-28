@@ -34,6 +34,10 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Create directories
+        run: |
+          mkdir -p ${{ env.BASE_DIR }}
       
       - name: Build installer binary
         id: docker_build
@@ -42,7 +46,7 @@ jobs:
           context: ./installer
           push: false
           tags: alation/installer:latest
-          outputs: type=docker,dest=installer.tar.gz
+          outputs: type=docker,dest=${{ env.BASE_DIR }}/installer.tar.gz
       
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
