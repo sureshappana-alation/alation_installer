@@ -124,14 +124,14 @@ jobs:
         run: |
           echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
       
-      - name: Caching Kurl
+      - name: Importing kurl package from cache
         id: kurl-cache
         uses: actions/cache@v2
         with:
           path: ./dependencies
           key: ${{ env.KURL_FILE_NAME }}
 
-      - name: Get Kurl package
+      - name: Get Kurl package from S3 or Kurl.sh
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
           echo "Checking if kurl package ${{env.KURL_FILE_NAME}} exists in S3"
@@ -149,7 +149,7 @@ jobs:
           fi
       - name: Copy Kurl file from dependencies to installer base directory
         run: |
-          cp ./dependencies/${{env.KURL_FILE_NAME}} ${{ env.BASE_DIR}}/${{env.KURL_FILE_NAME}} 
+          cp ./dependencies/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR}}/${{env.KURL_FILE_NAME}} 
       # - name: Check if Kurl Package exists in S3
       #   if: steps.kurl-cache.outputs.cache-hit != 'true'
       #   run: |
@@ -176,9 +176,9 @@ jobs:
             aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application ${{env.MODULES_DIR}}/$applicationName/
           done
 
-      - name: Generate install-config.yaml file
+      - name: Generate alation-install.yaml file
         run: |
-          installConfigFile=${{ env.BASE_DIR }}/install-config.yaml
+          installConfigFile=${{ env.BASE_DIR }}/alation-install.yaml
           touch $installConfigFile
           for dir in $(find $MODULES_DIR -mindepth 1 -maxdepth 1 -type d); do
             directory=${dir%*/}
