@@ -13,7 +13,7 @@ const (
 )
 const ( // Bash commands used in this file
 	containerdLoadImageCmd = "sudo ctr -n k8s.io images import %s"
-	helmInstallCmd         = "helm install %s %s %s"
+	helmInstallCmd         = "/usr/local/bin/helm install %s %s %s"
 	kubeApplyFileCmd       = "cat <<EOF | kubectl apply -f -\n%s\nEOF"
 )
 

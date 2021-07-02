@@ -5,12 +5,18 @@ import (
 )
 
 const ( // bash commands used in this file
-	nodeNameCmd             = "kubectl get node --selector='node-role.kubernetes.io/master' -o jsonpath='{.items..metadata.name}'"
-	applyStorageClassCmd    = "kubectl apply -f res/kurl_patch/local-storage.yaml"
+	nodeNameCmd          = "kubectl get node --selector='node-role.kubernetes.io/master' -o jsonpath='{.items..metadata.name}'"
+	applyStorageClassCmd = "kubectl apply -f res/kurl_patch/local-storage.yaml"
+
 	labelMonitoringNodeCmd  = "kubectl label node %s node-role.alation.com/monitoring=monitoring --overwrite"
 	prometheusDeletePvcCmd  = "kubectl -n monitoring delete pvc prometheus-k8s-db-prometheus-k8s-%s"
 	prometheusMkdirCmd      = "sudo sudo mkdir -p /mnt/disks/prometheus-db-0"
 	applyPrometheusPatchCmd = "kubectl apply -f res/kurl_patch/prometheus.yaml"
+
+	labelRegistryNodeCmd  = "kubectl label node %s node-role.alation.com/registry=registry --overwrite"
+	registryDeletePvcCmd  = "kubectl -n kurl delete pvc registry-pvc"
+	registryMkdirCmd      = "sudo mkdir -p /mnt/disks/registry"
+	applyRegistryPatchCmd = "kubectl apply -f res/kurl_patch/registry.yaml"
 )
 
 // The Kurl bootstrapper build does not include a storage solution and the cluster would need extra configuration for storage
@@ -23,6 +29,8 @@ func configClusterPlugins() {
 	setupLocalStorageClass()
 
 	setupPrometheus(nodeName)
+
+	setupRegistry(nodeName)
 }
 
 func setupLocalStorageClass() {
@@ -51,5 +59,24 @@ func setupPrometheus(nodeName string) {
 
 	// Apply prometheus manifests
 	_, out = RunBashCmd(applyPrometheusPatchCmd)
+	LOGGER.Info(out)
+}
+
+func setupRegistry(nodeName string) {
+
+	// Label node for registry
+	_, out := RunBashCmd(fmt.Sprintf(labelRegistryNodeCmd, nodeName))
+	LOGGER.Info(out)
+
+	// Delete existing persistent volume claims
+	_, out = RunBashCmd(registryDeletePvcCmd)
+	LOGGER.Info(out)
+
+	// Create directory for registry db data
+	_, out = RunBashCmd(registryMkdirCmd)
+	LOGGER.Info(out)
+
+	// Apply registry manifests
+	_, out = RunBashCmd(applyRegistryPatchCmd)
 	LOGGER.Info(out)
 }
