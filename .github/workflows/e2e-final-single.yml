@@ -34,9 +34,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Create output directory
         run: |
           mkdir -p ${{ env.BASE_DIR }}
@@ -48,7 +45,16 @@ jobs:
           context: ./installer
           push: false
           tags: alation/installer:latest
-          outputs: type=docker,dest=${{ env.BASE_DIR }}/installer.tar.gz
+          outputs: type=local,dest=.
+          cache-from: |
+            user/app:cache
+            type=local,src=./docker-cache
+      
+      - name: Extract the generated installer tar file
+        run: tar xvzf installer.tar.gz
+      
+      - name: Copying the installer binary to base directory
+        run: mv installer/installer ${{ env.BASE_DIR }}/
       
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
@@ -122,7 +128,7 @@ jobs:
           path: ./dependencies
           key: ${{ env.KURL_FILE_NAME }}
 
-      - name: Check if Kurl Package exists in S3
+      - name: Get Kurl package
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
           echo "Checking if kurl package ${{env.KURL_FILE_NAME}} exists in S3"
@@ -200,6 +206,6 @@ jobs:
       - name: Compress final bundle
         run: tar -cvzf ${{ env.ALATION_OUTPUT }} ./alation
 
-      - name: Upload to final artifact to S3
+      - name: Upload the final artifact to S3
         run: |
           aws s3 cp ${{ env.ALATION_OUTPUT }} ${{ env.S3_RELEASE_BUCKET_URL }}/${{ env.ALATION_OUTPUT }}
