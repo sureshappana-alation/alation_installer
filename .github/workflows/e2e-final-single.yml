@@ -36,7 +36,7 @@ jobs:
     - name: Setup golang
       uses: actions/setup-go@v2
     - name: Build installer
-      run: go build -o ${{ env.BASE_DIR }}/installer installer/*.go
+      run: go build -o ${{ env.BASE_DIR }}/installer ${{ github.workspace }}/installer/*.go
     - name: List of files
       run: find ${{ env.BASE_DIR }}
   build:
