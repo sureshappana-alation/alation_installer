@@ -1,4 +1,4 @@
-name: unified-installer-final-single-job
+name: unified-installer-build-pipeline
 
 on:
   push:
