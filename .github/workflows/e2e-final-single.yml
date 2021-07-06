@@ -28,6 +28,17 @@ env:
 
 jobs:
 
+  build-go:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Setup golang
+      uses: actions/setup-go@v2
+    - name: Build installer
+      run: go build -o ${{ env.BASE_DIR }}/installer installer/*.go
+    - name: List of files
+      run: find ${{ env.BASE_DIR }}
   build:
     runs-on: ubuntu-latest
     steps:
@@ -131,7 +142,7 @@ jobs:
           path: ./dependencies
           key: ${{ env.KURL_FILE_NAME }}
 
-      - name: In case of cache miss get Kurl package from S3 or Kurl.sh
+      - name: In case of cache miss get the Kurl package from S3 or Kurl.sh
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
           echo "Checking if kurl package ${{env.KURL_FILE_NAME}} exists in S3"
@@ -147,7 +158,7 @@ jobs:
             echo "Uploading Kurl Package ${{ env.BASE_DIR}}/${{ env.KURL_FILE_NAME }} to S3"
             aws s3 cp ./dependencies/${{ env.KURL_FILE_NAME }} ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }}
           fi
-      - name: Copy Kurl file from dependencies to installer base directory
+      - name: Copy Kurl file from dependencies to the installer base directory
         run: |
           cp ./dependencies/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR}}/${{env.KURL_FILE_NAME}} 
       # - name: Check if Kurl Package exists in S3
