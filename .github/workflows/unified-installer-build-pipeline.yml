@@ -45,7 +45,7 @@ jobs:
     
     - name: Build installer
       run: |
-      go build -o ${{ env.BASE_DIR }}/installer src/*.go
+        go build -o ${{ env.BASE_DIR }}/installer src/*.go
     
     - name: List of files
       run: find ${{ env.BASE_DIR }}
