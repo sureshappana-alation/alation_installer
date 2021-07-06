@@ -47,17 +47,17 @@ jobs:
     
     - name: Build installer
       run: |
-        # cd ${{ github.workspace }}/installer/src
-        go build -o ${{ env.BASE_DIR }}/installer alation_installer/installer/src/*.go
+        cd ${{ github.workspace }}/installer/src
+        go build -o out/installer *.go
     
     - name: List of files
-      run: find ${{ env.BASE_DIR }}
+      run: find ${{ github.workspace }}/installer/src/out
 
     - name: Upload installer binary for app-setup job
       uses: actions/upload-artifact@v2
       with:
         name: installer-binary
-        path: ${{ env.BASE_DIR }}
+        path: ${{ github.workspace }}/installer/src/out
         retention-days: 1
   # build:
   #   runs-on: ubuntu-latest
