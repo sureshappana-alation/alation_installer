@@ -20,9 +20,9 @@ env:
   S3_DEV_BUCKET_URL: "s3://${{ secrets.S3_DEV_BUCKET_NAME }}"
   S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
   BASE_DIR: ./alation-$GITHUB_RUN_NUMBER
-  RESOURCE_DIR: ./alation/res
-  MODULES_DIR: ./alation/res/modules
-  KURL_PATCH_DIR: ./alation/res/kurl_patch
+  RESOURCE_DIR: ./alation-$GITHUB_RUN_NUMBER/res
+  MODULES_DIR: ./alation-$GITHUB_RUN_NUMBER/res/modules
+  KURL_PATCH_DIR: ./alation-$GITHUB_RUN_NUMBER/res/kurl_patch
   ALATION_OUTPUT: alation-$GITHUB_RUN_NUMBER.tar.gz
 
 jobs:
@@ -161,7 +161,7 @@ jobs:
           path: ./dependencies
           key: ${{ env.KURL_FILE_NAME }}
 
-      - name: In case of cache miss get the Kurl package from S3 or Kurl.sh
+      - name: In the case of cache miss get the Kurl package from S3 or Kurl.sh
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
           echo "Checking if kurl package ${{env.KURL_FILE_NAME}} exists in S3"
@@ -233,7 +233,7 @@ jobs:
             fi
           done
 
-      - name: print list of files
+      - name: Print list of files
         run: find ${{ env.BASE_DIR }}
 
       - name: Compress the final bundle
