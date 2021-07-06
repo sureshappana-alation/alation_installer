@@ -39,11 +39,11 @@ jobs:
     
     - name: Copy go artifacts
       run: |
-        cp ${{ github.workspace }}installer/go.sum ${{ github.workspace }}installer/src/go.sum
-        cp ${{ github.workspace }}installer/go.mod ${{ github.workspace }}installer/src/go.mod
+        cp ${{ github.workspace }}/installer/go.sum ${{ github.workspace }}/installer/src/go.sum
+        cp ${{ github.workspace }}/installer/go.mod ${{ github.workspace }}/installer/src/go.mod
     
     - name: Build installer
-      run: go build -o ${{ env.BASE_DIR }}/installer ${{ github.workspace }}installer/*.go
+      run: go build -o ${{ env.BASE_DIR }}/installer ${{ github.workspace }}/installer/*.go
     
     - name: List of files
       run: find ${{ env.BASE_DIR }}
