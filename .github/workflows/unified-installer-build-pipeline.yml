@@ -115,12 +115,21 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_S3_REGION }}
-      
+
+      - name: Creating required directories
+        run: |
+          mkdir -p ${{ env.BASE_DIR }}
+          mkdir -p ${{ env.MODULES_DIR }}
+          mkdir -p ${{ env.KURL_PATCH_DIR }}
+
       - name: Download installer from build job
         uses: actions/download-artifact@v2
         with:
           name: installer-binary
           path: ${{ env.BASE_DIR }}
+
+      - name: Print list of files
+        run: find ${{ env.BASE_DIR }}          
       
       - name: Read environment versions files
         id: read_env
@@ -139,12 +148,6 @@ jobs:
           done  >> $GITHUB_ENV
           # echo APPLICATION_LIST=${applicationList[@]} >> $GITHUB_ENV
           echo ::set-output name=applicationList::${applicationList[@]}
-
-      - name: Creating required directories
-        run: |
-          mkdir -p ${{ env.BASE_DIR }}
-          mkdir -p ${{ env.MODULES_DIR }}
-          mkdir -p ${{ env.KURL_PATCH_DIR }}
 
       - name: Copy res content from source code to archiving directory
         run: |
@@ -237,7 +240,7 @@ jobs:
         run: find ${{ env.BASE_DIR }}
 
       - name: Compress the final bundle
-        run: tar -cvzf ${{ env.ALATION_OUTPUT }} ./alation
+        run: tar -cvzf ${{ env.ALATION_OUTPUT }} ${{ env.BASE_DIR }}
 
       - name: Upload the compressd build to S3
         run: |
