@@ -219,18 +219,18 @@ jobs:
                 moduleFile=${files[0]}
                 echo "Found $moduleFile. Extracting..."
                 tar -xzf $moduleFile -C $directory  --strip-components=2
-                if test -f "$directory/install.yaml"; then
-                  echo "Found $directory/install.yaml"
-                  echo "Appending $directory/install.yaml content to $installConfigFile file"
-                  echo "${directory##*/}:" >> $installConfigFile
-                  sed -e 's/^/  /' $directory/install.yaml >> $installConfigFile
-                else
-                  echo "$directory/install.yaml" doesn\'t exists. Ignoring...
-                fi
                 echo "Deleting $moduleFile"
                 rm -f $moduleFile
             else
               echo "No tar files found in $directory"
+            fi
+            if test -f "$directory/install.yaml"; then
+              echo "Found $directory/install.yaml"
+              echo "Appending $directory/install.yaml content to $installConfigFile file"
+              echo "${directory##*/}:" >> $installConfigFile
+              sed -e 's/^/  /' $directory/install.yaml >> $installConfigFile
+            else
+              echo "$directory/install.yaml" doesn\'t exists. Ignoring...
             fi
           done
 
