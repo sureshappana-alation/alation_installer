@@ -47,8 +47,8 @@ jobs:
     
     - name: Build installer
       run: |
-        cd ${{ github.workspace }}/installer/src
-        go build -o ${{ env.BASE_DIR }}/installer *.go
+        # cd ${{ github.workspace }}/installer/src
+        go build -o ${{ env.BASE_DIR }}/installer alation_installer/installer/src/*.go
     
     - name: List of files
       run: find ${{ env.BASE_DIR }}
