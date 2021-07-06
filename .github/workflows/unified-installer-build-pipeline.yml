@@ -127,6 +127,7 @@ jobs:
         id: read_env
         run: |
           applicationList=()
+          shopt -s nullglob
           for i in ./versions/*.sh; do
             while read line || [ -n "$line" ];
             do
