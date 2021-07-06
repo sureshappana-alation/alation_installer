@@ -19,10 +19,11 @@ on:
 env:
   S3_DEV_BUCKET_URL: "s3://${{ secrets.S3_DEV_BUCKET_NAME }}"
   S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
-  BASE_DIR: ./alation-$GITHUB_RUN_NUMBER
-  RESOURCE_DIR: ./alation-$GITHUB_RUN_NUMBER/res
-  MODULES_DIR: ./alation-$GITHUB_RUN_NUMBER/res/modules
-  KURL_PATCH_DIR: ./alation-$GITHUB_RUN_NUMBER/res/kurl_patch
+  BASE_DIR: ./alation
+  RESOURCE_DIR: ./alation/res
+  MODULES_DIR: ./alation/res/modules
+  KURL_PATCH_DIR: ./alation/res/kurl_patch
+  ALATION_OUTPUT_DIR: alation-$GITHUB_RUN_NUMBER
   ALATION_OUTPUT: alation-$GITHUB_RUN_NUMBER.tar.gz
 
 jobs:
@@ -115,21 +116,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_S3_REGION }}
-
-      - name: Creating required directories
-        run: |
-          mkdir -p ${{ env.BASE_DIR }}
-          mkdir -p ${{ env.MODULES_DIR }}
-          mkdir -p ${{ env.KURL_PATCH_DIR }}
-
+      
       - name: Download installer from build job
         uses: actions/download-artifact@v2
         with:
           name: installer-binary
           path: ${{ env.BASE_DIR }}
-
-      - name: Print list of files
-        run: find ${{ env.BASE_DIR }}          
       
       - name: Read environment versions files
         id: read_env
@@ -148,6 +140,12 @@ jobs:
           done  >> $GITHUB_ENV
           # echo APPLICATION_LIST=${applicationList[@]} >> $GITHUB_ENV
           echo ::set-output name=applicationList::${applicationList[@]}
+
+      - name: Creating required directories
+        run: |
+          mkdir -p ${{ env.BASE_DIR }}
+          mkdir -p ${{ env.MODULES_DIR }}
+          mkdir -p ${{ env.KURL_PATCH_DIR }}
 
       - name: Copy res content from source code to archiving directory
         run: |
@@ -239,9 +237,12 @@ jobs:
       - name: Print list of files
         run: find ${{ env.BASE_DIR }}
 
-      - name: Compress the final bundle
-        run: tar -cvzf ${{ env.ALATION_OUTPUT }} ${{ env.BASE_DIR }}
+      - name: Renaming base directory to alation version
+        run: mv ./alation ${{ env.ALATION_OUTPUT_DIR }}
 
-      - name: Upload the compressd build to S3
+      - name: Compress the final bundle
+        run: tar -cvzf ${{ env.ALATION_OUTPUT }} ${{ env.ALATION_OUTPUT_DIR }}
+
+      - name: Upload the compressed build to S3
         run: |
           aws s3 cp ${{ env.ALATION_OUTPUT }} ${{ env.S3_RELEASE_BUCKET_URL }}/${{ env.ALATION_OUTPUT }}
