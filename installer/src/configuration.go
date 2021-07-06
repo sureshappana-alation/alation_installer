@@ -54,7 +54,7 @@ func ParseAlationInstallConfig(configFilePath string) AlationInstallConfig {
 func PrepareInstallConfig() AlationInstallConfig {
 
 	// Parse and validate yaml configurations
-	config := ParseAlationInstallConfig("res/alation-install.yaml")
+	config := ParseAlationInstallConfig("alation-install.yaml")
 	LOGGER.Info("Parsed Alation install config YAML file: ", config)
 
 	type Secret struct {

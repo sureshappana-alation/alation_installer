@@ -131,7 +131,7 @@ jobs:
           path: ./dependencies
           key: ${{ env.KURL_FILE_NAME }}
 
-      - name: Get Kurl package from S3 or Kurl.sh
+      - name: In case of cache miss get Kurl package from S3 or Kurl.sh
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
           echo "Checking if kurl package ${{env.KURL_FILE_NAME}} exists in S3"
@@ -206,9 +206,9 @@ jobs:
       - name: print list of files
         run: find ${{ env.BASE_DIR }}
 
-      - name: Compress final bundle
+      - name: Compress the final bundle
         run: tar -cvzf ${{ env.ALATION_OUTPUT }} ./alation
 
-      - name: Upload the final artifact to S3
+      - name: Upload the compressd build to S3
         run: |
           aws s3 cp ${{ env.ALATION_OUTPUT }} ${{ env.S3_RELEASE_BUCKET_URL }}/${{ env.ALATION_OUTPUT }}
