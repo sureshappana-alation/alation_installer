@@ -28,17 +28,17 @@ env:
 
 jobs:
 
-  build-go:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Setup golang
-      uses: actions/setup-go@v2
-    - name: Build installer
-      run: go build -o ${{ env.BASE_DIR }}/installer ${{ github.workspace }}/installer/*.go
-    - name: List of files
-      run: find ${{ env.BASE_DIR }}
+  # build-go:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - name: Checkout code
+  #     uses: actions/checkout@v2
+  #   - name: Setup golang
+  #     uses: actions/setup-go@v2
+  #   - name: Build installer
+  #     run: go build -o ${{ env.BASE_DIR }}/installer ${{ github.workspace }}/installer/*.go
+  #   - name: List of files
+  #     run: find ${{ env.BASE_DIR }}
   build:
     runs-on: ubuntu-latest
     steps:
@@ -59,16 +59,17 @@ jobs:
           context: ./installer
           push: false
           tags: alation/installer:latest
-          outputs: type=local,dest=.
+          outputs: type=local,dest=${{ env.BASE_DIR }}
+          target: build
           cache-from: |
             user/app:cache
             type=local,src=./docker-cache
       
-      - name: Extract the generated installer tar file
-        run: tar xvzf installer.tar.gz
+      # - name: Extract the generated installer tar file
+      #   run: tar xvzf installer.tar.gz
       
-      - name: Copying the installer binary to base directory
-        run: mv installer/installer ${{ env.BASE_DIR }}/
+      # - name: Copying the installer binary to base directory
+      #   run: mv installer/installer ${{ env.BASE_DIR }}/
       
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
