@@ -19,11 +19,10 @@ on:
 env:
   S3_DEV_BUCKET_URL: "s3://${{ secrets.S3_DEV_BUCKET_NAME }}"
   S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
-  BASE_DIR: ./alation
+  BASE_DIR: ./alation-$GITHUB_RUN_NUMBER
   RESOURCE_DIR: ./alation/res
   MODULES_DIR: ./alation/res/modules
   KURL_PATCH_DIR: ./alation/res/kurl_patch
-  ALATION_BUILD_OUTPUT: alation-$GITHUB_RUN_NUMBER.tar.gz
   ALATION_OUTPUT: alation-$GITHUB_RUN_NUMBER.tar.gz
 
 jobs:
@@ -198,7 +197,7 @@ jobs:
       #     fi
       
 
-      - name: Download files from S3
+      - name: Download application files from S3
         run: |
           for i in ${{ steps.read_env.outputs.applicationList }}; do
             applicationName="${i,,}"
