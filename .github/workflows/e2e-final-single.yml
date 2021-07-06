@@ -28,61 +28,75 @@ env:
 
 jobs:
 
-  # build-go:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Checkout code
-  #     uses: actions/checkout@v2
-  #   - name: Setup golang
-  #     uses: actions/setup-go@v2
-  #   - name: Build installer
-  #     run: go build -o ${{ env.BASE_DIR }}/installer ${{ github.workspace }}/installer/*.go
-  #   - name: List of files
-  #     run: find ${{ env.BASE_DIR }}
-  build:
+  build-go:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Setup golang
+      uses: actions/setup-go@v2
+    
+    - name: Copy go artifacts
+      run: |
+        cp ${{ github.workspace }}installer/go.sum ${{ github.workspace }}installer/src/go.sum
+        cp ${{ github.workspace }}installer/go.mod ${{ github.workspace }}installer/src/go.mod
+    
+    - name: Build installer
+      run: go build -o ${{ env.BASE_DIR }}/installer ${{ github.workspace }}installer/*.go
+    
+    - name: List of files
+      run: find ${{ env.BASE_DIR }}
 
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Upload installer binary for app-setup job
+      uses: actions/upload-artifact@v2
+      with:
+        name: installer-binary
+        path: ${{ env.BASE_DIR }}
+        retention-days: 1
+  # build:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v1
 
-      - name: Create output directory
-        run: |
-          mkdir -p ${{ env.BASE_DIR }}
-      
-      - name: Build installer binary
-        id: docker_build
-        uses: docker/build-push-action@v2
-        with:
-          context: ./installer
-          push: false
-          tags: alation/installer:latest
-          outputs: type=local,dest=${{ env.BASE_DIR }}
-          target: build
-          cache-from: |
-            user/app:cache
-            type=local,src=./docker-cache
-      
-      # - name: Extract the generated installer tar file
-      #   run: tar xvzf installer.tar.gz
-      
-      # - name: Copying the installer binary to base directory
-      #   run: mv installer/installer ${{ env.BASE_DIR }}/
-      
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
 
-      - name: List of files
-        run: find ${{ env.BASE_DIR }}
+  #     - name: Create output directory
+  #       run: |
+  #         mkdir -p ${{ env.BASE_DIR }}
+      
+  #     - name: Build installer binary
+  #       id: docker_build
+  #       uses: docker/build-push-action@v2
+  #       with:
+  #         context: ./installer
+  #         push: false
+  #         tags: alation/installer:latest
+  #         outputs: type=local,dest=.
+  #         cache-from: |
+  #           user/app:cache
+  #           type=local,src=./docker-cache
+      
+  #     - name: Extract the generated installer tar file
+  #       run: tar xvzf installer.tar.gz
+      
+  #     - name: Copying the installer binary to base directory
+  #       run: mv installer/installer ${{ env.BASE_DIR }}/
+      
+  #     - name: Image digest
+  #       run: echo ${{ steps.docker_build.outputs.digest }}
 
-      - name: Upload installer binary for package job
-        uses: actions/upload-artifact@v2
-        with:
-          name: docker-artifact
-          path: ${{ env.BASE_DIR }}
-          retention-days: 1
+  #     - name: List of files
+  #       run: find ${{ env.BASE_DIR }}
+
+  #     - name: Upload installer binary for package job
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: docker-artifact
+  #         path: ${{ env.BASE_DIR }}
+  #         retention-days: 1
 
   app-setup:
     runs-on: ubuntu-latest
@@ -101,7 +115,7 @@ jobs:
       - name: Download installer from build job
         uses: actions/download-artifact@v2
         with:
-          name: docker-artifact
+          name: installer-binary
           path: ${{ env.BASE_DIR }}
       
       - name: Read environment versions files
