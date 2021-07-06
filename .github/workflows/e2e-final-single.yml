@@ -28,7 +28,7 @@ env:
 
 jobs:
 
-  build-go:
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
