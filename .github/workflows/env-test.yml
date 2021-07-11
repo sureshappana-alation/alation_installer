@@ -15,7 +15,7 @@ jobs:
   env-test:
     runs-on: ubuntu-latest
     env:
-      INPUT_KURL: ${{ github.event.KURL }
+      INPUT_KURL: ${{ github.event.KURL }}
       INPUT_NGINX-INGRESS-CONTROLLER: ${{ github.event.NGINX-INGRESS-CONTROLLER }}
       appList: ("ocf", "NGINX-INGRESS-CONTROLLER")
     steps:
