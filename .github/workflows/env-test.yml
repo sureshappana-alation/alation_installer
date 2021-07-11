@@ -11,6 +11,9 @@ on:
       KURL:
         description: 'KURL Version'
         required: false
+      NGINX-INGRESS-CONTROLLER:
+        description: 'Nginx ingress Version'
+        required: false
 jobs:
   env-test:
     runs-on: ubuntu-latest
