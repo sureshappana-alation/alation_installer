@@ -160,28 +160,35 @@ jobs:
         id: kurl-cache
         uses: actions/cache@v2
         with:
-          path: ./dependencies
+          path: ./cache
           key: ${{ env.KURL_FILE_NAME }}
 
-      - name: In the case of cache miss get the Kurl package from S3 or Kurl.sh
+      - name: In the case of cache miss get the Kurl package from S3
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
-          echo "Checking if kurl package ${{env.KURL_FILE_NAME}} exists in S3"
-          mkdir -p ./dependencies
-          exists=$(aws s3api list-objects-v2 --bucket ${{ secrets.S3_DEV_BUCKET_NAME }} --query "contains(Contents[].Key, '${{ env.KURL_FILE_NAME }}')" || false)
-          if $exists; then
-            echo "Kurl package ${{env.KURL_FILE_NAME}} exists in S3. Downloading..."
-            aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}} ./dependencies/${{ env.KURL_FILE_NAME }}            
-          else
-            echo "Kurl package ${{ env.KURL_FILE_NAME }} does not exists in S3. Fetching it from Kurl.sh repo..."
-            curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL }}
-            mv ${{ env.KURL }} ./dependencies/${{env.KURL_FILE_NAME}}
-            echo "Uploading Kurl Package ${{ env.BASE_DIR}}/${{ env.KURL_FILE_NAME }} to S3"
-            aws s3 cp ./dependencies/${{ env.KURL_FILE_NAME }} ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }}
-          fi
-      - name: Copy Kurl file from dependencies to the installer base directory
+          mkdir -p ./cache
+          echo "Downloading Kurl package ${{env.KURL_FILE_NAME}} from S3. "
+          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}} ./cache/${{ env.KURL_FILE_NAME }}            
+
+      # - name: In the case of cache miss get the Kurl package from S3 or Kurl.sh
+      #   if: steps.kurl-cache.outputs.cache-hit != 'true'
+      #   run: |
+      #     echo "Checking if kurl package ${{env.KURL_FILE_NAME}} exists in S3"
+      #     mkdir -p ./cache
+      #     exists=$(aws s3api list-objects-v2 --bucket ${{ secrets.S3_DEV_BUCKET_NAME }} --query "contains(Contents[].Key, '${{ env.KURL_FILE_NAME }}')" || false)
+      #     if $exists; then
+      #       echo "Kurl package ${{env.KURL_FILE_NAME}} exists in S3. Downloading..."
+      #       aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}} ./cache/${{ env.KURL_FILE_NAME }}            
+      #     else
+      #       echo "Kurl package ${{ env.KURL_FILE_NAME }} does not exists in S3. Fetching it from Kurl.sh repo..."
+      #       curl -LO https://k8s.kurl.sh/bundle/${{ env.KURL }}
+      #       mv ${{ env.KURL }} ./cache/${{env.KURL_FILE_NAME}}
+      #       echo "Uploading Kurl Package ${{ env.BASE_DIR}}/${{ env.KURL_FILE_NAME }} to S3"
+      #       aws s3 cp ./cache/${{ env.KURL_FILE_NAME }} ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }}
+      #     fi
+      - name: Copy Kurl file from cache to the installer base directory
         run: |
-          cp ./dependencies/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR}}/${{env.KURL_FILE_NAME}} 
+          cp ./cache/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR}}/${{env.KURL_FILE_NAME}} 
       # - name: Check if Kurl Package exists in S3
       #   if: steps.kurl-cache.outputs.cache-hit != 'true'
       #   run: |
