@@ -39,4 +39,4 @@ jobs:
           echo ::set-output name=applicationList::${applicationList[@]}
       - name: Override manual inputs
         run: |
-          echo ${{ github.events.inputs.* }}
+          echo ${{ github.events.inputs.*[0] }}
