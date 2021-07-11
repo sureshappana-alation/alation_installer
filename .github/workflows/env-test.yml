@@ -35,7 +35,7 @@ jobs:
             do
                 set -f; IFS="="; application=($line)
                 if [[ "${application[0],,}" != *"KURL"* ]];then
-                  echo "${application[0]}"
+                  echo "${application[0],,}"
                   applicationList+=(${application[0]})
                 fi
             done < "${i}"
