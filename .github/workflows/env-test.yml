@@ -31,14 +31,12 @@ jobs:
           applicationList=()
           shopt -s nullglob
           for i in ./versions1/*.sh; do
-            while read line || [ -n "$line" ];
+            while IFS='=' read -r key val
             do
-                set -f; IFS="="; application=($line)
-                if [[ "${application[0],,}" != *"KURL"* ]];then
-                  echo "${application[0],,}"
-                  applicationList+=(${application[0]})
-                fi
-            done < "${i}"
+              if [[ $key != *"KURL"* ]]; then
+                applicationList+=(${application[0]})
+              fi
+            done < "$i"
             cat "$i"
             echo
           done  >> $GITHUB_ENV
