@@ -15,8 +15,8 @@ jobs:
   env-test:
     runs-on: ubuntu-latest
     env:
-      INPUT_KURL: ${{ github.event.KURL }}
-      INPUT_NGINX-INGRESS-CONTROLLER: ${{ github.event.NGINX-INGRESS-CONTROLLER }}
+      INPUT_KURL: ${{ github.event.inputs.KURL }}
+      INPUT_NGINX-INGRESS-CONTROLLER: ${{ github.event.inputs.NGINX-INGRESS-CONTROLLER }}
     steps:
       - name: Set service list
         id: env-list
