@@ -40,3 +40,6 @@ jobs:
       - name: Override manual inputs
         run: |
           echo ${{ steps.read_env.outputs.applicationList }}
+      - name: Print env
+        run: |
+          printenv
