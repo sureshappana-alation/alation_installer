@@ -34,10 +34,10 @@ jobs:
             while IFS='=' read -r key val
             do
               if [[ $key != *"KURL"* ]]; then
-                applicationList+=(${application[0]})
+                applicationList+=(${key})
               fi
-            done < "$i"
-            cat "$i"
+            done < "${i}"
+            cat "${i}"
             echo
           done  >> $GITHUB_ENV
           echo ::set-output name=applicationList::${applicationList[@]}
