@@ -58,17 +58,17 @@ jobs:
             input_key="INPUT_$i"
             echo "$i=${!input_key:-${!i}}" >> $GITHUB_ENV
           done
-      - name: printing applicationlist
+      - name: printing application list
         run: |
           echo ${{ steps.read_env.outputs.applicationList }}
       - name: Process files
         run: |
           for i in ${{ steps.read_env.outputs.applicationList }}; do
-            applicationName="${i,,}"
-            if [ ${!i} = "null" ]; then
+            applicationName="${i}"
+            if [ ${!i} = "skip" ]; then
               echo "Skipping $applicationName"
             else
-              echo "Downloading $application from S3"
+              echo "Downloading $applicationName from S3"
             fi
           done
 
