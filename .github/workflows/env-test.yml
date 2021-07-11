@@ -1,0 +1,22 @@
+name: env-var-test
+on:
+  workflow_dispatch:
+    inputs:
+      ALATION_ANALYTICS:
+        description: 'Alation analytics version'
+        required: false
+      OCF:
+        description: 'OCF version'
+        required: false
+      KURL:
+        description: 'KURL Version'
+        required: false
+jobs:
+  env-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply env variables
+        uses: actions/checkout@v2
+      - name: Print env values
+        run: |
+          echo ${{ github.event.input.OCF }}
