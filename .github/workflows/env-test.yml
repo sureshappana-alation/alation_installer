@@ -14,12 +14,13 @@ on:
 jobs:
   env-test:
     runs-on: ubuntu-latest
+    env:
+      INPUT_KURL: ${{ github.event.KURL }
+      INPUT_NGINX-INGRESS-CONTROLLER: ${{ github.event.NGINX-INGRESS-CONTROLLER }}
+      appList: ("ocf", "NGINX-INGRESS-CONTROLLER")
     steps:
       - name: Apply env variables
         uses: actions/checkout@v2
-      - name: Print env values
-        run: |
-          echo ${{ github.event.inputs.OCF }}
       - name: Read versions files
         id: read_env
         run: |
