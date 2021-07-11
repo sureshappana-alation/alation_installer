@@ -45,7 +45,8 @@ jobs:
       - name: apply overrides
         run: |
           for i in ${{ steps.read_env.outputs.applicationList }}; do
-            echo $i=${INPUT_i:-$i} >> $GITHUB_ENV
+            input_val="INPUT_$i"
+            echo "$i=${${!input_val}:-!i}" $GITHUB_ENV
           done
       - name: print final versions
         run: printenv
