@@ -17,13 +17,12 @@ jobs:
     env:
       INPUT_KURL: ${{ github.event.KURL }}
       INPUT_NGINX-INGRESS-CONTROLLER: ${{ github.event.NGINX-INGRESS-CONTROLLER }}
-      appList: ("ocf" "NGINX-INGRESS-CONTROLLER")
     steps:
-      - name: Apply env variables
-        uses: actions/checkout@v2
       - name: Set service list
         id: env-list
         run: echo ::set-output name=applicationList::["ocf", "NGINX-INGRESS-CONTROLLER"]
+      - name: Apply env variables
+        uses: actions/checkout@v2
       - name: Output array
         run: echo ${{ steps.env-list.outputs.applicationList }}
       - name: Read versions files
@@ -43,17 +42,22 @@ jobs:
             echo
           done  >> $GITHUB_ENV
           echo ::set-output name=applicationList::${applicationList[@]}
-      - name: Override manual inputs
+      - name: apply overrides
         run: |
-          echo ${{ steps.read_env.outputs.applicationList }}
-      - name: Print env
-        run: |
-          printenv
-      - name: Apply overrides
-        env:
-          OCF_INPUT: ${{ github.event.inputs.OCF }}
-        run: |
-          echo OCF=${OCF_INPUT:-$OCF} >> $GITHUB_ENV
-      - name: Final versions
-        run: |
-          echo $OCF
+          for i in ${{ steps.read_env.outputs.applicationList }}; do
+            echo $i=${INPUT_i:-$i} >> $GITHUB_ENV
+          done
+      # - name: Override manual inputs
+      #   run: |
+      #     echo ${{ steps.read_env.outputs.applicationList }}
+      # - name: Print env
+      #   run: |
+      #     printenv
+      # - name: Apply overrides
+      #   env:
+      #     OCF_INPUT: ${{ github.event.inputs.OCF }}
+      #   run: |
+      #     echo OCF=${OCF_INPUT:-$OCF} >> $GITHUB_ENV
+      # - name: Final versions
+      #   run: |
+      #     echo $OCF
