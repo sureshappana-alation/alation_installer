@@ -39,4 +39,4 @@ jobs:
           echo ::set-output name=applicationList::${applicationList[@]}
       - name: Override manual inputs
         run: |
-          echo ${{ format('github.event.input.{0}', 'OCF') }}
+          echo ${{ join(github.event.input.*) }}
