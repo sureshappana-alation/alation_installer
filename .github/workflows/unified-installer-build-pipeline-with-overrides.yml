@@ -130,7 +130,6 @@ jobs:
       - name: In the case of cache miss get the Kurl package from S3
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
-          mkdir -p ./cache
           echo "Downloading Kurl package ${{env.KURL_FILE_NAME}} from S3. "
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }} ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }}
 
