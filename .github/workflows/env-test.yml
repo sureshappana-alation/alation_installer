@@ -17,9 +17,6 @@ on:
 jobs:
   env-test:
     runs-on: ubuntu-latest
-    env:
-      INPUT_KURL: ${{ github.event.inputs.KURL }}
-      INPUT_NGINX-INGRESS-CONTROLLER: ${{ github.event.inputs.NGINX-INGRESS-CONTROLLER }}
     steps:
       - name: Set service list
         id: env-list
@@ -46,6 +43,9 @@ jobs:
           done  >> $GITHUB_ENV
           echo ::set-output name=applicationList::${applicationList[@]}
       - name: apply overrides
+        env:
+          INPUT_KURL: ${{ github.event.inputs.KURL }}
+          INPUT_NGINX-INGRESS-CONTROLLER: ${{ github.event.inputs.NGINX-INGRESS-CONTROLLER }}
         run: |
           for i in ${{ steps.read_env.outputs.applicationList }}; do
             input_key="INPUT_$i"
