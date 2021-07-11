@@ -28,7 +28,7 @@ jobs:
 
 
     - name: List of file
-      run: find .
+      run: find ./base
 
     - name: Create file
       if: steps.cache-primes.outputs.cache-hit != 'true'
@@ -36,6 +36,6 @@ jobs:
         echo hi >> ./base/hi1.txt
 
     - name: List of file
-      run: find .
+      run: find ./base
 
 
