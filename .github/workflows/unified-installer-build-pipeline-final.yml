@@ -125,7 +125,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }}
-          key: ${{ env.KURL_FILE_NAME }}-1
+          key: ${{ env.KURL_FILE_NAME }}-2
     
       - name: Print list of files
         run: find ${{ env.BASE_DIR }}    
@@ -184,6 +184,9 @@ jobs:
 
       - name: Compress the final bundle
         run: tar -cvzf ${{ env.ALATION_OUTPUT }} ${{ env.ALATION_OUTPUT_DIR }}
+
+      - name: Renaming alation version back to original for caching
+        run: mv ${{ env.ALATION_OUTPUT_DIR }} ./alation 
 
       - name: Upload the compressed build to S3
         run: |
