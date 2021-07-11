@@ -34,7 +34,7 @@ jobs:
             while read line || [ -n "$line" ];
             do
                 set -f; IFS="="; application=($line)
-                if [[ "${application[0],,}" != *"kurl"* ]];then
+                if [[ "${application[0],,}" != *"KURL"* ]];then
                   applicationList+=(${application[0]})
                 fi
             done < "${i}"
@@ -49,24 +49,37 @@ jobs:
       #     echo NGINX_INGRESS_CONTROLLER=${INPUT_NGINX_INGRESS_CONTROLLER:-$NGINX_INGRESS_CONTROLLER} >> $GITHUB_ENV
       #     echo ::set-output name=applicationList::["NGINX_INGRESS_CONTROLLER"]
 
-      # - name: apply overrides (working)
-      #   run: |
-      #     echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
-      #     for i in ${{ steps.read_env.outputs.applicationList }}; do
-      #       input_key="INPUT_$i"
-      #       echo "$i=${!input_key:-${!i}}" >> $GITHUB_ENV
-      #     done
-
       - name: apply overrides (working)
         run: |
           echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
           for i in ${{ steps.read_env.outputs.applicationList }}; do
             input_key="INPUT_$i"
-            input_val=${!input_key}
-            if [ ! -z $input_val ]; then
-              echo "$i=$input_val" >> $GITHUB_ENV
+            echo "$i=${!input_key:-${!i}}" >> $GITHUB_ENV
+          done
+      - name: printing applicationlist
+        run: |
+          echo ${{ steps.read_env.outputs.applicationList }}
+      - name: Process files
+        run: |
+          for i in ${{ steps.read_env.outputs.applicationList }}; do
+            applicationName="${i,,}"
+            if [ ${!i} = "null" ]; then
+              echo "Skipping $applicationName"
+            else
+              echo "Downloading $application from S3"
             fi
           done
+
+      # - name: apply overrides (working)
+      #   run: |
+      #     echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
+      #     for i in ${{ steps.read_env.outputs.applicationList }}; do
+      #       input_key="INPUT_$i"
+      #       input_val=${!input_key}
+      #       if [ ! -z $input_val ]; then
+      #         echo "$i=$input_val" >> $GITHUB_ENV
+      #       fi
+      #     done
       - name: print final versions
         run: printenv
       # - name: Override manual inputs
