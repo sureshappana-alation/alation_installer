@@ -11,7 +11,7 @@ on:
       KURL:
         description: 'KURL Version'
         required: false
-      NGINX-INGRESS-CONTROLLER:
+      NGINX_INGRESS_CONTROLLER:
         description: 'Nginx ingress Version'
         required: false
 jobs:
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       INPUT_KURL: ${{ github.event.inputs.KURL }}
-      INPUT_NGINX-INGRESS-CONTROLLER: ${{ github.event.inputs.NGINX-INGRESS-CONTROLLER }}
+      INPUT_NGINX_INGRESS_CONTROLLER: ${{ github.event.inputs.NGINX_INGRESS_CONTROLLER }}
     steps:
       - name: Apply env variables
         uses: actions/checkout@v2
@@ -63,7 +63,7 @@ jobs:
         run: |
           for i in ${{ steps.read_env.outputs.applicationList }}; do
             applicationName="${i}"
-            if [ ${!i} = "skip" ]; then
+            if [[ ${!applicationName} = "skip" ]]; then
               echo "Skipping $applicationName"
             else
               echo "Downloading $applicationName from S3"
