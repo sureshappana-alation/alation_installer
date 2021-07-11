@@ -3,6 +3,8 @@ name: Caching Primes
 on:
   workflow_dispatch:
 
+env:
+  BASE_DIR: ./base
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,31 +13,34 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: List of file
-      run: find .
+      run: find ${{ env.BASE_DIR }}
 
+    - name: set env
+      run: |
+        echo FILE_NAME=hi3.txt >> GITHUB_ENV
 #     - name: File content
 #       run: cat ./hi1.txt
 
     - name: Create base directory
       run: |
-        mkdir -p ./base
-        echo hello > ./base/hi2.txt
+        mkdir -p ${{ env.BASE_DIR }}
+        echo hello > ${{ env.BASE_DIR }}/hi5.txt
 
     - name: Cache Primes
       id: cache-primes
       uses: actions/cache@v2
       with:
-        path: ./base/hi1.txt
-        key: ${{ runner.os }}-hi1.txt
+        path: ${{ env.BASE_DIR }}/${{ env.FILE_NAME }}
+        key: ${{ env.FILE_NAME }}
 
 
-    - name: List of file
+    - name: List of files
       run: find ./base
 
     - name: Create file
       if: steps.cache-primes.outputs.cache-hit != 'true'
       run: |
-        echo hi >> ./base/hi1.txt
+        echo hi >> ${{ env.BASE_DIR }}/${{ env.FILE_NAME }}
 
     - name: List of file
       run: find ./base
