@@ -1,0 +1,189 @@
+name: unified-installer-build-pipeline-with-overrides
+
+on:
+  # push:
+  #   branches: [main]
+
+  workflow_dispatch:
+    inputs:
+      KURL:
+        description: 'KURL version'
+        required: false
+      NGINX_INGRESS_CONTROLLER:
+        description: 'Nginx ingress controller version'
+        required: false
+
+env:
+  S3_DEV_BUCKET_URL: "s3://${{ secrets.S3_DEV_BUCKET_NAME }}"
+  S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
+  BASE_DIR: ./alation
+  RESOURCE_DIR: ./alation/res
+  MODULES_DIR: ./alation/res/modules
+  KURL_PATCH_DIR: ./alation/res/kurl_patch
+  ALATION_OUTPUT_DIR: alation-$GITHUB_RUN_NUMBER
+  ALATION_OUTPUT: alation-$GITHUB_RUN_NUMBER.tar.gz
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Setup golang
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16.4
+    
+    - name: Copy go artifacts
+      run: |
+        cd ${{ github.workspace }}/installer
+        cp go.sum src/go.sum
+        cp go.mod src/go.mod
+    
+    - name: Build installer
+      run: |
+        cd ${{ github.workspace }}/installer/src
+        go build -o out/installer *.go
+    
+    - name: List of files
+      run: find ${{ github.workspace }}/installer/src/out
+
+    - name: Upload installer binary for app-setup job
+      uses: actions/upload-artifact@v2
+      with:
+        name: installer-binary
+        path: ${{ github.workspace }}/installer/src/out
+        retention-days: 1
+  app-setup:
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      INPUT_KURL: ${{ github.event.inputs.KURL }}
+      INPUT_NGINX_INGRESS_CONTROLLER: ${{ github.event.inputs.NGINX_INGRESS_CONTROLLER }}
+
+    steps:   
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_S3_REGION }}
+      
+      - name: Download installer from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: installer-binary
+          path: ${{ env.BASE_DIR }}
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Creating required directories
+        run: |
+          mkdir -p ${{ env.BASE_DIR }}
+          mkdir -p ${{ env.MODULES_DIR }}
+          mkdir -p ${{ env.KURL_PATCH_DIR }}
+
+      - name: Copy res content from source code to archiving directory
+        run: |
+          cp -a ${{ github.workspace }}/installer/res/. ${{ env.BASE_DIR }}/res/
+
+      - name: Read environment versions files
+        id: read_env
+        run: |
+          applicationList=()
+          shopt -s nullglob
+          for i in ./versions/*.sh; do
+            while read line || [ -n "$line" ];
+            do
+                set -f; IFS="="; application=($line)
+                if [[ "${application[0],,}" != *"KURL"* ]];then
+                  applicationList+=(${application[0]})
+                fi
+            done < "${i}"
+            cat "$i"
+            echo
+          done  >> $GITHUB_ENV
+          echo ::set-output name=applicationList::${applicationList[@]}
+
+      - name: Apply overrides from user inputs and set as env variables
+        run: |
+          for app in ${{ steps.read_env.outputs.applicationList }}; do
+            input_key="INPUT_$app"
+            echo "$app=${!input_key:-${!app}}" >> $GITHUB_ENV
+          done
+          echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
+          echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
+      
+      - name: Importing kurl package from cache
+        id: kurl-cache
+        uses: actions/cache@v2
+        with:
+          path: ./cache
+          key: ${{ env.KURL_FILE_NAME }}
+
+      - name: In the case of cache miss get the Kurl package from S3
+        if: steps.kurl-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ./cache
+          echo "Downloading Kurl package ${{env.KURL_FILE_NAME}} from S3. "
+          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}} ./cache/${{ env.KURL_FILE_NAME }}            
+
+      - name: Copy Kurl file from cache to the installer base directory
+        run: |
+          cp ./cache/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR}}/${{env.KURL_FILE_NAME}} 
+
+      - name: Download application files from S3
+        run: |
+          for i in ${{ steps.read_env.outputs.applicationList }}; do
+            applicationName="${i,,}"
+            if [ ${!i} = "null" ]; then
+              echo "Skipping $applicationName"
+            else
+              application="${applicationName}-${!i}.tar.gz"
+              echo "Downloading $application from S3"
+              aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application ${{env.MODULES_DIR}}/$applicationName/
+            fi
+          done
+
+      - name: Generate alation-install.yaml file
+        run: |
+          installConfigFile=${{ env.BASE_DIR }}/alation-install.yaml
+          touch $installConfigFile
+          for dir in $(find $MODULES_DIR -mindepth 1 -maxdepth 1 -type d); do
+            directory=${dir%*/}
+            echo "Processing $directory"
+            files=$(find $directory -mindepth 1 -maxdepth 1 -iname "*.tar.gz")
+            if [ "${#files}" -gt 1 ]; then
+                moduleFile=${files[0]}
+                echo "Found $moduleFile. Extracting..."
+                tar -xzf $moduleFile -C $directory  --strip-components=2
+                echo "Deleting $moduleFile"
+                rm -f $moduleFile
+            else
+              echo "No tar files found in $directory"
+            fi
+            if test -f "$directory/install.yaml"; then
+              echo "Found $directory/install.yaml"
+              echo "Appending $directory/install.yaml content to $installConfigFile file"
+              echo "${directory##*/}:" >> $installConfigFile
+              sed -e 's/^/  /' $directory/install.yaml >> $installConfigFile
+            else
+              echo "$directory/install.yaml" doesn\'t exists. Ignoring...
+            fi
+          done
+
+      - name: Print list of files
+        run: find ${{ env.BASE_DIR }}
+
+      - name: Renaming base directory to alation version
+        run: mv ./alation ${{ env.ALATION_OUTPUT_DIR }}
+
+      - name: Compress the final bundle
+        run: tar -cvzf ${{ env.ALATION_OUTPUT }} ${{ env.ALATION_OUTPUT_DIR }}
+
+      - name: Upload the compressed build to S3
+        run: |
+          aws s3 cp ${{ env.ALATION_OUTPUT }} ${{ env.S3_RELEASE_BUCKET_URL }}/${{ env.ALATION_OUTPUT }}
