@@ -9,7 +9,7 @@ import (
 const (
 	// spec of the build is available at https://kurl.sh/d2b213e
 	// and https://alationcorp.atlassian.net/wiki/spaces/ENG/pages/5595541243/Alation+kURL+build
-	kurlBuildHash = "d2b213e"
+	kurlBuildHash = "d2b213e-86607afd5b"
 )
 
 const ( // Bash commands used in this file
