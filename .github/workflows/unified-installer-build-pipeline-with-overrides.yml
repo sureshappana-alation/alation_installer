@@ -126,6 +126,9 @@ jobs:
         with:
           path: ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }}
           key: ${{ env.KURL_FILE_NAME }}
+    
+      - name: Print list of files
+        run: find ${{ env.BASE_DIR }}    
 
       - name: In the case of cache miss get the Kurl package from S3
         if: steps.kurl-cache.outputs.cache-hit != 'true'
