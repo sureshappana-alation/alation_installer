@@ -46,7 +46,7 @@ jobs:
         run: |
           for i in ${{ steps.read_env.outputs.applicationList }}; do
             input_val="INPUT_$i"
-            echo "$i=${${!input_val}:-!i}" $GITHUB_ENV
+            echo "$i=${!input_val:-${!i}}" $GITHUB_ENV
           done
       - name: print final versions
         run: printenv
