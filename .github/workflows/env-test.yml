@@ -20,7 +20,6 @@ jobs:
       - name: Print env values
         run: |
           echo ${{ github.event.inputs.OCF }}
-            - name: Read environment versions files
       - name: Read versions files
         id: read_env
         run: |
