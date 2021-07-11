@@ -62,7 +62,10 @@ jobs:
           echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
           for i in ${{ steps.read_env.outputs.applicationList }}; do
             input_key="INPUT_$i"
-            echo "$i=${!'input_key':-${!i}}" >> $GITHUB_ENV
+            input_val=${!input_key}
+            if [ ! -z $input_val ]; then
+              echo "$i=$input_val" >> $GITHUB_ENV
+            fi
           done
       - name: print final versions
         run: printenv
