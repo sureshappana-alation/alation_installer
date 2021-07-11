@@ -34,6 +34,8 @@ jobs:
             while read line || [ -n "$line" ];
             do
                 set -f; IFS="="; application=($line)
+                echo "${application[0],,}"
+                echo "${application[0]}"
                 if [[ "${application[0],,}" != *"KURL"* ]];then
                   applicationList+=(${application[0]})
                 fi
