@@ -138,8 +138,8 @@ jobs:
       - name: Download application files from S3
         run: |
           for i in ${{ steps.read_env.outputs.applicationList }}; do
-            applicationName="${i,,}"
-            if [ ${!i} = "null" ]; then
+            applicationName="${i}"
+            if [[ ${!applicationName} = "skip" ]]; then
               echo "Skipping $applicationName"
             else
               application="${applicationName}-${!i}.tar.gz"
