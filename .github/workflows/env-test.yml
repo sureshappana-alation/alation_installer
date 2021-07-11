@@ -47,7 +47,7 @@ jobs:
         env:
           OCF_INPUT: ${{ github.event.inputs.OCF }}
         run: |
-          echo OCF=${OCF_INPUT:-OCF} >> $GITHUB_ENV
+          echo OCF=${OCF_INPUT:-$OCF} >> $GITHUB_ENV
       - name: Final versions
         run: |
           echo $OCF
