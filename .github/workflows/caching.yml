@@ -23,8 +23,8 @@ jobs:
       id: cache-primes
       uses: actions/cache@v2
       with:
-        path: ./base/hi.txt
-        key: ${{ runner.os }}-hi
+        path: ./base/hi1.txt
+        key: ${{ runner.os }}-hi1
 
 
     - name: List of file
