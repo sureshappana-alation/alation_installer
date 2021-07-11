@@ -124,7 +124,7 @@ jobs:
         id: kurl-cache
         uses: actions/cache@v2
         with:
-          path: ./cache
+          path: ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }}
           key: ${{ env.KURL_FILE_NAME }}
 
       - name: In the case of cache miss get the Kurl package from S3
@@ -132,11 +132,7 @@ jobs:
         run: |
           mkdir -p ./cache
           echo "Downloading Kurl package ${{env.KURL_FILE_NAME}} from S3. "
-          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{env.KURL_FILE_NAME}} ./cache/${{ env.KURL_FILE_NAME }}            
-
-      - name: Copy Kurl file from cache to the installer base directory
-        run: |
-          cp ./cache/${{env.KURL_FILE_NAME}} ${{ env.RESOURCE_DIR}}/${{env.KURL_FILE_NAME}} 
+          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }} ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }}
 
       - name: Download application files from S3
         run: |
