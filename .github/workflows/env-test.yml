@@ -17,7 +17,7 @@ jobs:
     env:
       INPUT_KURL: ${{ github.event.KURL }}
       INPUT_NGINX-INGRESS-CONTROLLER: ${{ github.event.NGINX-INGRESS-CONTROLLER }}
-      appList: ("ocf", "NGINX-INGRESS-CONTROLLER")
+      appList: ("ocf" "NGINX-INGRESS-CONTROLLER")
     steps:
       - name: Apply env variables
         uses: actions/checkout@v2
