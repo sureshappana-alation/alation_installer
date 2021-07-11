@@ -106,6 +106,10 @@ jobs:
             echo
           done  >> $GITHUB_ENV
           echo ::set-output name=applicationList::${applicationList[@]}
+      
+      - name: Print application list
+        run: |
+          echo ${{ steps.read_env.outputs.applicationList }}
 
       - name: Apply overrides from user inputs and set as env variables
         run: |
