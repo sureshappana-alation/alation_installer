@@ -1,4 +1,4 @@
-name: unified-installer-build-pipeline-with-overrides
+name: unified-installer-build-pipeline-final
 
 on:
   # push:
