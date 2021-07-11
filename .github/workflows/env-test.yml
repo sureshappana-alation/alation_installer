@@ -19,4 +19,4 @@ jobs:
         uses: actions/checkout@v2
       - name: Print env values
         run: |
-          echo ${{ github.event.input.OCF }}
+          echo ${{ github.event.inputs.OCF }}
