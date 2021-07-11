@@ -17,14 +17,16 @@ jobs:
 #       run: cat ./hi1.txt
 
     - name: Create base directory
-      run: mkdir -p ./base
+      run: |
+        mkdir -p ./base
+        echo hello > ./base/hi2.txt
 
     - name: Cache Primes
       id: cache-primes
       uses: actions/cache@v2
       with:
         path: ./base/hi1.txt
-        key: ${{ runner.os }}-hi1
+        key: ${{ runner.os }}-hi1.txt
 
 
     - name: List of file
