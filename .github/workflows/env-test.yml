@@ -18,8 +18,8 @@ jobs:
   env-test:
     runs-on: ubuntu-latest
     env:
-      INPUT_KURL: ${{ github.event.inputs.KURL }}
-      INPUT_NGINX-INGRESS-CONTROLLER: ${{ github.event.inputs.NGINX-INGRESS-CONTROLLER }}
+      INPUT-KURL: ${{ github.event.inputs.KURL }}
+      INPUT-NGINX-INGRESS-CONTROLLER: ${{ github.event.inputs.NGINX-INGRESS-CONTROLLER }}
     steps:
       - name: Apply env variables
         uses: actions/checkout@v2
@@ -45,8 +45,8 @@ jobs:
       - name: Apply Overrides
         id: env-list
         run: |
-          echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
-          echo NGINX-INGRESS-CONTROLLER=${INPUT_NGINX-INGRESS-CONTROLLER:-$NGINX-INGRESS-CONTROLLER} >> $GITHUB_ENV
+          echo KURL=${INPUT-KURL:-$KURL} >> $GITHUB_ENV
+          echo NGINX-INGRESS-CONTROLLER=${INPUT-NGINX-INGRESS-CONTROLLER:-$NGINX-INGRESS-CONTROLLER} >> $GITHUB_ENV
           echo ::set-output name=applicationList::["NGINX-INGRESS-CONTROLLER"]
 
       # - name: apply overrides
