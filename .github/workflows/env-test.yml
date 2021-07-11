@@ -21,6 +21,11 @@ jobs:
     steps:
       - name: Apply env variables
         uses: actions/checkout@v2
+      - name: Set service list
+        id: env-list
+        run: echo ::set-output name=applicationList::["ocf", "NGINX-INGRESS-CONTROLLER"]
+      - name: Output array
+        run: echo ${{ steps.env-list.outputs.applicationList }}
       - name: Read versions files
         id: read_env
         run: |
