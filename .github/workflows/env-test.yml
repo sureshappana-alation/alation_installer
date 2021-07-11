@@ -47,6 +47,8 @@ jobs:
           for i in ${{ steps.read_env.outputs.applicationList }}; do
             echo $i=${INPUT_i:-$i} >> $GITHUB_ENV
           done
+      - name: print final versions
+        run: printenv
       # - name: Override manual inputs
       #   run: |
       #     echo ${{ steps.read_env.outputs.applicationList }}
