@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       INPUT_KURL: ${{ github.event.inputs.KURL }}
-      INPUT_NGINX-INGRESS-CONTROLLER: ${{ github.event.inputs.NGINX_INGRESS_CONTROLLER }}
+      INPUT_NGINX-INGRESS-CONTROLLER: ${{ github.event.inputs.NGINX-INGRESS-CONTROLLER }}
     steps:
       - name: Apply env variables
         uses: actions/checkout@v2
