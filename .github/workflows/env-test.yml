@@ -20,3 +20,24 @@ jobs:
       - name: Print env values
         run: |
           echo ${{ github.event.inputs.OCF }}
+            - name: Read environment versions files
+      - name: Read versions files
+        id: read_env
+        run: |
+          applicationList=()
+          shopt -s nullglob
+          for i in ./versions1/*.sh; do
+            while read line || [ -n "$line" ];
+            do
+                set -f; IFS="="; application=($line)
+                if [[ "${application[0],,}" != *"kurl"* ]];then
+                  applicationList+=(${application[0]})
+                fi
+            done < "${i}"
+            cat "$i"
+            echo
+          done  >> $GITHUB_ENV
+          echo ::set-output name=applicationList::${applicationList[@]}
+      - name: Override manual inputs
+        run: |
+          echo ${{ github.events.inputs.* }}
