@@ -1,8 +1,8 @@
 name: unified-installer-build-pipeline-final
 
 on:
-  pull_request:
-    types: [ closed ] # Run the job when pull request closed
+  # pull_request:
+  #   types: [ closed ] # Run the job when pull request closed
 
   # This section is to trigger the workflow manually
   workflow_dispatch:
@@ -81,6 +81,10 @@ jobs:
           name: installer-binary
           path: ${{ env.BASE_DIR }}
 
+      # Remove
+      - name: Print list of files in base directory
+        run: find ${{ env.BASE_DIR }}
+
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -132,9 +136,13 @@ jobs:
         with:
           path: ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }}
           key: ${{ env.KURL_FILE_NAME }}-2
+
+      # Remove
+      - name: Print list of files in base directory
+        run: find ${{ env.BASE_DIR }}
     
       - name: Print list of files in base directory
-        run: find ${{ env.BASE_DIR }}    
+        run: find ${{ env.BASE_DIR }}
 
       - name: In the case of cache miss get the Kurl package from S3
         if: steps.kurl-cache.outputs.cache-hit != 'true'
