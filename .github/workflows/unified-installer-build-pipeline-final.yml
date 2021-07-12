@@ -75,12 +75,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_S3_REGION }}
       
-      - name: Download installer from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: installer-binary
-          path: ${{ env.BASE_DIR }}
-
       # Remove
       - name: Print list of files in base directory
         run: find ${{ env.BASE_DIR }}
@@ -140,9 +134,6 @@ jobs:
       # Remove
       - name: Print list of files in base directory
         run: find ${{ env.BASE_DIR }}
-    
-      - name: Print list of files in base directory
-        run: find ${{ env.BASE_DIR }}
 
       - name: In the case of cache miss get the Kurl package from S3
         if: steps.kurl-cache.outputs.cache-hit != 'true'
@@ -189,6 +180,12 @@ jobs:
               echo "$directory/install.yaml" doesn\'t exists. Ignoring...
             fi
           done
+
+      - name: Download installer from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: installer-binary
+          path: ${{ env.BASE_DIR }}
 
       - name: Print list of files
         run: find ${{ env.BASE_DIR }}
