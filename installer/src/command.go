@@ -14,7 +14,7 @@ func RunBashCmd(cmd string) (bool, string) {
 }
 
 func RunCommand(cmd *exec.Cmd) (bool, string) {
-	LOGGER.Info(fmt.Sprintf("running cmd: %s", cmd))
+					LOGGER.Info(fmt.Sprintf("running cmd: %s", cmd))
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		errStr := fmt.Sprintf("%s%s", out, err)
