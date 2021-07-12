@@ -13,11 +13,10 @@ const ( // bash commands used in this file
 	prometheusMkdirCmd      = "sudo sudo mkdir -p /mnt/disks/prometheus-db-0"
 	applyPrometheusPatchCmd = "kubectl apply -f res/kurl_patch/prometheus.yaml"
 
-	labelRegistryNodeCmd      = "kubectl label node %s node-role.alation.com/registry=registry --overwrite"
-	registryDeletePvcCmd      = "kubectl -n kurl delete pvc registry-pvc"
-	registryMkdirCmd          = "sudo mkdir -p /mnt/disks/registry"
-	applyRegistryPatchCmd     = "kubectl -n kurl apply -f res/kurl_patch/registry.yaml"
-	setRegistryServicePortCmd = `kubectl -n kurl patch svc registry --type merge -p '{"spec":{"ports": [{"port": 80,"name":"registry","targetPort":80}]}}'`
+	labelRegistryNodeCmd  = "kubectl label node %s node-role.alation.com/registry=registry --overwrite"
+	registryDeletePvcCmd  = "kubectl -n kurl delete pvc registry-pvc"
+	registryMkdirCmd      = "sudo mkdir -p /mnt/disks/registry"
+	applyRegistryPatchCmd = "kubectl apply -f res/kurl_patch/registry.yaml"
 )
 
 // The Kurl bootstrapper build does not include a storage solution and the cluster would need extra configuration for storage
@@ -32,7 +31,6 @@ func configClusterPlugins() {
 	setupPrometheus(nodeName)
 
 	setupRegistry(nodeName)
-	configRegistryOnContainerd()
 }
 
 func setupLocalStorageClass() {
@@ -80,9 +78,5 @@ func setupRegistry(nodeName string) {
 
 	// Apply registry manifests
 	_, out = RunBashCmd(applyRegistryPatchCmd)
-	LOGGER.Info(out)
-
-	// Set registry service ports
-	_, out = RunBashCmd(setRegistryServicePortCmd)
 	LOGGER.Info(out)
 }

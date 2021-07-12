@@ -1,9 +1,10 @@
 name: unified-installer-build-pipeline-final
 
 on:
-  # push:
-  #   branches: [main]
+  pull_request:
+    types: [ closed ] # Run the job when pull request closed
 
+  # This section is to trigger the workflow manually
   workflow_dispatch:
     inputs:
       KURL:
@@ -24,10 +25,11 @@ env:
   ALATION_OUTPUT: alation-$GITHUB_RUN_NUMBER.tar.gz
 
 jobs:
-
+  # Build job builds the installer go application which generates and exports go binary
   build:
     runs-on: ubuntu-latest
     steps:
+
     - name: Checkout code
       uses: actions/checkout@v2
     
@@ -36,7 +38,7 @@ jobs:
       with:
         go-version: 1.16.4
     
-    - name: Copy go artifacts
+    - name: Copy go artifacts to respective directories
       run: |
         cd ${{ github.workspace }}/installer
         cp go.sum src/go.sum
@@ -47,7 +49,7 @@ jobs:
         cd ${{ github.workspace }}/installer/src
         go build -o out/installer *.go
     
-    - name: List of files
+    - name: List of files in the out directory
       run: find ${{ github.workspace }}/installer/src/out
 
     - name: Upload installer binary for app-setup job
@@ -56,6 +58,8 @@ jobs:
         name: installer-binary
         path: ${{ github.workspace }}/installer/src/out
         retention-days: 1
+
+  # This job is for creating alation unified installer build
   app-setup:
     runs-on: ubuntu-latest
     needs: build
@@ -95,7 +99,7 @@ jobs:
         run: |
           applicationList=()
           shopt -s nullglob
-          for i in ./versions/*.sh; do
+          for i in ./versions/*.env; do
             while IFS='=' read -r key val
             do
               if [[ $key != *"KURL"* ]]; then
@@ -111,6 +115,7 @@ jobs:
         run: |
           echo ${{ steps.read_env.outputs.applicationList }}
 
+      # This section overrides the user inputs provided manually or REST
       - name: Apply overrides from user inputs and set as env variables
         run: |
           for app in ${{ steps.read_env.outputs.applicationList }}; do
@@ -120,6 +125,7 @@ jobs:
           echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
           echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
       
+      # Caching Kurl package
       - name: Importing kurl package from cache
         id: kurl-cache
         uses: actions/cache@v2
@@ -127,7 +133,7 @@ jobs:
           path: ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }}
           key: ${{ env.KURL_FILE_NAME }}-2
     
-      - name: Print list of files
+      - name: Print list of files in base directory
         run: find ${{ env.BASE_DIR }}    
 
       - name: In the case of cache miss get the Kurl package from S3
@@ -185,7 +191,7 @@ jobs:
       - name: Compress the final bundle
         run: tar -cvzf ${{ env.ALATION_OUTPUT }} ${{ env.ALATION_OUTPUT_DIR }}
 
-      - name: Renaming alation version back to original for caching
+      - name: Renaming alation version directory back to original for caching
         run: mv ${{ env.ALATION_OUTPUT_DIR }} ./alation 
 
       - name: Upload the compressed build to S3
