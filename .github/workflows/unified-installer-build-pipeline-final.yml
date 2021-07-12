@@ -74,10 +74,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_S3_REGION }}
-      
-      # Remove
-      - name: Print list of files in base directory
-        run: find ${{ env.BASE_DIR }}
 
       - name: Checkout code
         uses: actions/checkout@v2
