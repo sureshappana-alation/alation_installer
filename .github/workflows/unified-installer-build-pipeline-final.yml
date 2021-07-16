@@ -157,7 +157,7 @@ jobs:
             if [ "${#files}" -gt 1 ]; then
                 moduleFile=${files[0]}
                 echo "Found $moduleFile. Extracting..."
-                tar -xzf $moduleFile -C $directory  --strip-components=2
+                tar -xzf $moduleFile -C $directory  --strip-components=1
                 echo "Deleting $moduleFile"
                 rm -f $moduleFile
             else
