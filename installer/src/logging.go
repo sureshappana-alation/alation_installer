@@ -37,3 +37,7 @@ func newLogger() *Logger {
 	logger.SetFormatter(&logrus.TextFormatter{})
 	return logger
 }
+
+func getLogFilePath() string {
+	return fmt.Sprintf("%s/%s", logDirectory, logFile)
+}

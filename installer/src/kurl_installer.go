@@ -6,18 +6,12 @@ import (
 	"strings"
 )
 
-const (
-	// spec of the build is available at https://kurl.sh/d2b213e
-	// and https://alationcorp.atlassian.net/wiki/spaces/ENG/pages/5595541243/Alation+kURL+build
-	kurlBuildHash = "d2b213e-86607afd5b"
-)
-
 const ( // Bash commands used in this file
 	kubeClusterInfoCmd = "kubectl cluster-info"
 	workingDirCmd      = "pwd"
 	deleteDirCmd       = "if [ -d \"%s\" ]; then rm -Rf %s; fi"
-	makeKurlDirCmd     = "mkdir %s/res/kurl-%s"
-	kurlDecompressCmd  = "tar xvzf %s/res/kurl-%s.tar.gz -C %s/res/kurl-%s"
+	makeKurlDirCmd     = "mkdir %s/res/kurl"
+	kurlDecompressCmd  = "tar xvzf %s/res/kurl.tar.gz -C %s/res/kurl"
 	kurlInstallCmd     = "cd %s && cat install.sh | sudo bash -s airgap"
 )
 
@@ -40,9 +34,6 @@ func BootstrapKubernetesCluster() {
 	} else {
 		logAndShowMsg("Kubernetes platform is already installed. Alation Setup will be continued.")
 	}
-
-	// extra config needed to run cluster plugins after kurl installation
-	configClusterPlugins()
 }
 
 func decompressKurlPackage() {
@@ -51,14 +42,14 @@ func decompressKurlPackage() {
 	workingDirectory = strings.TrimSpace(cmdOut)
 	LOGGER.Info("Working directory is", workingDirectory)
 
-	kurlDirectory = fmt.Sprintf("%s/res/kurl-%s", workingDirectory, kurlBuildHash)
+	kurlDirectory = fmt.Sprintf("%s/res/kurl", workingDirectory)
 	LOGGER.Info("Desired path for decompressed kurl package is ", workingDirectory)
 
 	// delete decompress kurl directory if exist - in case of installer re-run
 	RunBashCmd(fmt.Sprintf(deleteDirCmd, kurlDirectory, kurlDirectory))
 
 	// create directory to decompress kURL package into
-	kurlDirectoryCreated, cmdOut := RunBashCmd(fmt.Sprintf(makeKurlDirCmd, workingDirectory, kurlBuildHash))
+	kurlDirectoryCreated, cmdOut := RunBashCmd(fmt.Sprintf(makeKurlDirCmd, workingDirectory))
 	if !kurlDirectoryCreated {
 		logAndShowError("Could not create new directory for Kubernetes bootstrapper.", cmdOut)
 		os.Exit(1)
@@ -66,7 +57,7 @@ func decompressKurlPackage() {
 
 	// Decompress kURL package
 	decompressed, cmdOut :=
-		RunBashCmd(fmt.Sprintf(kurlDecompressCmd, workingDirectory, kurlBuildHash, workingDirectory, kurlBuildHash))
+		RunBashCmd(fmt.Sprintf(kurlDecompressCmd, workingDirectory, workingDirectory))
 	if !decompressed {
 		logAndShowError("Could not decompress Kubernetes bootstrapper package.", cmdOut)
 		os.Exit(1)
@@ -84,9 +75,15 @@ func bootstrapKubernetes() {
 		os.Exit(1)
 	}
 
+	LOGGER.Info("Kurl install out: \n" + cmdOut)
+
+	kubeConfig, kubeConfigExist := os.LookupEnv("KUBECONFIG")
+	if kubeConfigExist {
+		LOGGER.Info("KUBECONFIG environmnet already set. Value:" + kubeConfig)
+	}
 	// This environment variable is needed for next commands which work with kubectl
 	os.Setenv("KUBECONFIG", "/etc/kubernetes/admin.conf")
+	LOGGER.Info("KUBECONFIG environmnet variable set to /etc/kubernetes/admin.conf")
 
-	LOGGER.Info("Kurl install out: \n" + cmdOut)
-	logAndShowSuccess("Kubernetes Cluster installed.")
+	logAndShowSuccess("Kubernetes Cluster installed and is running.")
 }

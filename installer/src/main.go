@@ -14,7 +14,11 @@ func main() {
 
 	BootstrapKubernetesCluster()
 
+	setupNodes()
+
+	configClusterPlugins()
+
 	InstallModules(installConfig)
 
-	logAndShowSuccess("Installer Script finished successfully.")
+	logAndShowSuccess("Installer Script finished successfully. \nInstaller logs are available at " + getLogFilePath())
 }

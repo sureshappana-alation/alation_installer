@@ -2,19 +2,23 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
 
 const (
-	modulesDirPath   = "res/modules"
-	moduleChartsPath = "/helm.tgz"
-	moduleImagesPath = "/images"
+	persistentVolumeTemplate = "res/kurl_patch/persistent-volume-template.yaml"
+	modulesDirPath           = "res/modules"
+	moduleChartsPath         = "/helm.tgz"
+	moduleImagesPath         = "/images"
 )
+
 const ( // Bash commands used in this file
 	containerdLoadImageCmd = "sudo ctr -n k8s.io images import %s"
-	helmInstallCmd         = "/usr/local/bin/helm install %s %s %s"
+	helmInstallCmd         = "/usr/local/bin/helm upgrade --install %s %s %s"
 	kubeApplyFileCmd       = "cat <<EOF | kubectl apply -f -\n%s\nEOF"
+	mkdirCmd               = "sudo mkdir -p %s"
 )
 
 // This function looks at the modules available in res/module directory and install them all
@@ -45,6 +49,9 @@ func InstallModules(installConfig AlationInstallConfig) {
 }
 
 func installModule(modulePath string, installConfig AlationInstallConfig) {
+	moduleName := filepath.Base(modulePath)
+	logAndShowMsg(fmt.Sprintf("Module %s installation is started.", moduleName))
+
 	loadModuleImages(modulePath)
 	createPersistentVolumes(modulePath)
 	installModuleCharts(modulePath, installConfig)
@@ -54,9 +61,11 @@ func installModule(modulePath string, installConfig AlationInstallConfig) {
 func loadModuleImages(modulePath string) {
 	var imageTarBallPaths []string
 
+	imagesDirPath := modulePath + moduleImagesPath
+
 	// find all images of the module
 	imagesDirScanError :=
-		filepath.Walk(modulePath+moduleImagesPath, func(filePath string, fileInfo os.FileInfo, err error) error {
+		filepath.Walk(imagesDirPath, func(filePath string, fileInfo os.FileInfo, err error) error {
 			if !fileInfo.IsDir() && filepath.Ext(filePath) == ".tar" {
 				imageTarBallPaths = append(imageTarBallPaths, filePath)
 			}
@@ -108,34 +117,22 @@ func installModuleCharts(modulePath string, installConfig AlationInstallConfig) 
 // Create persistent volumes for the module base on the storage.yaml values.
 func createPersistentVolumes(modulePath string) {
 	moduleName := filepath.Base(modulePath)
-	template := `apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: %s
-spec:
-  capacity:
-    storage: %s
-  volumeMode: Filesystem
-  accessModes:
-  - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  local:
-    path: %s
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: %s
-          operator: In
-          values:
-          - %s`
+	template, err := ioutil.ReadFile(persistentVolumeTemplate)
+	if err != nil {
+		logAndShowError("Module installation.", "Persistent volume template not found.")
+		os.Exit(1)
+	}
 
 	storageFilePath := modulePath + "/storage.yaml"
 	if fileExists(storageFilePath) {
 		storage := ParseModuleStorage(storageFilePath)
 		for _, volume := range storage.Volumes {
-			manifest := fmt.Sprintf(template, volume.Name, volume.Capacity, volume.Path, volume.Label, "labeled")
+
+			// Create directory for volume
+			_, out := RunBashCmd(fmt.Sprintf(mkdirCmd, volume.Path))
+			LOGGER.Info(out)
+
+			manifest := fmt.Sprintf(string(template), volume.Name, volume.Capacity, volume.Path, volume.Label, "labeled")
 
 			persistentVolumeConfigured, out := RunBashCmd(fmt.Sprintf(kubeApplyFileCmd, manifest))
 			if persistentVolumeConfigured {

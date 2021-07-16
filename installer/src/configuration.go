@@ -1,5 +1,5 @@
 /**
-* This file contains code related to loading, parsing and validating the initail configuration passed to the installer script.
+* This file contains code related to loading, parsing and validating the initial configuration passed to the installer script.
  */
 package main
 
@@ -36,7 +36,7 @@ func ParseAlationInstallConfig(configFilePath string) AlationInstallConfig {
 	yamlFile, error := ioutil.ReadFile(configFilePath)
 
 	if error != nil {
-		logAndShowError("Loading alation install config file", error.Error())
+		logAndShowError("Loading Alation install config file", error.Error())
 		os.Exit(1)
 	}
 
@@ -44,7 +44,7 @@ func ParseAlationInstallConfig(configFilePath string) AlationInstallConfig {
 
 	error = yaml.Unmarshal(yamlFile, &config)
 	if error != nil {
-		logAndShowError("Parsing alation install config file", error.Error())
+		logAndShowError("Parsing Alation install config file", error.Error())
 		os.Exit(1)
 	}
 
@@ -123,7 +123,7 @@ type Volume struct {
 	Label    string `yaml:"label"`
 }
 
-// Load module storgae yaml file and parse it as ModuleStorage struct
+// Load module storage yaml file and parse it as ModuleStorage struct
 func ParseModuleStorage(configFilePath string) ModuleStorage {
 
 	yamlFile, error := ioutil.ReadFile(configFilePath)

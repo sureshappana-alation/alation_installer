@@ -127,10 +127,6 @@ jobs:
           path: ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }}
           key: ${{ env.KURL_FILE_NAME }}-2
 
-      # Remove
-      - name: Print list of files in base directory
-        run: find ${{ env.BASE_DIR }}
-
       - name: In the case of cache miss get the Kurl package from S3
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
@@ -177,7 +173,7 @@ jobs:
             fi
           done
 
-      - name: Download installer from build job
+      - name: Download installer binary from build job
         uses: actions/download-artifact@v2
         with:
           name: installer-binary

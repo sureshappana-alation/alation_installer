@@ -13,6 +13,7 @@ func logAndShowMsg(msg string) {
 	output := fmt.Sprintf(" %s %s", Black("\u2714"), msg)
 	fmt.Println(output)
 }
+
 func logAndShowSuccess(check string) {
 	tmplMsg := "[ %s %s ] %s"
 	output := fmt.Sprintf(tmplMsg, Green("\u2714"), Green("Success"), check)

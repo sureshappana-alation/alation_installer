@@ -5,7 +5,7 @@ Build installer project to generate binary for linux platform using docker
 ```bash
 docker build -o out .
 ```
-This will create a packege containing the binary and the needed resources under installer/out path
+This will create a package containing the binary and the needed resources under installer/out path
 
 ## install
 1. Upload the installer bundle to your Linux box and decompress it
