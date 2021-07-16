@@ -7,13 +7,10 @@ on:
   # This section is to trigger the workflow manually
   workflow_dispatch:
     inputs:
-      KURL:
+      kurl:
         description: 'KURL version'
         required: false
-      NGINX_INGRESS_CONTROLLER:
-        description: 'Nginx ingress controller version'
-        required: false
-      ALATION_ANALYTICS:
+      alation_analytics:
         description: 'Alation Analytics version'
         required: false
 
@@ -67,8 +64,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     env:
-      INPUT_KURL: ${{ github.event.inputs.KURL }}
-      INPUT_NGINX_INGRESS_CONTROLLER: ${{ github.event.inputs.NGINX_INGRESS_CONTROLLER }}
+      input_kurl: ${{ github.event.inputs.kurl }}
+      input_alation_analytics: ${{ github.event.inputs.alation_analytics }}
 
     steps:   
       - name: Configure AWS Credentials
@@ -116,10 +113,10 @@ jobs:
       - name: Apply overrides from user inputs and set as env variables
         run: |
           for app in ${{ steps.read_env.outputs.applicationList }}; do
-            input_key="INPUT_$app"
+            input_key="input_$app"
             echo "$app=${!input_key:-${!app}}" >> $GITHUB_ENV
           done
-          echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
+          echo KURL=${input_kurl:-$KURL} >> $GITHUB_ENV
           echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
       
       # Caching Kurl package
@@ -127,14 +124,14 @@ jobs:
         id: kurl-cache
         uses: actions/cache@v2
         with:
-          path: ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }}
-          key: ${{ env.KURL_FILE_NAME }}-2
+          path: ${{ env.RESOURCE_DIR }}/kurl.tar.gz
+          key: ${{ env.KURL_FILE_NAME }}
 
       - name: In the case of cache miss get the Kurl package from S3
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
           echo "Downloading Kurl package ${{env.KURL_FILE_NAME}} from S3. "
-          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }} ${{ env.RESOURCE_DIR }}/${{ env.KURL_FILE_NAME }}
+          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }} ${{ env.RESOURCE_DIR }}/kurl.tar.gz
 
       - name: Download application files from S3
         run: |
