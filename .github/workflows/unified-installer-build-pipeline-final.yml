@@ -96,7 +96,7 @@ jobs:
           for i in ./versions/*.env; do
             while IFS='=' read -r key val
             do
-              if [[ $key != *"KURL"* ]]; then
+              if [[ $key != *"kurl"* ]]; then
                 applicationList+=(${key})
               fi
             done < "${i}"
@@ -117,7 +117,7 @@ jobs:
             echo "$app=${!input_key:-${!app}}" >> $GITHUB_ENV
           done
           echo KURL=${input_kurl:-$KURL} >> $GITHUB_ENV
-          echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
+          echo KURL_FILE_NAME=kurl-${{ env.kurl }}.tar.gz >> $GITHUB_ENV
       
       # Caching Kurl package
       - name: Importing kurl package from cache
