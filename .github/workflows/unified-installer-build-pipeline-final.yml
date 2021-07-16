@@ -13,6 +13,9 @@ on:
       NGINX_INGRESS_CONTROLLER:
         description: 'Nginx ingress controller version'
         required: false
+      ALATION_ANALYTICS:
+        description: 'Alation Analytics version'
+        required: false
 
 env:
   S3_DEV_BUCKET_URL: "s3://${{ secrets.S3_DEV_BUCKET_NAME }}"
