@@ -10,7 +10,7 @@ on:
       kurl:
         description: 'KURL version'
         required: false
-      alation_analytics:
+      alationanalytics:
         description: 'Alation Analytics version'
         required: false
 
@@ -65,7 +65,7 @@ jobs:
     needs: build
     env:
       input_kurl: ${{ github.event.inputs.kurl }}
-      input_alation_analytics: ${{ github.event.inputs.alation_analytics }}
+      input_alationanalytics: ${{ github.event.inputs.alationanalytics }}
 
     steps:   
       - name: Configure AWS Credentials
