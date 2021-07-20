@@ -89,9 +89,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # - name: Apply execute permissions for files
-      #   run: |
-      #     chmod +x "${GITHUB_WORKSPACE}/.github/scripts/*.sh"
+      - name: Apply execute permissions for files
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/.github/scripts/*.sh"
 
       - name: Creating required directories
         run: |
