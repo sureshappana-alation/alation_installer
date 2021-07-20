@@ -135,7 +135,7 @@ jobs:
       
       - name: Bootstrap environment
         run: ${{ github.workspace }}/.github/scripts/setup.sh
-        with:
+        env:
           modules: ${{ steps.read_env.outputs.modulesList }}
 
       - name: Generate alation-install.yaml file content
