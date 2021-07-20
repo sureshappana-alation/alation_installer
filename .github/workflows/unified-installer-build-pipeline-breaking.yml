@@ -31,41 +31,41 @@ env:
 
 jobs:
   # Build job builds the installer go module which generates and exports go binary
-  build:
-    # This job will only run if the PR has been merged.
-    # This is commented for now to trigger the job manually only
-    # if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    steps:
+  # build:
+  #   # This job will only run if the PR has been merged.
+  #   # This is commented for now to trigger the job manually only
+  #   # if: github.event.pull_request.merged == true
+  #   runs-on: ubuntu-latest
+  #   steps:
 
-    - name: Checkout code
-      uses: actions/checkout@v2
+  #   - name: Checkout code
+  #     uses: actions/checkout@v2
     
-    - name: Setup golang
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.16.4
+  #   - name: Setup golang
+  #     uses: actions/setup-go@v2
+  #     with:
+  #       go-version: 1.16.4
     
-    - name: Copy go artifacts to respective directories
-      run: |
-        cd ${{ github.workspace }}/installer
-        cp go.sum src/go.sum
-        cp go.mod src/go.mod
+  #   - name: Copy go artifacts to respective directories
+  #     run: |
+  #       cd ${{ github.workspace }}/installer
+  #       cp go.sum src/go.sum
+  #       cp go.mod src/go.mod
     
-    - name: Build installer
-      run: |
-        cd ${{ github.workspace }}/installer/src
-        go build -o out/installer *.go
+  #   - name: Build installer
+  #     run: |
+  #       cd ${{ github.workspace }}/installer/src
+  #       go build -o out/installer *.go
     
-    - name: List of files in the out directory
-      run: find ${{ github.workspace }}/installer/src/out
+  #   - name: List of files in the out directory
+  #     run: find ${{ github.workspace }}/installer/src/out
 
-    - name: Upload installer binary for app-setup job
-      uses: actions/upload-artifact@v2
-      with:
-        name: installer-binary
-        path: ${{ github.workspace }}/installer/src/out
-        retention-days: 1
+  #   - name: Upload installer binary for app-setup job
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       name: installer-binary
+  #       path: ${{ github.workspace }}/installer/src/out
+  #       retention-days: 1
 
   # This job is for creating alation unified installer build
   app-setup:
@@ -73,7 +73,7 @@ jobs:
     # This job will only run if the PR has been merged.
     # This is commented for now to trigger the job manually only
     # if: github.event.pull_request.merged == true
-    needs: build
+    # needs: build
     env:
       INPUT_KURL: ${{ github.event.inputs.KURL }}
       INPUT_ALATIONANALYTICS: ${{ github.event.inputs.ALATIONANALYTICS }}
@@ -91,7 +91,7 @@ jobs:
 
       - name: Apply execute permissions for files
         run: |
-          ls -al
+          find ${{ github.workspace }}/.github
           chmod +x "${{ github.workspace }}/.github/scripts/*.sh"
           ls -al
 
@@ -187,11 +187,11 @@ jobs:
           done
 
 
-      - name: Download installer binary from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: installer-binary
-          path: ${{ env.BASE_DIR }}
+      # - name: Download installer binary from build job
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: installer-binary
+      #     path: ${{ env.BASE_DIR }}
 
       - name: Print list of files
         run: find ${{ env.BASE_DIR }}
