@@ -1,4 +1,4 @@
-name: unified-installer-build-pipeline-final
+name: unified-installer-build-pipeline-final-breaking
 
 on:
   # Run the job when pull request closed
