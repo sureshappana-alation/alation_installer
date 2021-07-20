@@ -99,8 +99,8 @@ jobs:
             while IFS='=' read -r key val
             do
               # Ignore KURL from modules list as KURL has special treatment
-              if [[ key != *"KURL"* ]]; then
-                modulesList+=(${key})
+              if [[ $key != *"KURL"* ]]; then
+                modulesList+=($key)
               fi
             done < "$file"
             cat "$file"
