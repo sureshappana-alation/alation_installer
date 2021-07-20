@@ -119,7 +119,13 @@ jobs:
             echo "$app=${!input_key:-${!app}}" >> $GITHUB_ENV
           done
           echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
-          echo KURL_FILE_NAME=kurl-${{ env.kurl }}.tar.gz >> $GITHUB_ENV
+          echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
+
+          # Exit when KURL Version is not
+          if [[ -z $KURL ]]; then
+            echo "Existing workflow run as KURL version is not set"
+            exit 1
+          fi
       
       # Caching Kurl package
       - name: Importing kurl package from cache
