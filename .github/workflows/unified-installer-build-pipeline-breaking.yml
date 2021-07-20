@@ -160,7 +160,7 @@ jobs:
 
       - name: Download modules from S3
         run: ${{ github.workspace }}/.github/scripts/download-modules.sh
-        with:
+        env:
           modules: ${{ steps.read_env.outputs.modulesList }}
 
 
