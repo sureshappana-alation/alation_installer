@@ -155,7 +155,7 @@ jobs:
             else
               application="${applicationName}-${!i}.tar.gz"
               echo "Downloading $application from S3"
-              aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application ${{env.MODULES_DIR}}/$applicationName/
+              aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application ${{env.MODULES_DIR}}/${applicationName,,}/
             fi
           done
 
@@ -167,7 +167,6 @@ jobs:
             echo "[$directory]: Started processing"
             files=$(find $directory -mindepth 1 -maxdepth 1 -iname "*.tar.gz")
             
-            # 
             if [ "${#files}" -gt 1 ]; then
                 moduleFile=${files[0]}
                 echo "[$directory]: Found $moduleFile. Extracting..."
