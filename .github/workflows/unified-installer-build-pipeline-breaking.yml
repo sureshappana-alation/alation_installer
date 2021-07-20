@@ -91,7 +91,8 @@ jobs:
 
       - name: Apply execute permissions for files
         run: |
-          chmod +x "${GITHUB_WORKSPACE}/.github/scripts/*.sh"
+          chmod +x "${{ github.workspace }}/.github/scripts/*.sh"
+          ls -al
 
       - name: Creating required directories
         run: |
@@ -144,6 +145,10 @@ jobs:
             exit 1
           fi
       
+
+      - name: Generate alation-install.yaml file content
+        run: ${{ github.workspace }}/.github/scripts/generate-alation-install.sh
+
       # Caching Kurl package
       - name: Importing kurl package from cache
         id: kurl-cache
@@ -180,8 +185,6 @@ jobs:
             fi
           done
 
-      - name: Generate alation-install.yaml file content
-        run: ${{ github.workspace }}/.github/scripts/generate-alation-install.sh
 
       - name: Download installer binary from build job
         uses: actions/download-artifact@v2
