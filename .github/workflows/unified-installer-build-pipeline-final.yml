@@ -112,7 +112,7 @@ jobs:
         run: |
           echo ${{ steps.read_env.outputs.modulesList }}
 
-      # This section overrides the user inputs provided manually or REST
+      # This section overrides the user inputs provided manually in UI or REST
       - name: Apply overrides from user inputs and set as env variables
         run: |
           for app in ${{ steps.read_env.outputs.modulesList }}; do
@@ -121,6 +121,9 @@ jobs:
           done
           echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
           echo KURL_FILE_NAME=kurl-$KURL.tar.gz >> $GITHUB_ENV
+
+          echo "Adding Kurl version to versions file"
+          echo "KURL= ${{ env.KURL }}" >> ${{ env.VERSIONS_FILE }}
 
           # Exit when KURL Version is not available
           if [[ -z $KURL ]]; then
@@ -143,8 +146,6 @@ jobs:
       - name: In the case of cache miss get the Kurl package from S3
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
-          echo "Adding Kurl version to versions file"
-          echo "KURL= ${{ env.KURL }}" >> ${{ env.VERSIONS_FILE }}
           echo "Downloading Kurl package ${{env.KURL_FILE_NAME}} from S3. "
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }} ${{ env.RESOURCE_DIR }}/kurl.tar.gz
 
@@ -176,8 +177,10 @@ jobs:
             
             if [ "${#files}" -gt 1 ]; then
                 moduleFile=${files[0]}
+                
                 echo "[$directory]: Found $moduleFile. Extracting..."
                 tar -xzf $moduleFile -C $directory  --strip-components=1
+                
                 echo "[$directory]: Deleting $moduleFile"
                 rm -f $moduleFile
             else
