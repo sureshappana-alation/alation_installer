@@ -11,10 +11,13 @@ on:
   workflow_dispatch:
     inputs:
       KURL:
-        description: 'KURL version'
+        description: 'KURL: KURL version'
         required: false
       ALATIONANALYTICS:
-        description: 'Alation Analytics version'
+        description: 'ALATIONANALYTICS: Alation Analytics version'
+        required: false
+      EXCLUDE_MODULES:
+        description: 'List of comma separated modules to be excluded'
         required: false
 
 env:
@@ -76,7 +79,8 @@ jobs:
     # needs: build
     env:
       INPUT_KURL: ${{ github.event.inputs.KURL }}
-      INPUT_ALATIONANALYTICS: ${{ github.event.inputs.ALATIONANALYTICS }}
+      EXCLUDE_MODULES_STRING: ${{ github.event.inputs.EXCLUDE_MODULES }}
+      INPUT_ALATIONANALYTICS: ${{ github.event.inputs.ALATIONANALYTICS }}      
 
     steps:   
       - name: Configure AWS Credentials
@@ -97,46 +101,24 @@ jobs:
         env:
           modules: ${{ steps.read_env.outputs.modulesList }}
 
-      # - name: Read environment versions files
-      #   id: read_env
-      #   run: |
-      #     modulesList=()
-      #     shopt -s nullglob
-      #     for file in ./versions/*.env; do
-      #       while IFS='=' read -r key val
-      #       do
-      #         # Ignore KURL from modules list as KURL has special treatment
-      #         if [[ $key != *"KURL"* ]]; then
-      #           modulesList+=($key)
-      #         fi
-      #       done < "$file"
-      #       cat "$file"
-      #       echo
-      #     done  >> $GITHUB_ENV
-      #     echo ::set-output name=modulesList::${modulesList[@]}
-      - name: Read environment versions files
+      - name: Get module versions and apply overrides
         id: read_env
         run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
 
-      # This section overrides the user inputs provided manually in UI or REST
-      - name: Apply overrides from user inputs and set as env variables
-        run: |
-          for app in ${{ steps.read_env.outputs.modulesList }}; do
-            input_key="input_$app"
-            echo "$app=${!input_key:-${!app}}" >> $GITHUB_ENV
-          done
-          echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
-          echo KURL_FILE_NAME=kurl-$KURL.tar.gz >> $GITHUB_ENV
+      - name: Download modules from S3
+        run: ${{ github.workspace }}/.github/scripts/download-modules.sh
+        env:
+          modules: ${{ steps.read_env.outputs.modulesList }}
 
-          echo "Adding Kurl version to versions file"
-          echo "KURL= ${{ env.KURL }}" >> ${{ env.VERSIONS_FILE }}
+      - name: Generate alation-install.yaml file
+        run: ${{ github.workspace }}/.github/scripts/generate-alation-install.sh
 
-          # Exit when KURL Version is not available
-          if [[ -z $KURL ]]; then
-            echo "Existing workflow run as KURL version is not set"
-            exit 1
-          fi
-  
+      - name: Download installer binary from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: installer-binary
+          path: ${{ env.BASE_DIR }}
+
       # Caching Kurl package
       - name: Importing kurl package from cache
         id: kurl-cache
@@ -151,23 +133,6 @@ jobs:
           echo "Downloading Kurl package ${{env.KURL_FILE_NAME}} from S3. "
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }} ${{ env.RESOURCE_DIR }}/kurl.tar.gz
 
-      - name: Download modules from S3
-        run: ${{ github.workspace }}/.github/scripts/download-modules.sh
-        env:
-          modules: ${{ steps.read_env.outputs.modulesList }}
-
-      - name: Generate alation-install.yaml file content
-        run: ${{ github.workspace }}/.github/scripts/generate-alation-install.sh
-
-      - name: Content of alation-install.yaml file
-        run: cat  ${{ env.INSTALL_CONFIG_FILE }}
-
-      - name: Download installer binary from build job
-        uses: actions/download-artifact@v2
-        with:
-          name: installer-binary
-          path: ${{ env.BASE_DIR }}
-
       - name: Print information
         run: |
           echo "List of files"
@@ -176,14 +141,17 @@ jobs:
           echo "Print list of versions information"
           cat ${{ env.VERSIONS_FILE }}
 
+          echo "Content of alation-install.yaml file"
+          cat  ${{ env.INSTALL_CONFIG_FILE }}
+
       - name: Renaming base directory to alation version
-        run: mv ./alation ${{ env.ALATION_OUTPUT_DIR }}
+        run: mv ${{ env.BASE_DIR }} ${{ env.ALATION_OUTPUT_DIR }}
 
       - name: Compress the final bundle
         run: tar -cvzf ${{ env.ALATION_OUTPUT }} ${{ env.ALATION_OUTPUT_DIR }}
 
       - name: Renaming alation version directory back to original for caching
-        run: mv ${{ env.ALATION_OUTPUT_DIR }} ./alation
+        run: mv ${{ env.ALATION_OUTPUT_DIR }} ${{ env.BASE_DIR }}
 
       - name: Upload the compressed build to S3
         run: |
