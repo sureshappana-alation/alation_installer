@@ -97,23 +97,26 @@ jobs:
         env:
           modules: ${{ steps.read_env.outputs.modulesList }}
 
+      # - name: Read environment versions files
+      #   id: read_env
+      #   run: |
+      #     modulesList=()
+      #     shopt -s nullglob
+      #     for file in ./versions/*.env; do
+      #       while IFS='=' read -r key val
+      #       do
+      #         # Ignore KURL from modules list as KURL has special treatment
+      #         if [[ $key != *"KURL"* ]]; then
+      #           modulesList+=($key)
+      #         fi
+      #       done < "$file"
+      #       cat "$file"
+      #       echo
+      #     done  >> $GITHUB_ENV
+      #     echo ::set-output name=modulesList::${modulesList[@]}
       - name: Read environment versions files
         id: read_env
-        run: |
-          modulesList=()
-          shopt -s nullglob
-          for file in ./versions/*.env; do
-            while IFS='=' read -r key val
-            do
-              # Ignore KURL from modules list as KURL has special treatment
-              if [[ $key != *"KURL"* ]]; then
-                modulesList+=($key)
-              fi
-            done < "$file"
-            cat "$file"
-            echo
-          done  >> $GITHUB_ENV
-          echo ::set-output name=modulesList::${modulesList[@]}
+        run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
 
       # This section overrides the user inputs provided manually in UI or REST
       - name: Apply overrides from user inputs and set as env variables

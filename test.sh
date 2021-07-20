@@ -1,8 +1,19 @@
 #!/bin/bash
 
+modulesList=()
+shopt -s nullglob
 
+# Read version files
 for file in ./versions/*.env; do
-echo $file
+  while IFS='=' read -r key val
+  do
+    # Ignore KURL from modules list as KURL has special treatment
+    if [[ $key != *"KURL"* ]]; then
+      modulesList+=($key)
+    fi
+  done < "$file"
+  cat "$file"
+  echo
 done
 # applicationList=()
 # shopt -s nullglob
