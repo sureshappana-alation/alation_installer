@@ -121,7 +121,7 @@ jobs:
           echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
           echo KURL_FILE_NAME=kurl-$KURL.tar.gz >> $GITHUB_ENV
 
-          # Exit when KURL Version is not
+          # Exit when KURL Version is not available
           if [[ -z $KURL ]]; then
             echo "Existing workflow run as KURL version is not set"
             exit 1
@@ -137,13 +137,13 @@ jobs:
 
       - name: Create versions and install config file
         run: |
-          touch {{ env.VERSIONS_FILE }} {{ env.INSTALL_CONFIG_FILE }}
+          touch ${{ env.VERSIONS_FILE }} ${{ env.INSTALL_CONFIG_FILE }}
 
       - name: In the case of cache miss get the Kurl package from S3
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
           echo "Adding Kurl version to versions file"
-          echo "KURL= {{ env.KURL }}" >> {{ env.VERSIONS_FILE }}
+          echo "KURL= ${{ env.KURL }}" >> ${{ env.VERSIONS_FILE }}
           echo "Downloading Kurl package ${{env.KURL_FILE_NAME}} from S3. "
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }} ${{ env.RESOURCE_DIR }}/kurl.tar.gz
 
@@ -153,7 +153,7 @@ jobs:
             applicationName="${i}"
             
             # Add entry to versions file
-            echo "$applicationName=${!applicationName}" >> {{ env.VERSIONS_FILE }}
+            echo "$applicationName=${!applicationName}" >> ${{ env.VERSIONS_FILE }}
 
             # Download files from S3 only if version is not null and skip
             if [[ ${!applicationName} = "skip" ]] || [[ -z ${!applicationName} ]]; then
@@ -185,13 +185,13 @@ jobs:
             
             if test -f "$directory/install.yaml"; then
               echo "[$directory]: Found install.yaml"
-              echo "[$directory]: Appending install.yaml content to {{ env.INSTALL_CONFIG_FILE }} file"
+              echo "[$directory]: Appending install.yaml content to ${{ env.INSTALL_CONFIG_FILE }} file"
               
               # Creating any entry for module in alation_install.yaml
-              echo "${directory##*/}:" >> {{ env.INSTALL_CONFIG_FILE }}
+              echo "${directory##*/}:" >> ${{ env.INSTALL_CONFIG_FILE }}
               
               # Adding contents of install.yaml to alation_install.yaml with indentation
-              sed -e 's/^/  /' $directory/install.yaml >> {{ env.INSTALL_CONFIG_FILE }}
+              sed -e 's/^/  /' $directory/install.yaml >> ${{ env.INSTALL_CONFIG_FILE }}
             else
               echo "$directory/install.yaml" doesn\'t exists. Ignoring...
             fi
@@ -207,7 +207,7 @@ jobs:
         run: find ${{ env.BASE_DIR }}
 
       - name: Print list of versions information
-        run: cat {{ env.VERSIONS_FILE }}
+        run: cat ${{ env.VERSIONS_FILE }}
 
       - name: Renaming base directory to alation version
         run: mv ./alation ${{ env.ALATION_OUTPUT_DIR }}
