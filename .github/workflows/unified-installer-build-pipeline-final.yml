@@ -201,6 +201,9 @@ jobs:
       - name: Print list of files
         run: find ${{ env.BASE_DIR }}
 
+      - name: Print list of versions information
+        run: cat {{ env.VERSIONS_FILE }}
+
       - name: Renaming base directory to alation version
         run: mv ./alation ${{ env.ALATION_OUTPUT_DIR }}
 
@@ -208,7 +211,7 @@ jobs:
         run: tar -cvzf ${{ env.ALATION_OUTPUT }} ${{ env.ALATION_OUTPUT_DIR }}
 
       - name: Renaming alation version directory back to original for caching
-        run: mv ${{ env.ALATION_OUTPUT_DIR }} ./alation 
+        run: mv ${{ env.ALATION_OUTPUT_DIR }} ./alation
 
       - name: Upload the compressed build to S3
         run: |
