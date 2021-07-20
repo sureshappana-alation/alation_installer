@@ -161,7 +161,7 @@ jobs:
             else
               moduleFullName="${module}-${!i}.tar.gz"
               echo "Downloading $moduleFullName from S3"
-              aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$moduleFullName ${{env.MODULES_DIR}}/${module,,}/
+              aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${moduleFullName,,} ${{env.MODULES_DIR}}/${module,,}/
             fi
           done
 
