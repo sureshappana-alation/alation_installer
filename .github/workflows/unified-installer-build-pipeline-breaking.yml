@@ -92,6 +92,17 @@ jobs:
       - name: Apply execute permissions for files
         run: chmod +x ${{ github.workspace }}/.github/scripts/*.sh
 
+      - name: Bootstrap environment
+        run: ${{ github.workspace }}/.github/scripts/setup.sh
+        env:
+          modules: ${{ steps.read_env.outputs.modulesList }}
+
+      - name: Generate alation-install.yaml file content
+        run: ${{ github.workspace }}/.github/scripts/generate-alation-install.sh
+
+      - name: Content of alation-install.yaml file
+        run: cat  ${{ env.INSTALL_CONFIG_FILE }}
+
       - name: Read environment versions files
         id: read_env
         run: |
@@ -133,17 +144,7 @@ jobs:
             exit 1
           fi
       
-      - name: Bootstrap environment
-        run: ${{ github.workspace }}/.github/scripts/setup.sh
-        env:
-          modules: ${{ steps.read_env.outputs.modulesList }}
-
-      - name: Generate alation-install.yaml file content
-        run: ${{ github.workspace }}/.github/scripts/generate-alation-install.sh
-
-      - name: Content of alation-install.yaml file
-        run: cat  ${{ env.INSTALL_CONFIG_FILE }}
-
+      
       # Caching Kurl package
       - name: Importing kurl package from cache
         id: kurl-cache
@@ -162,7 +163,6 @@ jobs:
         run: ${{ github.workspace }}/.github/scripts/download-modules.sh
         env:
           modules: ${{ steps.read_env.outputs.modulesList }}
-
 
       - name: Download installer binary from build job
         uses: actions/download-artifact@v2
