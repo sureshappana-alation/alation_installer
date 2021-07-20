@@ -16,6 +16,9 @@ on:
       ALATIONANALYTICS:
         description: 'Alation Analytics version'
         required: false
+      excluse_list:
+        description: "List of values: ALATIONANALYTICS"
+        required: false
 
 env:
   S3_DEV_BUCKET_URL: "s3://${{ secrets.S3_DEV_BUCKET_NAME }}"

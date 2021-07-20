@@ -31,41 +31,41 @@ env:
 
 jobs:
   # Build job builds the installer go module which generates and exports go binary
-  # build:
-  #   # This job will only run if the PR has been merged.
-  #   # This is commented for now to trigger the job manually only
-  #   # if: github.event.pull_request.merged == true
-  #   runs-on: ubuntu-latest
-  #   steps:
+  build:
+    # This job will only run if the PR has been merged.
+    # This is commented for now to trigger the job manually only
+    # if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
 
-  #   - name: Checkout code
-  #     uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
     
-  #   - name: Setup golang
-  #     uses: actions/setup-go@v2
-  #     with:
-  #       go-version: 1.16.4
+    - name: Setup golang
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.16.4
     
-  #   - name: Copy go artifacts to respective directories
-  #     run: |
-  #       cd ${{ github.workspace }}/installer
-  #       cp go.sum src/go.sum
-  #       cp go.mod src/go.mod
+    - name: Copy go artifacts to respective directories
+      run: |
+        cd ${{ github.workspace }}/installer
+        cp go.sum src/go.sum
+        cp go.mod src/go.mod
     
-  #   - name: Build installer
-  #     run: |
-  #       cd ${{ github.workspace }}/installer/src
-  #       go build -o out/installer *.go
+    - name: Build installer
+      run: |
+        cd ${{ github.workspace }}/installer/src
+        go build -o out/installer *.go
     
-  #   - name: List of files in the out directory
-  #     run: find ${{ github.workspace }}/installer/src/out
+    - name: List of files in the out directory
+      run: find ${{ github.workspace }}/installer/src/out
 
-  #   - name: Upload installer binary for app-setup job
-  #     uses: actions/upload-artifact@v2
-  #     with:
-  #       name: installer-binary
-  #       path: ${{ github.workspace }}/installer/src/out
-  #       retention-days: 1
+    - name: Upload installer binary for app-setup job
+      uses: actions/upload-artifact@v2
+      with:
+        name: installer-binary
+        path: ${{ github.workspace }}/installer/src/out
+        retention-days: 1
 
   # This job is for creating alation unified installer build
   app-setup:
@@ -90,19 +90,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Apply execute permissions for files
-        run: |
-          find .github/scripts
-          chmod +x .github/scripts/*.sh
-
-      - name: Creating required directories
-        run: |
-          mkdir -p ${{ env.BASE_DIR }}
-          mkdir -p ${{ env.MODULES_DIR }}
-          mkdir -p ${{ env.KURL_PATCH_DIR }}
-
-      - name: Copy res content from source code to archiving directory
-        run: |
-          cp -a ${{ github.workspace }}/installer/res/. ${{ env.BASE_DIR }}/res/
+        run: chmod +x ${{ github.workspace }}/.github/scripts/*.sh
 
       - name: Read environment versions files
         id: read_env
@@ -145,9 +133,16 @@ jobs:
             exit 1
           fi
       
+      - name: Bootstrap environment
+        run: ${{ github.workspace }}/.github/scripts/setup.sh
+        with:
+          modules: ${{ steps.read_env.outputs.modulesList }}
 
       - name: Generate alation-install.yaml file content
         run: ${{ github.workspace }}/.github/scripts/generate-alation-install.sh
+
+      - name: Content of alation-install.yaml file
+        run: cat  ${{ env.INSTALL_CONFIG_FILE }}
 
       # Caching Kurl package
       - name: Importing kurl package from cache
@@ -157,10 +152,6 @@ jobs:
           path: ${{ env.RESOURCE_DIR }}/kurl.tar.gz
           key: ${{ env.KURL_FILE_NAME }}
 
-      - name: Create versions and install config file
-        run: |
-          touch ${{ env.VERSIONS_FILE }} ${{ env.INSTALL_CONFIG_FILE }}
-
       - name: In the case of cache miss get the Kurl package from S3
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
@@ -168,35 +159,24 @@ jobs:
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }} ${{ env.RESOURCE_DIR }}/kurl.tar.gz
 
       - name: Download modules from S3
+        run: ${{ github.workspace }}/.github/scripts/download-modules.sh
+        with:
+          modules: ${{ steps.read_env.outputs.modulesList }}
+
+
+      - name: Download installer binary from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: installer-binary
+          path: ${{ env.BASE_DIR }}
+
+      - name: Print information
         run: |
-          for i in ${{ steps.read_env.outputs.modulesList }}; do
-            module="${i}"
-            
-            # Add entry to versions file
-            echo "$module=${!module}" >> ${{ env.VERSIONS_FILE }}
+          echo "List of files"
+          find ${{ env.BASE_DIR }}
 
-            # Download files from S3 only if version is not null and skip
-            if [[ ${!module} = "skip" ]] || [[ -z ${!module} ]]; then
-              echo "Skipping $module"
-            else
-              moduleFullName="${module}-${!i}.tar.gz"
-              echo "Downloading $moduleFullName from S3"
-              aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${moduleFullName,,} ${{env.MODULES_DIR}}/${module,,}/
-            fi
-          done
-
-
-      # - name: Download installer binary from build job
-      #   uses: actions/download-artifact@v2
-      #   with:
-      #     name: installer-binary
-      #     path: ${{ env.BASE_DIR }}
-
-      - name: Print list of files
-        run: find ${{ env.BASE_DIR }}
-
-      - name: Print list of versions information
-        run: cat ${{ env.VERSIONS_FILE }}
+          echo "Print list of versions information"
+          cat ${{ env.VERSIONS_FILE }}
 
       - name: Renaming base directory to alation version
         run: mv ./alation ${{ env.ALATION_OUTPUT_DIR }}
