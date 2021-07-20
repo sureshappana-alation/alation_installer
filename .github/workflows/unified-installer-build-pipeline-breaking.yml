@@ -10,11 +10,8 @@ on:
   # This section is to trigger the workflow manually
   workflow_dispatch:
     inputs:
-      KURL:
-        description: 'KURL: KURL version'
-        required: false
       ALATIONANALYTICS:
-        description: 'ALATIONANALYTICS: Alation Analytics version'
+        description: 'Alation Analytics(ALATIONANALYTICS) version'
         required: false
       EXCLUDE_MODULES:
         description: 'List of comma separated modules to be excluded'
@@ -94,18 +91,12 @@ jobs:
           # cache-from: |
           #   user/app:cache
           #   type=local,src=./docker-cache
-      
-      - name: Extract the generated installer tar file
-        run: tar xvzf installer.tar.gz
-      
-      - name: Copying the installer binary to base directory
-        run: mv installer/installer ${{ env.BASE_DIR }}/
-      
+        
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
 
       - name: List of files
-        run: find ${{ env.BASE_DIR }}
+        run: find /out/installer
 
       - name: Upload installer binary for package job
         uses: actions/upload-artifact@v2

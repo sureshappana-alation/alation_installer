@@ -19,13 +19,13 @@ for dir in $(find $MODULES_DIR -mindepth 1 -maxdepth 1 -type d); do
 
   if test -f "$directory/install.yaml"; then
     echo "[$directory]: Found install.yaml"
-    echo "[$directory]: Appending install.yaml content to ${{ env.INSTALL_CONFIG_FILE }} file"
+    echo "[$directory]: Appending install.yaml content to $INSTALL_CONFIG_FILE file"
     
     # Creating any entry for module in alation_install.yaml
-    echo "${directory##*/}:" >> ${{ env.INSTALL_CONFIG_FILE }}
+    echo "${directory##*/}:" >> $INSTALL_CONFIG_FILE
     
     # Adding contents of install.yaml to alation_install.yaml with indentation
-    sed -e 's/^/  /' $directory/install.yaml >> ${{ env.INSTALL_CONFIG_FILE }}
+    sed -e 's/^/  /' $directory/install.yaml >> $INSTALL_CONFIG_FILE
   else
     echo "[$directory]: $directory/install.yaml" doesn\'t exists. Ignoring...
   fi

@@ -5,4 +5,3 @@ COPY src/ .
 COPY go.mod go.mod
 COPY go.sum go.sum
 RUN go build -o /out/installer *.go
-COPY --from=compress /installer.tar.gz /
