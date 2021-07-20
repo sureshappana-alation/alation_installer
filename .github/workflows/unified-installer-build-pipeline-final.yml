@@ -93,28 +93,29 @@ jobs:
       - name: Read environment versions files
         id: read_env
         run: |
-          moduleList=()
+          modulesList=()
           shopt -s nullglob
           for i in ./versions/*.env; do
             while IFS='=' read -r key val
             do
-              if [[ $key != *"kurl"* ]]; then
-                moduleList+=(${key})
+              # Ignore KURL from modules list as KURL has special treatment
+              if [[ key != *"KURL"* ]]; then
+                modulesList+=(${key})
               fi
             done < "${i}"
             cat "${i}"
             echo
           done  >> $GITHUB_ENV
-          echo ::set-output name=moduleList::${moduleList[@]}
+          echo ::set-output name=modulesList::${modulesList[@]}
       
       - name: Print modules list
         run: |
-          echo ${{ steps.read_env.outputs.moduleList }}
+          echo ${{ steps.read_env.outputs.modulesList }}
 
       # This section overrides the user inputs provided manually or REST
       - name: Apply overrides from user inputs and set as env variables
         run: |
-          for app in ${{ steps.read_env.outputs.moduleList }}; do
+          for app in ${{ steps.read_env.outputs.modulesList }}; do
             input_key="input_$app"
             echo "$app=${!input_key:-${!app}}" >> $GITHUB_ENV
           done
@@ -149,7 +150,7 @@ jobs:
 
       - name: Download modules from S3
         run: |
-          for i in ${{ steps.read_env.outputs.moduleList }}; do
+          for i in ${{ steps.read_env.outputs.modulesList }}; do
             module="${i}"
             
             # Add entry to versions file
@@ -177,7 +178,7 @@ jobs:
                 moduleFile=${files[0]}
                 echo "[$directory]: Found $moduleFile. Extracting..."
                 tar -xzf $moduleFile -C $directory  --strip-components=1
-                echo "Deleting $moduleFile"
+                echo "[$directory]: Deleting $moduleFile"
                 rm -f $moduleFile
             else
               echo "[$directory]: No module tar files found"
@@ -193,7 +194,7 @@ jobs:
               # Adding contents of install.yaml to alation_install.yaml with indentation
               sed -e 's/^/  /' $directory/install.yaml >> ${{ env.INSTALL_CONFIG_FILE }}
             else
-              echo "$directory/install.yaml" doesn\'t exists. Ignoring...
+              echo "[$directory]: $directory/install.yaml" doesn\'t exists. Ignoring...
             fi
           done
 
