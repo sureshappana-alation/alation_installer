@@ -119,7 +119,7 @@ jobs:
             echo "$app=${!input_key:-${!app}}" >> $GITHUB_ENV
           done
           echo KURL=${INPUT_KURL:-$KURL} >> $GITHUB_ENV
-          echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
+          echo KURL_FILE_NAME=kurl-$KURL.tar.gz >> $GITHUB_ENV
 
           # Exit when KURL Version is not
           if [[ -z $KURL ]]; then
