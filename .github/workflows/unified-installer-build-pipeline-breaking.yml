@@ -91,9 +91,8 @@ jobs:
 
       - name: Apply execute permissions for files
         run: |
-          find ${{ github.workspace }}/.github
-          chmod +x "${{ github.workspace }}/.github/scripts/*.sh"
-          ls -al
+          find .github/scripts
+          chmod +x ".github/scripts/*.sh"
 
       - name: Creating required directories
         run: |
