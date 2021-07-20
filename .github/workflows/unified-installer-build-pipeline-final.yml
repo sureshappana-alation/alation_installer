@@ -27,7 +27,7 @@ env:
   INSTALL_CONFIG_FILE: ./alation/alation_install.yaml
 
 jobs:
-  # Build job builds the installer go application which generates and exports go binary
+  # Build job builds the installer go module which generates and exports go binary
   build:
     runs-on: ubuntu-latest
     steps:
@@ -93,28 +93,28 @@ jobs:
       - name: Read environment versions files
         id: read_env
         run: |
-          applicationList=()
+          moduleList=()
           shopt -s nullglob
           for i in ./versions/*.env; do
             while IFS='=' read -r key val
             do
               if [[ $key != *"kurl"* ]]; then
-                applicationList+=(${key})
+                moduleList+=(${key})
               fi
             done < "${i}"
             cat "${i}"
             echo
           done  >> $GITHUB_ENV
-          echo ::set-output name=applicationList::${applicationList[@]}
+          echo ::set-output name=moduleList::${moduleList[@]}
       
-      - name: Print application list
+      - name: Print modules list
         run: |
-          echo ${{ steps.read_env.outputs.applicationList }}
+          echo ${{ steps.read_env.outputs.moduleList }}
 
       # This section overrides the user inputs provided manually or REST
       - name: Apply overrides from user inputs and set as env variables
         run: |
-          for app in ${{ steps.read_env.outputs.applicationList }}; do
+          for app in ${{ steps.read_env.outputs.moduleList }}; do
             input_key="input_$app"
             echo "$app=${!input_key:-${!app}}" >> $GITHUB_ENV
           done
@@ -147,21 +147,21 @@ jobs:
           echo "Downloading Kurl package ${{env.KURL_FILE_NAME}} from S3. "
           aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }} ${{ env.RESOURCE_DIR }}/kurl.tar.gz
 
-      - name: Download application files from S3
+      - name: Download modules from S3
         run: |
-          for i in ${{ steps.read_env.outputs.applicationList }}; do
-            applicationName="${i}"
+          for i in ${{ steps.read_env.outputs.moduleList }}; do
+            module="${i}"
             
             # Add entry to versions file
-            echo "$applicationName=${!applicationName}" >> ${{ env.VERSIONS_FILE }}
+            echo "$module=${!module}" >> ${{ env.VERSIONS_FILE }}
 
             # Download files from S3 only if version is not null and skip
-            if [[ ${!applicationName} = "skip" ]] || [[ -z ${!applicationName} ]]; then
-              echo "Skipping $applicationName"
+            if [[ ${!module} = "skip" ]] || [[ -z ${!module} ]]; then
+              echo "Skipping $module"
             else
-              application="${applicationName}-${!i}.tar.gz"
-              echo "Downloading $application from S3"
-              aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$application ${{env.MODULES_DIR}}/${applicationName,,}/
+              moduleFullName="${module}-${!i}.tar.gz"
+              echo "Downloading $moduleFullName from S3"
+              aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/$moduleFullName ${{env.MODULES_DIR}}/${module,,}/
             fi
           done
 
