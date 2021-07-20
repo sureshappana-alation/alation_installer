@@ -91,6 +91,7 @@ jobs:
 
       - name: Apply execute permissions for files
         run: |
+          ls -al
           chmod +x "${{ github.workspace }}/.github/scripts/*.sh"
           ls -al
 
