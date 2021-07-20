@@ -153,7 +153,7 @@ jobs:
             applicationName="${i}"
             
             # Add entry to versions file
-            echo "$applicationName=${!applicationName}"" >> {{ env.VERSIONS_FILE }}
+            echo "$applicationName=${!applicationName}" >> {{ env.VERSIONS_FILE }}
 
             # Download files from S3 only if version is not null and skip
             if [[ ${!applicationName} = "skip" ]] || [[ -z ${!applicationName} ]]; then
