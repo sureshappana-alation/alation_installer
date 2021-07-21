@@ -88,12 +88,10 @@ jobs:
           push: false
           tags: alation/installer:latest
           outputs: type=local,dest=./out
-          # cache-from: |
-          #   user/app:cache
-          #   type=local,src=./docker-cache
-        
-      - name: Image digest
-        run: echo ${{ steps.docker_build.outputs.digest }}
+          cache-from: |
+            user/app:cache
+            type=local,src=./docker-cache
+
 
       - name: List of files
         run: find ./out
