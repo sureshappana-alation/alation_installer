@@ -102,7 +102,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: installer-binary
-          path: /out
+          path: ./out/installer
           retention-days: 1
 
   # This job is for creating alation unified installer build
