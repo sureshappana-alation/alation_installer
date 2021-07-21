@@ -87,7 +87,7 @@ jobs:
           context: ./installer
           push: false
           tags: alation/installer:latest
-          outputs: type=local,dest=.
+          outputs: type=local,dest=./out
           # cache-from: |
           #   user/app:cache
           #   type=local,src=./docker-cache
