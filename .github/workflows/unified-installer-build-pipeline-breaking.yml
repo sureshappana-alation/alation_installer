@@ -154,19 +154,22 @@ jobs:
           name: installer-binary
           path: ${{ env.BASE_DIR }}
 
+      - name: Set Kurl file name
+        run: echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz
+
       # Caching Kurl package
       - name: Importing kurl package from cache
         id: kurl-cache
         uses: actions/cache@v2
         with:
           path: ${{ env.RESOURCE_DIR }}/kurl.tar.gz
-          key: ${{ env.KURL }}
+          key: ${{ env.KURL_FILE_NAME }}
 
       - name: In the case of cache miss get the Kurl package from S3
         if: steps.kurl-cache.outputs.cache-hit != 'true'
         run: |
-          echo "Downloading Kurl package ${{env.KURL }}.tar.gz from S3. "
-          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL}}.tar.gz ${{ env.RESOURCE_DIR }}/kurl.tar.gz
+          echo "Downloading Kurl package ${{env.KURL_FILE_NAME}} from S3. "
+          aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }} ${{ env.RESOURCE_DIR }}/kurl.tar.gz
 
       - name: Print information
         run: |
