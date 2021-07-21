@@ -96,7 +96,7 @@ jobs:
         run: echo ${{ steps.docker_build.outputs.digest }}
 
       - name: List of files
-        run: find /out
+        run: find .
 
       - name: Upload installer binary for package job
         uses: actions/upload-artifact@v2
