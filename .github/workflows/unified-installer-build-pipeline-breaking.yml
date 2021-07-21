@@ -13,8 +13,11 @@ on:
       ALATIONANALYTICS:
         description: 'Alation Analytics(ALATIONANALYTICS) version'
         required: false
+      ALATIONFC:
+        description: 'Alation Fat Container(ALATIONFC) version'
+        required: false        
       EXCLUDE_MODULES:
-        description: 'List of comma separated modules to be excluded'
+        description: 'List of comma separated modules to be excluded(ex: ALATIONANALYTICS,ALATIONFC)'
         required: false
 
 env:
@@ -30,43 +33,6 @@ env:
   INSTALL_CONFIG_FILE: ./alation/alation_install.yaml
 
 jobs:
-  # Build job builds the installer go module which generates and exports go binary
-  # build:
-  #   # This job will only run if the PR has been merged.
-  #   # This is commented for now to trigger the job manually only
-  #   # if: github.event.pull_request.merged == true
-  #   runs-on: ubuntu-latest
-  #   steps:
-
-  #   - name: Checkout code
-  #     uses: actions/checkout@v2
-    
-  #   - name: Setup golang
-  #     uses: actions/setup-go@v2
-  #     with:
-  #       go-version: 1.16.4
-    
-  #   - name: Copy go artifacts to respective directories
-  #     run: |
-  #       cd ${{ github.workspace }}/installer
-  #       cp go.sum src/go.sum
-  #       cp go.mod src/go.mod
-    
-  #   - name: Build installer
-  #     run: |
-  #       cd ${{ github.workspace }}/installer/src
-  #       go build -o out/installer *.go
-    
-  #   - name: List of files in the out directory
-  #     run: find ${{ github.workspace }}/installer/src/out
-
-  #   - name: Upload installer binary for app-setup job
-  #     uses: actions/upload-artifact@v2
-  #     with:
-  #       name: installer-binary
-  #       path: ${{ github.workspace }}/installer/src/out
-  #       retention-days: 1
- 
   build:
     runs-on: ubuntu-latest
     steps:
@@ -113,7 +79,8 @@ jobs:
     env:
       INPUT_KURL: ${{ github.event.inputs.KURL }}
       EXCLUDE_MODULES_STRING: ${{ github.event.inputs.EXCLUDE_MODULES }}
-      INPUT_ALATIONANALYTICS: ${{ github.event.inputs.ALATIONANALYTICS }}      
+      INPUT_ALATIONANALYTICS: ${{ github.event.inputs.ALATIONANALYTICS }}
+      INPUT_ALATIONFC: ${{ github.inputs.ALATIONFC }}
 
     steps:   
       - name: Configure AWS Credentials
