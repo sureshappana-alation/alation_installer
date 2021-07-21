@@ -7,7 +7,7 @@ for i in $modules; do
   echo "$module=${!module}" >> $VERSIONS_FILE
 
   # Download files from S3 only if version is not null and skip
-  if [[ ${!module} = "skip" ]] || [[ -z ${!module} ]]; then
+  if [[ -z ${!module} ]]; then
     echo "Skipping $module"
   else
     moduleFullName="${module}-${!i}.tar.gz"

@@ -17,6 +17,7 @@ for dir in $(find $MODULES_DIR -mindepth 1 -maxdepth 1 -type d); do
     echo "[$directory]: No module tar files found"
   fi
 
+  # Processing install.yaml file
   if test -f "$directory/install.yaml"; then
     echo "[$directory]: Found install.yaml"
     echo "[$directory]: Appending install.yaml content to $INSTALL_CONFIG_FILE file"
