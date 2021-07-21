@@ -5,3 +5,6 @@ COPY src/ .
 COPY go.mod go.mod
 COPY go.sum go.sum
 RUN go build -o /out/installer *.go
+
+FROM scratch AS export
+COPY --from=build /out/installer /
