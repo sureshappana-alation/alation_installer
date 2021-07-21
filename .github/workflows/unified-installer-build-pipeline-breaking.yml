@@ -155,7 +155,7 @@ jobs:
           path: ${{ env.BASE_DIR }}
 
       - name: Set Kurl file name
-        run: echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz
+        run: echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
 
       # Caching Kurl package
       - name: Importing kurl package from cache
