@@ -11,6 +11,3 @@ cp -a $GITHUB_WORKSPACE/installer/res/. $RESOURCE_DIR/
 
 echo "Create versions and install config file"
 touch $VERSIONS_FILE $INSTALL_CONFIG_FILE
-
-
-echo test="hi" >> $GITHUB_ENV
