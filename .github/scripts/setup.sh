@@ -19,8 +19,8 @@ NOW=$(date +'%Y%m%d')
 # Get branch name
 BRANCH=${GITHUB_REF##*/}
 
-VERSION=alation-k8s-$branch-$NOW.$GITHUB_RUN_NUMBER
+ALATION_OUTPUT=alation-k8s-$branch-$NOW.$GITHUB_RUN_NUMBER
 
 # set env variables
-echo ALATION_OUTPUT_DIR=alation-$VERSION >> $GITHUB_ENV
-echo ALATION_OUTPUT=$ALATION_OUTPUT_DIR.tar.gz  >> $GITHUB_ENV
+echo ALATION_OUTPUT_DIR=$ALATION_OUTPUT >> $GITHUB_ENV
+echo ALATION_OUTPUT=$ALATION_OUTPUT.tar.gz  >> $GITHUB_ENV
