@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set current date as env variable
-        run: echo "NOW=$(date +'%Y%m%d')" >> $GITHUB_ENV
-      - name: Echo current date
-        run: echo alation-$GITHUB_REF-$NOW.$GITHUB_RUN_NUMBER
+        run: |
+          echo NOW=$(date +'%Y%m%d')
+          echo branch = ${GITHUB_REF##*/}
+          echo alation-$branch-$NOW.$GITHUB_RUN_NUMBER
