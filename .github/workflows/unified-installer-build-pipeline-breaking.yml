@@ -1,4 +1,4 @@
-name: unified-installer-build-pipeline-final-breaking
+name: unified-installer-build-pipeline
 
 on:
   # Run the job when pull request closed
@@ -10,14 +10,8 @@ on:
   # This section is to trigger the workflow manually
   workflow_dispatch:
     inputs:
-      ALATIONANALYTICS:
-        description: 'Alation Analytics(ALATIONANALYTICS) version'
-        required: false
-      ALATIONFC:
-        description: 'Alation Fat Container(ALATIONFC) version'
-        required: false        
       EXCLUDE_MODULES:
-        description: 'List of comma separated modules to be excluded(ex: ALATIONANALYTICS,ALATIONFC)'
+        description: 'List of comma separated modules to be excluded(ex: ALATIONANALYTICS,OCF)'
         required: false
 
 env:
@@ -27,14 +21,16 @@ env:
   RESOURCE_DIR: ./alation/res
   MODULES_DIR: ./alation/res/modules
   KURL_PATCH_DIR: ./alation/res/kurl_patch
-  ALATION_OUTPUT_DIR: alation-$GITHUB_RUN_NUMBER
-  ALATION_OUTPUT: alation-$GITHUB_RUN_NUMBER.tar.gz
   VERSIONS_FILE: ./alation/versions.txt
   INSTALL_CONFIG_FILE: ./alation/alation_install.yaml
 
 jobs:
+  # Build job builds the installer go module which generates and exports go binary
   build:
     runs-on: ubuntu-latest
+    #   # This job will only run if the PR has been merged.
+    #   # This is commented for now to trigger the job manually only
+    #   # if: github.event.pull_request.merged == true
     steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -58,8 +54,7 @@ jobs:
             user/app:cache
             type=local,src=./docker-cache
 
-
-      - name: List of files
+      - name: Print list of files in ./out directory
         run: find ./out
 
       - name: Upload installer binary for package job
@@ -79,8 +74,6 @@ jobs:
     env:
       INPUT_KURL: ${{ github.event.inputs.KURL }}
       EXCLUDE_MODULES_STRING: ${{ github.event.inputs.EXCLUDE_MODULES }}
-      INPUT_ALATIONANALYTICS: ${{ github.event.inputs.ALATIONANALYTICS }}
-      INPUT_ALATIONFC: ${{ github.inputs.ALATIONFC }}
 
     steps:   
       - name: Configure AWS Credentials
@@ -93,7 +86,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Make scripts executable
+      - name: Make workflow scripts executable
         run: chmod +x ${{ github.workspace }}/.github/scripts/*.sh
 
       - name: Bootstrap environment
@@ -101,7 +94,7 @@ jobs:
         env:
           modules: ${{ steps.read_env.outputs.modulesList }}
 
-      - name: Get module versions and apply overrides
+      - name: Get module versions from ./versions/*.env and apply overrides
         id: read_env
         run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
 
@@ -111,7 +104,7 @@ jobs:
           modules: ${{ steps.read_env.outputs.modulesList }}
 
       - name: Generate alation-install.yaml file
-        run: ${{ github.workspace }}/.github/scripts/generate-alation-install.sh
+        run: ${{ github.workspace }}/.github/scripts/generate-alation-install-yaml.sh
 
       - name: Download installer binary from build job
         uses: actions/download-artifact@v2
@@ -140,12 +133,6 @@ jobs:
         run: |
           echo "List of files"
           find ${{ env.BASE_DIR }}
-
-          echo "Print list of versions information"
-          cat ${{ env.VERSIONS_FILE }}
-
-          echo "Content of alation-install.yaml file"
-          cat  ${{ env.INSTALL_CONFIG_FILE }}
 
       - name: Renaming base directory to alation version
         run: mv ${{ env.BASE_DIR }} ${{ env.ALATION_OUTPUT_DIR }}
