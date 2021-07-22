@@ -1,0 +1,15 @@
+name: date
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set current date as env variable
+        run: |
+          echo "NOW=$(date +'%Y%m%d')" >> $GITHUB_ENV
+          echo branch=${GITHUB_REF##*/} >> $GITHUB_ENV
+      - name: Set current date as env variable
+        run: echo alation-$branch-$NOW.$GITHUB_RUN_NUMBER
