@@ -60,6 +60,12 @@ jobs:
     env:
       S3_DEV_BUCKET_URL: "s3://${{ secrets.S3_DEV_BUCKET_NAME }}"
       S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
+      BASE_DIR: ./alation
+      RESOURCE_DIR: ./alation/res
+      MODULES_DIR: ./alation/res/modules
+      KURL_PATCH_DIR: ./alation/res/kurl_patch
+      VERSIONS_FILE: ./alation/versions.txt
+      INSTALL_CONFIG_FILE: ./alation/alation_install.yaml
       INPUT_KURL: ${{ github.event.inputs.KURL }}
       EXCLUDE_MODULES_STRING: ${{ github.event.inputs.EXCLUDE_MODULES }}
 
