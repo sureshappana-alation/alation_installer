@@ -26,7 +26,7 @@ done
 modulesList=("${modulesList[@]/KURL}")
 echo ${modulesList[@]}
 
-# echo ::set-output name=modulesList::${modulesList[@]}
+echo ::set-output name=modulesList::${modulesList[@]}
 
 
 # applicationList=()

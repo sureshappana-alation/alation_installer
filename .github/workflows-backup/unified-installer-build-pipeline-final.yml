@@ -16,7 +16,7 @@ on:
       ALATIONANALYTICS:
         description: 'Alation Analytics version'
         required: false
-      excluse_list:
+      exclude_list:
         description: "List of values: ALATIONANALYTICS"
         required: false
 
