@@ -25,7 +25,8 @@ jobs:
         # run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
       - name: Checkout code
         uses: actions/checkout@v2
-                
+      - name: Make workflow scripts executable
+        run: chmod +x ${{ github.workspace }}/.github/scripts/*.sh                
       - name: Print bunch of random stuff
         run: |
           jq --version
