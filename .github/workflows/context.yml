@@ -21,6 +21,13 @@ jobs:
       INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
       var: ALATIONANALYTICS
     steps:
+      - name: Get module versions from ./versions/*.env and apply overrides
+        id: read_env
+        run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
+      - name: Run script
+        run: ${{ github.workspace }}/.github/scripts/print-versions.sh
+        env:
+          INPUT_CONTEXT1: ${{ toJSON(github.event.inputs) }}
       - name: Dump input
         run: echo "$INPUT_CONTEXT"
       - name: Print values
@@ -47,6 +54,9 @@ jobs:
       - name: Print values7
         run: |        
           echo ${{ github.event.inputs['ALATIONANALYTICS'] }}
+
+
+
       # - name: Dump GitHub context
       #   env:
       #     GITHUB_CONTEXT: ${{ toJSON(github).event.inputs }}
