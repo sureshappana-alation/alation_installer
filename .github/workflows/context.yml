@@ -25,7 +25,7 @@ jobs:
         run: echo "$INPUT_CONTEXT"
       - name: Print values
         run: |        
-          echo $INPUT_CONTEXT[$var]
+          echo ${INPUT_CONTEXT.ALATIONANALYTICS}
       # - name: Dump GitHub context
       #   env:
       #     GITHUB_CONTEXT: ${{ toJSON(github).event.inputs }}
