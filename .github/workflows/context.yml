@@ -6,6 +6,13 @@ name: Context information
 # or API.
 on:
   workflow_dispatch:
+    inputs:
+      ALATIONANALYTICS:
+        description: 'Alation Analytics(ALATIONANALYTICS) version'
+        required: false
+      EXCLUDE_MODULES:
+        description: 'List of comma separated modules to be excluded(ex: ALATIONANALYTICS,OCF)'
+        required: false
 
 jobs:
   one:
