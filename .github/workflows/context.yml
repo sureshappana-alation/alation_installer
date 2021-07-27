@@ -18,6 +18,10 @@ jobs:
   one:
     runs-on: ubuntu-latest
     steps:
+      - name: Dump input
+        env:
+          INPUT_CONTEXT: ${{ toJSON(input) }}
+        run: echo "$INPUT_CONTEXT"    
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJSON(github).event.inputs }}
