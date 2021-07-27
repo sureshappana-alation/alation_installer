@@ -25,8 +25,8 @@ jobs:
         # run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
       - name: Print bunch of random stuff
         run: |
-          jq
-          find ${{ github.workspace }}/.github
+          jq --version
+          find ${{ github.workspace }}
       - name: Run script
         run: ${{ github.workspace }}/.github/scripts/print-versions.sh
         env:
