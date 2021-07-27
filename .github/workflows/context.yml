@@ -21,7 +21,11 @@ jobs:
       - name: Dump input
         env:
           INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
-        run: echo "$INPUT_CONTEXT"    
+          var: ALATIONANALYTICS
+        run: echo "$INPUT_CONTEXT"
+      - name: Print values
+        run: |        
+          echo $INPUT_CONTEXT[$var]
       # - name: Dump GitHub context
       #   env:
       #     GITHUB_CONTEXT: ${{ toJSON(github).event.inputs }}
