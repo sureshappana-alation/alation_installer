@@ -21,8 +21,12 @@ jobs:
       INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
       var: ALATIONANALYTICS
     steps:
-      - name: Get module versions from ./versions/*.env and apply overrides
-        run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
+      # - name: Get module versions from ./versions/*.env and apply overrides
+        # run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
+      - name: Print bunch of random stuff
+        run: |
+          jq
+          find ${{ github.workspace }}/.github
       - name: Run script
         run: ${{ github.workspace }}/.github/scripts/print-versions.sh
         env:
