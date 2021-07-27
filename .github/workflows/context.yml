@@ -20,8 +20,11 @@ jobs:
     steps:
       - name: Dump GitHub context
         env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
+          GITHUB_CONTEXT: ${{ toJSON(github).event.inputs }}
         run: echo "$GITHUB_CONTEXT"
+      - name: Print values
+        run: |
+          echo $GITHUB_CONTEXT.ALATIONANALYTICS
       - name: Dump job context
         env:
           JOB_CONTEXT: ${{ toJSON(job) }}
