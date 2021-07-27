@@ -17,11 +17,11 @@ on:
 jobs:
   one:
     runs-on: ubuntu-latest
+    env:
+      INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
+      var: ALATIONANALYTICS
     steps:
       - name: Dump input
-        env:
-          INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
-          var: ALATIONANALYTICS
         run: echo "$INPUT_CONTEXT"
       - name: Print values
         run: |        
