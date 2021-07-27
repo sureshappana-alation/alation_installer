@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Dump input
         env:
-          INPUT_CONTEXT: ${{ toJSON(github.event.input) }}
+          INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
         run: echo "$INPUT_CONTEXT"    
       # - name: Dump GitHub context
       #   env:
