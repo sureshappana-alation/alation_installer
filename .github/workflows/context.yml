@@ -19,9 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
-      INPUT_CONTEXT7: ${{ github.event.inputs }}
       var: ALATIONANALYTICS
     steps:
+      - name: apply params
+        run: ${{ github.event.inputs }} >> $GITHUB_ENV
       # - name: Get module versions from ./versions/*.env and apply overrides
         # run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
       - name: Checkout code
