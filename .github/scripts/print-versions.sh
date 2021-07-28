@@ -13,4 +13,5 @@ export x=ALATIONANALYTICS
 echo "Printing4"
 echo ${INPUT_CONTEXT} | jq ."$x"
 
-
+echo "Printing5"
+echo ${INPUT_CONTEXT} | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
