@@ -65,4 +65,4 @@ jobs:
 
     - name: Push the state to S3
       run:
-        aws s3 cp  terraform.tfstate s3://gh-action-tf-state/
+        aws s3 cp terraform.tfstate s3://gh-action-tf-state/terraform_$GITHUB_RUN_NUMBER.tfstate
