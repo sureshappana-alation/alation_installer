@@ -21,75 +21,78 @@ jobs:
       INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
       var: ALATIONANALYTICS
     steps:
-      - name: apply params
-        run: ${{ github.event.inputs }} >> $GITHUB_ENV
-      # - name: Get module versions from ./versions/*.env and apply overrides
-        # run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Make workflow scripts executable
         run: chmod +x ${{ github.workspace }}/.github/scripts/*.sh                
-      - name: Print bunch of random stuff
-        run: |
-          jq --version
-          find ${{ github.workspace }}
       - name: Run script
-        run: ${{ github.workspace }}/.github/scripts/print-versions.sh
-        env:
-          INPUT_CONTEXT1: ${{ toJSON(github.event.inputs) }}
-      - name: Dump input
-        run: echo "$INPUT_CONTEXT"
-      - name: Print values
-        run: |        
-          echo ${{ env.INPUT_CONTEXT.ALATIONANALYTICS }}
-      - name: Print values1
-        run: |        
-          echo $INPUT_CONTEXT.ALATIONANALYTICS
-      - name: Print values2
-        run: |        
-          echo $INPUT_CONTEXT[ALATIONANALYTICS]
-      - name: Print values3
-        run: |        
-          echo $INPUT_CONTEXT[$var]
-      - name: Print values4
-        run: |        
-          echo ${{ env.INPUT_CONTEXT['ALATIONANALYTICS'] }}
-      - name: Print values5
-        run: |        
-          echo ${{ toJSON(github.event.inputs.ALATIONANALYTICS) }}
-      - name: Print values6
-        run: |        
-          echo ${{ github.event.inputs.ALATIONANALYTICS }}
-      - name: Print values7
-        run: |        
-          echo ${{ github.event.inputs['ALATIONANALYTICS'] }}
+        run: ${{ github.workspace }}/.github/scripts/get-module-versions-new.sh
+
+      # - name: apply params
+      #   run: ${{ github.event.inputs }} >> $GITHUB_ENV
+      # # - name: Get module versions from ./versions/*.env and apply overrides
+      #   # run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
+      # # - name: Print bunch of random stuff
+      # #   run: |
+      # #     jq --version
+      # #     find ${{ github.workspace }}
+      # - name: Run script
+      #   run: ${{ github.workspace }}/.github/scripts/print-versions.sh
+      #   env:
+      #     INPUT_CONTEXT1: ${{ toJSON(github.event.inputs) }}
+      # # - name: Dump input
+      # #   run: echo "$INPUT_CONTEXT"
+      # # - name: Print values
+      # #   run: |        
+      # #     echo ${{ env.INPUT_CONTEXT.ALATIONANALYTICS }}
+      # # - name: Print values1
+      # #   run: |        
+      # #     echo $INPUT_CONTEXT.ALATIONANALYTICS
+      # # - name: Print values2
+      # #   run: |        
+      # #     echo $INPUT_CONTEXT[ALATIONANALYTICS]
+      # # - name: Print values3
+      # #   run: |        
+      # #     echo $INPUT_CONTEXT[$var]
+      # # - name: Print values4
+      # #   run: |        
+      # #     echo ${{ env.INPUT_CONTEXT['ALATIONANALYTICS'] }}
+      # # - name: Print values5
+      # #   run: |        
+      # #     echo ${{ toJSON(github.event.inputs.ALATIONANALYTICS) }}
+      # # - name: Print values6
+      # #   run: |        
+      # #     echo ${{ github.event.inputs.ALATIONANALYTICS }}
+      # # - name: Print values7
+      # #   run: |        
+      # #     echo ${{ github.event.inputs['ALATIONANALYTICS'] }}
 
 
 
-      # - name: Dump GitHub context
-      #   env:
-      #     GITHUB_CONTEXT: ${{ toJSON(github).event.inputs }}
-      #   run: echo "$GITHUB_CONTEXT"
-      # - name: Print values
-      #   run: |
-      #     echo $GITHUB_CONTEXT.ALATIONANALYTICS
-      # - name: Dump job context
-      #   env:
-      #     JOB_CONTEXT: ${{ toJSON(job) }}
-      #   run: echo "$JOB_CONTEXT"
-      # - name: Dump steps context
-      #   env:
-      #     STEPS_CONTEXT: ${{ toJSON(steps) }}
-      #   run: echo "$STEPS_CONTEXT"
-      # - name: Dump runner context
-      #   env:
-      #     RUNNER_CONTEXT: ${{ toJSON(runner) }}
-      #   run: echo "$RUNNER_CONTEXT"
-      # - name: Dump strategy context
-      #   env:
-      #     STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
-      #   run: echo "$STRATEGY_CONTEXT"
-      # - name: Dump matrix context
-      #   env:
-      #     MATRIX_CONTEXT: ${{ toJSON(matrix) }}
-      #   run: echo "$MATRIX_CONTEXT"
+      # # - name: Dump GitHub context
+      # #   env:
+      # #     GITHUB_CONTEXT: ${{ toJSON(github).event.inputs }}
+      # #   run: echo "$GITHUB_CONTEXT"
+      # # - name: Print values
+      # #   run: |
+      # #     echo $GITHUB_CONTEXT.ALATIONANALYTICS
+      # # - name: Dump job context
+      # #   env:
+      # #     JOB_CONTEXT: ${{ toJSON(job) }}
+      # #   run: echo "$JOB_CONTEXT"
+      # # - name: Dump steps context
+      # #   env:
+      # #     STEPS_CONTEXT: ${{ toJSON(steps) }}
+      # #   run: echo "$STEPS_CONTEXT"
+      # # - name: Dump runner context
+      # #   env:
+      # #     RUNNER_CONTEXT: ${{ toJSON(runner) }}
+      # #   run: echo "$RUNNER_CONTEXT"
+      # # - name: Dump strategy context
+      # #   env:
+      # #     STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
+      # #   run: echo "$STRATEGY_CONTEXT"
+      # # - name: Dump matrix context
+      # #   env:
+      # #     MATRIX_CONTEXT: ${{ toJSON(matrix) }}
+      # #   run: echo "$MATRIX_CONTEXT"
