@@ -27,7 +27,11 @@ jobs:
         run: chmod +x ${{ github.workspace }}/.github/scripts/*.sh                
       - name: Run script
         run: ${{ github.workspace }}/.github/scripts/get-module-versions-new.sh
-
+      - name: Print information
+        run: |
+          printenv
+      - name: Print hello
+        echo hello
       # - name: apply params
       #   run: ${{ github.event.inputs }} >> $GITHUB_ENV
       # # - name: Get module versions from ./versions/*.env and apply overrides
