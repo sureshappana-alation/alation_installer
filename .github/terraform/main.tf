@@ -1,3 +1,11 @@
+variable "image_id" {
+  type = string
+}
+variable "alation_version" {
+  type = string,
+  default="alation-k8s-master-20210729.30"
+}
+
 terraform {
   required_providers {
     aws = {
@@ -40,7 +48,7 @@ resource "aws_network_interface" "foo" {
 }
 
 resource "aws_instance" "foo" {
-  ami           = "ami-0443305dabd4be2bc" # us-east-2
+  ami           = var.image_id #"ami-0443305dabd4be2bc" # us-east-2
   instance_type = "t3.2xlarge"
 
   network_interface {
@@ -50,4 +58,14 @@ resource "aws_instance" "foo" {
   tags = {
     Name = "Foo"
   }
+
+  provisioner "remote-exec" {
+    inline = [
+      "aws s3 cp s3://unified-installer-build-pipeline-release/${var.alation_version}.tar.gz .",
+      "chmod +x ${var.alation_version}.tar.gz",
+      "tar xvzf ${var.alation_version}",
+      "cd ${var.alation_version}/installer"
+    ]
+  }
 }
+
