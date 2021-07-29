@@ -31,7 +31,7 @@ jobs:
         run: |
           printenv
       - name: Print hello
-        echo hello
+          echo hello
       # - name: apply params
       #   run: ${{ github.event.inputs }} >> $GITHUB_ENV
       # # - name: Get module versions from ./versions/*.env and apply overrides
