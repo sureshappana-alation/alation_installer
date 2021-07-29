@@ -2,8 +2,7 @@ variable "image_id" {
   type = string
 }
 variable "alation_version" {
-  type = string,
-  default="alation-k8s-master-20210729.30"
+  type = string
 }
 
 terraform {
