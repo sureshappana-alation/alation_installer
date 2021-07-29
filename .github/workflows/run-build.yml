@@ -24,6 +24,7 @@ jobs:
 
     - name: Configure AWS credentials
       run: |
+        touch ~/.aws/credentials
         echo [engineering] >> ~/.aws/credentials
         echo aws-access-key-id = ${{ secrets.AWS_ACCESS_KEY_ID }} >> ~/.aws/credentials
         echo aws-secret-access-key = ${{ secrets.AWS_SECRET_ACCESS_KEY }} >> ~/.aws/credentials
