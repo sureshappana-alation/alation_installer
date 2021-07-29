@@ -10,6 +10,12 @@ on:
   # This section is to trigger the workflow manually
   workflow_dispatch:
     inputs:
+      ALATIONANALYTICS:
+        description: 'Alation Analytics(ALATIONANALYTICS) version'
+        required: false
+      ALATIONANFC:
+        description: 'Alation FC (ALATIONFC) version'
+        required: false
       EXCLUDE_MODULES:
         description: 'List of comma separated modules to be excluded(ex: ALATIONANALYTICS,OCF)'
         required: false
@@ -65,8 +71,8 @@ jobs:
       MODULES_DIR: ./alation/res/modules
       KURL_PATCH_DIR: ./alation/res/kurl_patch
       VERSIONS_FILE: ./alation/versions.txt
-      INSTALL_CONFIG_FILE: ./alation/alation_install.yaml
-      INPUT_KURL: ${{ github.event.inputs.KURL }}
+      # INSTALL_CONFIG_FILE: ./alation/alation_install.yaml
+      # INPUT_KURL: ${{ github.event.inputs.KURL }}
       EXCLUDE_MODULES_STRING: ${{ github.event.inputs.EXCLUDE_MODULES }}
 
     steps:   

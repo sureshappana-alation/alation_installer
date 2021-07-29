@@ -6,19 +6,21 @@ shopt -s nullglob
 for file in ./versions/*.env; do
   while IFS='=' read -r module version
   do
-    # Override application versions key name
-    input_module="INPUT_$module"
-    echo "$module=${!input_module:-$version}" >> $GITHUB_ENV
+    echo "$module=$version" >> $GITHUB_ENV
     modulesList+=($module)
   done < "$file"
 done
+
+# Override versions information
+echo ${INPUT_CONTEXT} | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
 IFS=',' read -r -a excludeModulesList <<< "$EXCLUDE_MODULES_STRING"
 
 # Remove the modules in exclude list for processing
 for del in ${excludeModulesList[@]}
 do
-   modulesList=("${modulesList[@]/$del}")
+  echo "working on delete module: $del"
+  modulesList=("${modulesList[@]/$del}")
 done
 
 # Remove KURL from final modules list as kurl has special processing
