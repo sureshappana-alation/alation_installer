@@ -14,7 +14,7 @@ done
 # Override versions information
 echo ${INPUT_CONTEXT} | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
-IFS=',' read -r -a excludeModulesList <<< "$EXCLUDE_MODULES_STRING"
+IFS=',' read -r -a excludeModulesList <<< "$EXCLUDE_MODULES"
 
 # Remove the modules in exclude list for processing
 for del in ${excludeModulesList[@]}

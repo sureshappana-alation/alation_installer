@@ -22,7 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
-      var: ALATIONANALYTICS
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
