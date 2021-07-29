@@ -35,11 +35,15 @@ jobs:
       uses: hashicorp/setup-terraform@v1
 
     - name: Change to terraform directory
-      run: cd ${{ github.workspace }}/.github/terraform
+      run: |
+        cd ${{ github.workspace }}/.github/terraform
+        ls
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
-      run: terraform init
+      run: |
+        pwd
+        terraform init
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
