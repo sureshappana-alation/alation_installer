@@ -10,6 +10,9 @@ on:
       ALATIONANALYTICS:
         description: 'Alation Analytics(ALATIONANALYTICS) version'
         required: false
+      ALATIONANFC:
+        description: 'Alation FC version'
+        required: false
       EXCLUDE_MODULES:
         description: 'List of comma separated modules to be excluded(ex: ALATIONANALYTICS,OCF)'
         required: false
