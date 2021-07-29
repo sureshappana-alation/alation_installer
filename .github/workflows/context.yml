@@ -22,6 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
+      EXCLUDE_MODULES_STRING: ${{ github.event.inputs.EXCLUDE_MODULES }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
