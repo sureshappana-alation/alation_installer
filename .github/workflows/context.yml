@@ -33,7 +33,7 @@ jobs:
       - name: Print information
         run: printenv
       - name: Print hello
-        run: echo hello
+        run: echo ${{ steps.read_env.outputs.modulesList }}
       # - name: apply params
       #   run: ${{ github.event.inputs }} >> $GITHUB_ENV
       # # - name: Get module versions from ./versions/*.env and apply overrides
