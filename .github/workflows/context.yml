@@ -29,6 +29,7 @@ jobs:
       - name: Make workflow scripts executable
         run: chmod +x ${{ github.workspace }}/.github/scripts/*.sh                
       - name: Run script
+        id: read_env
         run: ${{ github.workspace }}/.github/scripts/get-module-versions-new.sh
       - name: Print information
         run: printenv
