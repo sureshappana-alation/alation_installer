@@ -19,7 +19,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./alation_installer/.github/terraform
+        working-directory: .github/terraform
 
     steps:
     # Checkout the repository to the GitHub Actions runner
