@@ -48,6 +48,6 @@ resource "aws_instance" "foo" {
     device_index         = 0
   }
   tags = {
-    Name=Foo
+    Name = "Foo"
   }
 }
