@@ -1,10 +1,3 @@
-variable "image_id" {
-  type = string
-}
-variable "alation_version" {
-  type = string
-}
-
 terraform {
   required_providers {
     aws = {
@@ -12,59 +5,102 @@ terraform {
       version = "~> 3.0"
     }
   }
+
+  backend "s3" {
+    bucket = "gh-action-tf-state"
+    region = "us-east-2"
+  }
 }
 
 provider "aws" {
   region = "us-east-2"
-  profile = "engineering"
 }
 
-resource "aws_vpc" "my_vpc" {
-  cidr_block = "172.16.0.0/16"
 
+module "vpc" {
+  source = "terraform-aws-modules/vpc/aws"
+
+  name = var.instanceName
+  cidr = "10.36.0.0/16"
+
+  azs             = ["us-east-2a"]
+  private_subnets = ["10.36.0.0/20"]
+  public_subnets  = ["10.36.128.0/21"]
+
+  # Internet Gateway
+  create_igw = true
+
+  # Enable DHCP Options
+  enable_dhcp_options  = true
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+
+  # Default Tags
   tags = {
-    Name = "tf-example"
+    Terraform   = "true"
+    Environment = "Cloud Infrastructure"
+    Owner       = var.instanceName
   }
 }
 
-resource "aws_subnet" "my_subnet" {
-  vpc_id            = aws_vpc.my_vpc.id
-  cidr_block        = "172.16.10.0/24"
-  availability_zone = "us-east-2a"
+# Create Security Group
+resource "aws_security_group" "ssh-allowed" {
+  vpc_id = module.vpc.vpc_id
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = -1
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   tags = {
-    Name = "tf-example"
+    Name = var.instanceName
   }
 }
 
-resource "aws_network_interface" "foo" {
-  subnet_id   = aws_subnet.my_subnet.id
-  private_ips = ["172.16.10.100"]
-
-  tags = {
-    Name = "primary_network_interface"
-  }
-}
-
+# Finally, create AWS instance
 resource "aws_instance" "foo" {
-  ami           = var.image_id #"ami-0443305dabd4be2bc" # us-east-2
+  ami           = var.image_id
   instance_type = "t3.2xlarge"
+  # VPC
+  subnet_id = module.vpc.public_subnets[0]
+  #   # Security Group
+  vpc_security_group_ids = ["${aws_security_group.ssh-allowed.id}"]
+  # the Public SSH key
+  key_name = var.keyName
 
-  network_interface {
-    network_interface_id = aws_network_interface.foo.id
-    device_index         = 0
-  }
-  tags = {
-    Name = "Foo"
+  # data drive
+  ebs_block_device {
+    device_name           = "/dev/xvda"
+    volume_size           = 100
+    volume_type           = "gp2"
+    delete_on_termination = true
+    encrypted             = true
   }
 
   provisioner "remote-exec" {
     inline = [
-      "aws s3 cp s3://unified-installer-build-pipeline-release/${var.alation_version}.tar.gz .",
-      "chmod +x ${var.alation_version}.tar.gz",
-      "tar xvzf ${var.alation_version}",
-      "cd ${var.alation_version}/installer"
+        "aws configure set aws_access_key_id ${var.aws_access_key_id}",
+        "aws configure set aws_secret_access_key ${var.aws_secret_access_key}",
+        "aws s3 cp s3://unified-installer-build-pipeline-release/${var.alation_version}.tar.gz .",
+        "tar xvzf ./${var.alation_version}.tar.gz",
+        "cd ./${var.alation_version}",
+        "chmod +x ./installer",
+        "./installer"
     ]
+    connection {
+      user        = "ec2-user"
+      private_key = file(var.keyPath)
+      host        = self.public_ip
+    }
+  }
+  tags = {
+    Name = var.instanceName
   }
 }
-

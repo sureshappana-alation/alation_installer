@@ -14,6 +14,7 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TERRAFORM_STRING: '-var="image_id=ami-0443305dabd4be2bc" -var="alation_version=alation-k8s-master-20210729.30" -var="aws_access_key_id=${{ env.AWS_ACCESS_KEY_ID }}" -var="aws_secret_access_key=${{ env.AWS_SECRET_ACCESS_KEY }}"'
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
@@ -44,7 +45,7 @@ jobs:
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
-      run: terraform init
+      run: terraform init -backend-config="key=$GITHUB_RUN_NUMBER/terraform.tfstate"
 
     # Checks that all Terraform configuration files adhere to a canonical format
     # - name: Terraform Format
@@ -52,17 +53,10 @@ jobs:
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      run: terraform plan -var="image_id=ami-0443305dabd4be2bc" -var="alation_version=alation-k8s-master-20210729.30"
+      run: terraform plan ${{ env.TERRAFORM_STRING }}
 
       # On push to main, build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
-    - name: Terraform Apply
-      # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve -var="image_id=ami-0443305dabd4be2bc" -var="alation_version=alation-k8s-master-20210729.30"
+    # - name: Terraform Apply
+    #   run: terraform apply -auto-approve ${{ env.TERRAFORM_STRING }}
 
-    - name: List files
-      run: ls
-
-    - name: Push the state to S3
-      run:
-        aws s3 cp terraform.tfstate s3://gh-action-tf-state/terraform_$GITHUB_RUN_NUMBER.tfstate
