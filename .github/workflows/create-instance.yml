@@ -62,7 +62,7 @@ jobs:
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
-      run: terraform init -backend-config="key=$GITHUB_RUN_NUMBER_$GITHUB_JOB/$GITHUB_JOB/terraform.tfstate"
+      run: terraform init -backend-config="key=$GITHUB_RUN_NUMBER/$GITHUB_JOB/terraform.tfstate"
 
     # Checks that all Terraform configuration files adhere to a canonical format
     # - name: Terraform Format
