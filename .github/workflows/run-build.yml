@@ -34,6 +34,10 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_S3_REGION }}
 
+    - name: Copy key from S3 bucket
+      run: |
+        aws s3 cp s3://gh-action-tf-state/gh-actions-terraform.pem ~/.ssh/gh-actions-terraform.pem
+
     # - name: Configure AWS credentials
     #   run: |
     #     echo [engineering] >> ~/.aws/credentials
