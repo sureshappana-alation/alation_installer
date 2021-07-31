@@ -15,25 +15,27 @@ jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ami: [ami-0443305dabd4be2bc, ami-0ba62214afa52bec7]
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       TFSTATE_FILE: ${{ github.event.inputs.WORKFLOW_RUN }}/terraform.tfstate
-      TERRAFORM_STRING: '-var="image_id=ami-0443305dabd4be2bc"
+      TERRAFORM_STRING: '-var="image_id=${{ matrix.os }}"
         -var="alation_version=alation-k8s-master-20210729.30"
         -var="aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}"
         -var="aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
         -var="instanceName=alation-test-k8s-${{ github.event.inputs.WORKFLOW_RUN }}"
         '
 
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
         working-directory: .github/terraform
 
     steps:
-    # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2
 
@@ -44,7 +46,6 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_S3_REGION }}
 
-    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
@@ -52,12 +53,9 @@ jobs:
       run: |
         aws s3 cp s3://gh-action-tf-state/gh-actions-terraform.pem ~/.ssh/gh-actions-terraform.pem
 
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       run: terraform init -backend-config="key=${{ env.TFSTATE_FILE }}"
 
-      # On push to main, build or change infrastructure according to Terraform configuration files
-      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
     - name: Terraform Destroy
       run: terraform destroy -auto-approve ${{ env.TERRAFORM_STRING }}
 

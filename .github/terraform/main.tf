@@ -65,7 +65,7 @@ resource "aws_security_group" "ssh-allowed" {
 }
 
 # Finally, create AWS instance
-resource "aws_instance" "foo" {
+resource "aws_instance" "alation_aws_instance" {
   ami           = var.image_id
   instance_type = "t3.2xlarge"
   # VPC
