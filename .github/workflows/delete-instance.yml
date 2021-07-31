@@ -50,7 +50,6 @@ jobs:
     - name: Copy key from S3 bucket
       run: |
         aws s3 cp s3://gh-action-tf-state/gh-actions-terraform.pem ~/.ssh/gh-actions-terraform.pem
-        # aws s3 cp s3://gh-action-tf-state/${{ github.event.inputs.WORKFLOW_RUN }}/terraform.tfstate .
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
@@ -61,3 +60,6 @@ jobs:
     - name: Terraform Destroy
       run: terraform destroy -auto-approve ${{ env.TERRAFORM_STRING }}
 
+    - name: Remove terraform state from S3
+      if: ${{ success() }}
+      run: aws s3 rm s3://gh-action-tf-state/${{ github.event.inputs.WORKFLOW_RUN }}/terraform.tfstate
