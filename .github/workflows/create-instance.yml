@@ -22,6 +22,12 @@ jobs:
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TERRAFORM_STRING: '-var="image_id=${{ matrix.ami }}"
+        -var="alation_version=${{ github.event.inputs.ALATION_VERSION }}"
+        -var="aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}"
+        -var="aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        -var="instanceName=alation-test-k8s-$GITHUB_RUN_NUMBER-${{ matrix.ami }}"
+        '
 
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
@@ -49,16 +55,6 @@ jobs:
       run: |
         echo BUILD_DOWNLOAD_URL=`aws s3 presign s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}/${{ github.event.inputs.ALATION_VERSION }}.tar.gz --expires-in 900` >> $GITHUB_ENV
 
-    - name: Generate Terraform argument string
-      run: |
-        echo  "TERRAFORM_STRING='-var="image_id=${{ matrix.ami }}"
-        -var="alation_version=${{ github.event.inputs.ALATION_VERSION }}"
-        -var="aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}"
-        -var="aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-        -var="instanceName=alation-test-k8s-$GITHUB_RUN_NUMBER-${{ matrix.ami }}"
-        -var="build_download_url=${{ env.BUILD_DOWNLOAD_URL }}"
-        '" >> $GITHUB_ENV
-
     # - name: Configure AWS credentials
     #   run: |
     #     echo [engineering] >> ~/.aws/credentials
@@ -78,10 +74,10 @@ jobs:
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      run: terraform plan ${{ env.TERRAFORM_STRING }}
+      run: terraform plan ${{ env.TERRAFORM_STRING }} -var="build_download_url=${{ env.BUILD_DOWNLOAD_URL }}"
 
       # On push to main, build or change infrastructure according to Terraform configuration files
       # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
-    # - name: Terraform Apply
-    #   run: terraform apply -auto-approve ${{ env.TERRAFORM_STRING }}
+    - name: Terraform Apply
+      run: terraform apply -auto-approve ${{ env.TERRAFORM_STRING }} -var="build_download_url=${{ env.BUILD_DOWNLOAD_URL }}"
 
