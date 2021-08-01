@@ -23,11 +23,11 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       TFSTATE_FILE: ${{ github.event.inputs.WORKFLOW_RUN }}/terraform.tfstate
-      TERRAFORM_STRING: '-var="image_id=${{ matrix.os }}"
+      TERRAFORM_STRING: '-var="image_id=${{ matrix.ami }}"
         -var="alation_version=alation-k8s-master-20210729.30"
         -var="aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}"
         -var="aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-        -var="instanceName=alation-test-k8s-${{ github.event.inputs.WORKFLOW_RUN }}"
+        -var="instanceName=alation-test-k8s-$GITHUB_RUN_NUMBER-${{ matrix.ami }}"
         '
 
     defaults:
@@ -54,7 +54,7 @@ jobs:
         aws s3 cp s3://gh-action-tf-state/gh-actions-terraform.pem ~/.ssh/gh-actions-terraform.pem
 
     - name: Terraform Init
-      run: terraform init -backend-config="key=${{ env.TFSTATE_FILE }}"
+      run: terraform init -backend-config="key=$GITHUB_RUN_NUMBER/${{ matrix.ami }}/terraform.tfstate"
 
     - name: Terraform Destroy
       run: terraform destroy -auto-approve ${{ env.TERRAFORM_STRING }}
