@@ -85,10 +85,17 @@ resource "aws_instance" "alation_aws_instance" {
   }
 
   provisioner "remote-exec" {
+    # inline = [
+    #     "aws configure set aws_access_key_id ${var.aws_access_key_id}",
+    #     "aws configure set aws_secret_access_key ${var.aws_secret_access_key}",
+    #     "aws s3 cp s3://unified-installer-build-pipeline-release/${var.alation_version}.tar.gz .",
+    #     "tar xvzf ./${var.alation_version}.tar.gz",
+    #     "cd ./${var.alation_version}",
+    #     "chmod +x ./installer",
+    #     "./installer"
+    # ]
     inline = [
-        "aws configure set aws_access_key_id ${var.aws_access_key_id}",
-        "aws configure set aws_secret_access_key ${var.aws_secret_access_key}",
-        "aws s3 cp s3://unified-installer-build-pipeline-release/${var.alation_version}.tar.gz .",
+        "curl '${var.build_download_url}' --output ${var.alation_version}.tar.gz",
         "tar xvzf ./${var.alation_version}.tar.gz",
         "cd ./${var.alation_version}",
         "chmod +x ./installer",
