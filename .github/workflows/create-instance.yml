@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
     inputs:
       ALATION_VERSION:
-        description: 'Alation k8s build to install'
+        description: 'Alation k8s build version to install'
         required: true
 jobs:
   terraform:
@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ami: [ami-0443305dabd4be2bc, ami-0ba62214afa52bec7]
+        ami: [ami-0443305dabd4be2bc]
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -29,17 +29,18 @@ jobs:
         -var="instanceName=alation-test-k8s-$GITHUB_RUN_NUMBER-${{ matrix.ami }}"
         '
 
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
         shell: bash
         working-directory: .github/terraform
 
     steps:
+    
     # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2
 
+    # Configure AWS credentials
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -51,16 +52,11 @@ jobs:
       run: |
         aws s3 cp s3://gh-action-tf-state/gh-actions-terraform.pem ~/.ssh/gh-actions-terraform.pem
     
-    - name: Presign release artifact for easy download using curl
+    - name: Presign release artifact for easy download using curl in any operating system
       run: |
         echo BUILD_DOWNLOAD_URL=`aws s3 presign s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}/${{ github.event.inputs.ALATION_VERSION }}.tar.gz --expires-in 900` >> $GITHUB_ENV
 
-    # - name: Configure AWS credentials
-    #   run: |
-    #     echo [engineering] >> ~/.aws/credentials
-    #     echo aws-access-key-id = ${{ secrets.AWS_ACCESS_KEY_ID }} >> ~/.aws/credentials
-    #     echo aws-secret-access-key = ${{ secrets.AWS_SECRET_ACCESS_KEY }} >> ~/.aws/credentials
-    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    # Install the latest version of Terraform CLI
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
@@ -68,16 +64,11 @@ jobs:
     - name: Terraform Init
       run: terraform init -backend-config="key=$GITHUB_RUN_NUMBER/${{ matrix.ami }}/terraform.tfstate"
 
-    # Checks that all Terraform configuration files adhere to a canonical format
-    # - name: Terraform Format
-    #   run: terraform fmt -check
-
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       run: terraform plan ${{ env.TERRAFORM_STRING }} -var="build_download_url=${{ env.BUILD_DOWNLOAD_URL }}"
 
-      # On push to main, build or change infrastructure according to Terraform configuration files
-      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+    # Apply the changes to the AWS
     - name: Terraform Apply
       run: terraform apply -auto-approve ${{ env.TERRAFORM_STRING }} -var="build_download_url=${{ env.BUILD_DOWNLOAD_URL }}"
 

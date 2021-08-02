@@ -11,6 +11,9 @@ on:
         WORKFLOW_RUN:
           description: 'Workflow run to delete'
           required: true
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}          
 jobs:
   terraform:
     name: 'Terraform'
@@ -20,8 +23,6 @@ jobs:
       matrix:
         ami: [ami-0443305dabd4be2bc, ami-0ba62214afa52bec7]
     env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       TFSTATE_FILE: ${{ github.event.inputs.WORKFLOW_RUN }}/${{ matrix.ami }}/terraform.tfstate
       TERRAFORM_STRING: '-var="image_id=${{ matrix.ami }}"
         -var="alation_version=alation-k8s-master-20210729.30"
@@ -36,9 +37,12 @@ jobs:
         working-directory: .github/terraform
 
     steps:
+    
+    # Checkout the repository to the GitHub Actions runner
     - name: Checkout
       uses: actions/checkout@v2
 
+    # Configure AWS credentials
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -46,6 +50,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_S3_REGION }}
 
+    # Install the latest version of Terraform CLI
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
@@ -56,9 +61,11 @@ jobs:
     - name: Terraform Init
       run: terraform init -backend-config="key=${{ env.TFSTATE_FILE }}"
 
+    # Clean the infra created by the create workflow
     - name: Terraform Destroy
       run: terraform destroy -auto-approve ${{ env.TERRAFORM_STRING }}
 
+    # If cleanup is successful then remove the state from S3
     - name: Remove terraform state from S3
       if: ${{ success() }}
       run: aws s3 rm s3://gh-action-tf-state/${{ env.TFSTATE_FILE }}
