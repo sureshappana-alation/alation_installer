@@ -12,8 +12,8 @@ import (
 	"syscall"
 
 	. "github.com/logrusorgru/aurora"
-
 	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 // This function loads the secret from environment variables if exist in normalized form
@@ -88,11 +88,11 @@ func getSecret() string {
 	signal.Notify(c, os.Interrupt, os.Kill)
 	go func() {
 		<-c
-		_ = terminal.Restore(syscall.Stdin, initialTermState)
+		_ = term.Restore(syscall.Stdin, initialTermState)
 		os.Exit(1)
 	}()
 
-	p, err := terminal.ReadPassword(syscall.Stdin)
+	p, err := term.ReadPassword(syscall.Stdin)
 	fmt.Println("")
 	if err != nil {
 		panic(err)
