@@ -12,7 +12,6 @@ import (
 	"syscall"
 
 	. "github.com/logrusorgru/aurora"
-	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/term"
 )
 
@@ -78,7 +77,7 @@ func askSecret(promptMsg string) string {
 
 func getSecret() string {
 	// Get the initial state of the terminal.
-	initialTermState, termErr := terminal.GetState(syscall.Stdin)
+	initialTermState, termErr := term.GetState(syscall.Stdin)
 	if termErr != nil {
 		panic(termErr)
 	}

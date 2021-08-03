@@ -29,5 +29,5 @@ func RunCommand(cmd *exec.Cmd, logMsg string) (bool, string) {
 		LOGGER.Error(fmt.Sprintf("Error in running command: %s", errStr))
 		return false, errStr
 	}
-	return true, fmt.Sprintf("%s", out)
+	return true, string(out)
 }
