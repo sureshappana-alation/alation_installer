@@ -4,9 +4,10 @@
 package main
 
 import (
-	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
+	"reflect"
 
 	"gopkg.in/yaml.v3"
 )
@@ -14,7 +15,7 @@ import (
 // Structs to keep the configuration needed for installer
 type AlationInstallConfig struct {
 	// Cluster Cluster                      `yaml:"installer"` // Not used until multi-node cluster support
-	Modules map[string]map[string]map[string]string `yaml:"modules"` // configurations related to each module
+	Modules map[string]map[string]interface{} `yaml:"modules"` // configurations related to each module
 }
 
 // Not used until multi-node cluster support
@@ -48,6 +49,32 @@ func ParseAlationInstallConfig(configFilePath string) AlationInstallConfig {
 		os.Exit(1)
 	}
 
+	// verify config types
+	// all module configuration should be type of key-values except for volumes which is an array of key-values
+	confTypeError := false
+	for moduleName, moduleConfs := range config.Modules {
+		for confName, conf := range moduleConfs {
+			switch conf.(type) {
+			case map[string]interface{}:
+				if confName == "volumes" {
+					confTypeError = true
+				}
+			case []interface{}:
+				if confName != "volumes" {
+					confTypeError = true
+				}
+			default:
+				confTypeError = true
+			}
+			if confTypeError {
+				logAndShowError("alation-install.yaml configuration file",
+					fmt.Sprintf("unknown configuration type. module=%s, property=%s, type=%s",
+						moduleName, confName, reflect.TypeOf(conf)))
+				os.Exit(1)
+			}
+		}
+	}
+
 	return config
 }
 
@@ -58,10 +85,11 @@ func PrepareInstallConfig() AlationInstallConfig {
 	LOGGER.Info("Parsed Alation install config YAML file: ", config)
 
 	type Secret struct {
-		module   string
-		conf     string
-		required bool
-		value    *string
+		description string
+		module      string
+		conf        string
+		required    bool
+		value       string
 	}
 
 	var secretConfs []Secret
@@ -69,36 +97,49 @@ func PrepareInstallConfig() AlationInstallConfig {
 
 	// find configurations of type secret
 	for module, moduleConf := range config.Modules {
-		for conf, confAttr := range moduleConf {
-			if confAttr["secret"] == "True" {
-				secretConfs = append(secretConfs, Secret{module: module, conf: conf, required: confAttr["required"] == "True"})
+		for confName, conf := range moduleConf {
+			if confName != "volumes" {
+				confMap := conf.(map[string]interface{})
+				if confMap["secret"] == true {
+					secretConfs = append(secretConfs,
+						Secret{
+							description: confMap["description"].(string),
+							module:      module,
+							conf:        confName,
+							required:    confMap["required"] == true})
+				}
 			}
 		}
 	}
 
 	// Receive secret arguments from command line arguments
 	for _, secretConf := range secretConfs {
-		secretConf.value = flag.String(secretConf.module+"."+secretConf.conf, "", "Absolute path of the YAML config file.")
+		secretConf.value =
+			getFromEnvOrPromptSecret(secretConf.module+"."+secretConf.conf, secretConf.description, secretConf.required)
 		secretConfsWithValueRef = append(secretConfsWithValueRef, secretConf)
 	}
-	flag.Parse()
 
 	// set secrets to the final config
 	for _, secretConf := range secretConfsWithValueRef {
-		if *secretConf.value != "" {
-			config.Modules[secretConf.module][secretConf.conf]["value"] = *secretConf.value
+		if secretConf.value != "" {
+			config.Modules[secretConf.module][secretConf.conf].(map[string]interface{})["value"] = secretConf.value
 		} else if secretConf.required {
-			logAndShowError("Required argument configuration missing.", secretConf.conf+" is missing.")
+			logAndShowError("Required argument configuration missing.",
+				fmt.Sprintf("modules.%s.%s is missing.", secretConf.module, secretConf.conf))
 			os.Exit(1)
 		}
 	}
 
 	// verify all required argument are present
-	for _, moduleConf := range config.Modules {
-		for _, confAttr := range moduleConf {
-			if confAttr["required"] == "True" && confAttr["value"] == "" {
-				logAndShowError("Required yaml configuration.", "Yaml configuration is missing.")
-				os.Exit(1)
+	for moduleName, moduleConf := range config.Modules {
+		for confName, conf := range moduleConf {
+			if confName != "volumes" {
+				confMap := conf.(map[string]interface{})
+				if confMap["required"] == true && (confMap["value"] == nil || confMap["value"] == "") {
+					logAndShowError("Required yaml configuration.",
+						fmt.Sprintf("Yaml configuration modules.%s.%s value is missing.", moduleName, confName))
+					os.Exit(1)
+				}
 			}
 		}
 	}
@@ -124,7 +165,8 @@ type Volume struct {
 }
 
 // Load module storage yaml file and parse it as ModuleStorage struct
-func ParseModuleStorage(configFilePath string) ModuleStorage {
+// volume paths get overridden from install config
+func ParseModuleStorage(moduleName string, configFilePath string, installConfig AlationInstallConfig) ModuleStorage {
 
 	yamlFile, error := ioutil.ReadFile(configFilePath)
 
@@ -140,7 +182,28 @@ func ParseModuleStorage(configFilePath string) ModuleStorage {
 		logAndShowError("Parsing module storage file", error.Error())
 		os.Exit(1)
 	}
+	overrideVolumes := installConfig.Modules[moduleName]["volumes"]
 
+	if overrideVolumes != nil {
+		overriddenVolumes := make([]Volume, 0)
+
+		for _, volume := range storage.Volumes {
+			var overriddenPath string = volume.Path
+			for _, volumeOverride := range overrideVolumes.([]interface{}) {
+				name := volumeOverride.(map[string]interface{})["name"]
+				path := volumeOverride.(map[string]interface{})["path"]
+				if volume.Name == name && volume.Path != path {
+					LOGGER.Info(fmt.Sprintf("Volume path overriden with install configuration. module=%s, persistantVolume=%s, defaultPath=%s, newPath=%s",
+						moduleName, volume.Name, volume.Path, path))
+					overriddenPath = path.(string)
+				}
+			}
+			overriddenVolumes = append(overriddenVolumes,
+				Volume{Name: volume.Name, Capacity: volume.Capacity, Label: volume.Label, Path: overriddenPath})
+		}
+
+		return ModuleStorage{Volumes: overriddenVolumes}
+	}
 	return storage
 }
 

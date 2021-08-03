@@ -6,9 +6,9 @@ import (
 )
 
 func main() {
-	logAndShowMsg("Installer Script started.")
+	logAndShowMsg("Installer Script started. \nInstaller logs are available at " + getLogFilePath())
 
-	// TODO - Add environment verifications
+	verifyEnvironment()
 
 	installConfig := PrepareInstallConfig()
 

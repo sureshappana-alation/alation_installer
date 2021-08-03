@@ -19,7 +19,7 @@ spec:
         - key: node-role.alation.com/monitoring
           operator: In
           values:
-          - monitoring
+          - labeled
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

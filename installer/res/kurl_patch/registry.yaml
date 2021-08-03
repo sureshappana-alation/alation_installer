@@ -69,6 +69,8 @@ spec:
                 secretKeyRef:
                   key: haSharedSecret
                   name: registry-session-secret
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: "true"
           readinessProbe:
             failureThreshold: 3
             initialDelaySeconds: 10
@@ -114,7 +116,7 @@ spec:
             - key: node-role.alation.com/registry
               operator: In
               values:
-                - registry
+                - labeled
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

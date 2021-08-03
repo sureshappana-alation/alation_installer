@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 const (
@@ -15,7 +17,7 @@ const (
 )
 
 const ( // Bash commands used in this file
-	containerdLoadImageCmd = "sudo ctr -n k8s.io images import %s"
+	containerdLoadImageCmd = "sudo gunzip --stdout %s | sudo ctr -n k8s.io images import -"
 	helmInstallCmd         = "/usr/local/bin/helm upgrade --install %s %s %s"
 	kubeApplyFileCmd       = "cat <<EOF | kubectl apply -f -\n%s\nEOF"
 	mkdirCmd               = "sudo mkdir -p %s"
@@ -29,9 +31,14 @@ func InstallModules(installConfig AlationInstallConfig) {
 	// scan modules directory to find available modules
 	moduleScanError :=
 		filepath.WalkDir(modulesDirPath, func(path string, dirInfo os.DirEntry, err error) error {
-			if dirInfo.IsDir() && path != modulesDirPath {
-				modulePaths = append(modulePaths, path)
-				return filepath.SkipDir // to only scan top level directories under modules directory
+			if err == nil {
+				if dirInfo.IsDir() && path != modulesDirPath {
+					modulePaths = append(modulePaths, path)
+					return filepath.SkipDir // to only scan top level directories under modules directory
+				}
+			} else {
+				logAndShowMsg("Modules installation skipped as module directory does not exist")
+				LOGGER.Warn(err)
 			}
 			return nil
 		})
@@ -53,7 +60,7 @@ func installModule(modulePath string, installConfig AlationInstallConfig) {
 	logAndShowMsg(fmt.Sprintf("Module %s installation is started.", moduleName))
 
 	loadModuleImages(modulePath)
-	createPersistentVolumes(modulePath)
+	createPersistentVolumes(modulePath, installConfig)
 	installModuleCharts(modulePath, installConfig)
 }
 
@@ -66,8 +73,13 @@ func loadModuleImages(modulePath string) {
 	// find all images of the module
 	imagesDirScanError :=
 		filepath.Walk(imagesDirPath, func(filePath string, fileInfo os.FileInfo, err error) error {
-			if !fileInfo.IsDir() && filepath.Ext(filePath) == ".tar" {
-				imageTarBallPaths = append(imageTarBallPaths, filePath)
+			if err == nil {
+				if !fileInfo.IsDir() && strings.HasSuffix(fileInfo.Name(), ".tar.gz") {
+					imageTarBallPaths = append(imageTarBallPaths, filePath)
+				}
+			} else {
+				LOGGER.Warn("Error in reading module images")
+				LOGGER.Warn(err)
 			}
 			return nil
 		})
@@ -94,16 +106,24 @@ func installModuleCharts(modulePath string, installConfig AlationInstallConfig) 
 	moduleName := filepath.Base(modulePath)
 
 	valueOverrides := ""
+	valueOverrideForLog := ""
 
 	overriddenConf := installConfig.Modules[moduleName]
 	for conf := range overriddenConf {
-		value := installConfig.Modules[moduleName][conf]["value"]
-		if value != "" {
-			valueOverrides += fmt.Sprintf("--set %s=%s ", conf, value)
+		if conf != "volumes" {
+			value := installConfig.Modules[moduleName][conf].(map[string]interface{})["value"]
+			if value != nil && value != "" {
+				valueOverrides += fmt.Sprintf("--set %s=%s ", conf, value)
+				valueOverrideForLog += fmt.Sprintf("--set %s=%s ", conf, "<REDACTED>")
+			}
 		}
 	}
 
-	installed, out := RunBashCmd(fmt.Sprintf(helmInstallCmd, valueOverrides, moduleName, modulePath+moduleChartsPath))
+	commandLogTxt := fmt.Sprintf(helmInstallCmd, valueOverrideForLog, moduleName, modulePath+moduleChartsPath)
+
+	installed, out :=
+		RunCommand(exec.Command("bash", "-c", fmt.Sprintf(helmInstallCmd, valueOverrides, moduleName, modulePath+moduleChartsPath)),
+			commandLogTxt)
 
 	if installed {
 		logAndShowSuccess(fmt.Sprintf("Module %s is successfully installed.", moduleName))
@@ -115,7 +135,7 @@ func installModuleCharts(modulePath string, installConfig AlationInstallConfig) 
 }
 
 // Create persistent volumes for the module base on the storage.yaml values.
-func createPersistentVolumes(modulePath string) {
+func createPersistentVolumes(modulePath string, installConfig AlationInstallConfig) {
 	moduleName := filepath.Base(modulePath)
 	template, err := ioutil.ReadFile(persistentVolumeTemplate)
 	if err != nil {
@@ -125,7 +145,7 @@ func createPersistentVolumes(modulePath string) {
 
 	storageFilePath := modulePath + "/storage.yaml"
 	if fileExists(storageFilePath) {
-		storage := ParseModuleStorage(storageFilePath)
+		storage := ParseModuleStorage(moduleName, storageFilePath, installConfig)
 		for _, volume := range storage.Volumes {
 
 			// Create directory for volume
