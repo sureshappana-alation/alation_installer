@@ -16,4 +16,4 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           working-directory: ${{github.workspace}}/installer          
-          skip-go-installation: true # Optional: if set to true then the action will use pre-installed Go.
+          skip-go-installation: false # Optional: if set to true then the action will use pre-installed Go.
