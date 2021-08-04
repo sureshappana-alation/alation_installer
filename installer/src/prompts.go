@@ -84,6 +84,10 @@ func getSecret() string {
 
 	// Restore it in the event of an interrupt.
 	c := make(chan os.Signal)
+
+	// The following line gives the lint issue "misuse of unbuffered os.Signal channel as argument to signal.Notify"
+	// As this code is ported from AA team ignoring lint issue for now.
+	//nolint
 	signal.Notify(c, os.Interrupt, os.Kill)
 	go func() {
 		<-c
