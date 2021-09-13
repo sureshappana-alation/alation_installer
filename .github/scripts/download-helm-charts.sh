@@ -13,6 +13,7 @@ aws ecr get-login-password \
 for i in $modules; do
   module="${i}"
 
+  echo "aa version is: " $alation-analytics
   # Add entry to versions file
   echo "$module=${!module}" >> $VERSIONS_FILE
 
