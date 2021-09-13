@@ -18,10 +18,10 @@ for i in $modules; do
     echo "Skipping $module"
   else
     moduleFullName="${module}-${!i}.tar.gz"
-    echo "Pulling helm chart"
+    echo "Pulling helm chart $module"
     # aws s3 cp $S3_DEV_BUCKET_URL/${moduleFullName,,} $MODULES_DIR/${module,,}/
-    helm chart pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics:12.17.21-906
-    echo "Exporting helm chart"
-    helm chart export 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics:12.17.21-906
+    helm chart pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/$module:${!module}
+    echo "Exporting helm chart $module"
+    helm chart export 248135293344.dkr.ecr.us-east-2.amazonaws.com/$module:${!module}
   fi
 done
