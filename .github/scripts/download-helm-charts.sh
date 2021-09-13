@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Printing env"
+printenv
+
 export HELM_EXPERIMENTAL_OCI=1
 
 aws ecr get-login-password \
