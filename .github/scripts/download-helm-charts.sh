@@ -25,5 +25,3 @@ for i in $modules; do
     helm chart export 248135293344.dkr.ecr.us-east-2.amazonaws.com/$module:${!module}
   fi
 done
-
-ls -al

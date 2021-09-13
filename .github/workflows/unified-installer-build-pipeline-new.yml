@@ -116,6 +116,11 @@ jobs:
         env:
           modules: ${{ steps.read_env.outputs.modulesList }}
           ECR_URL: ${{ env.ECR_URL }}
+
+      - name: Print information
+        run: |
+          echo "List of files"
+          find ${{ env.BASE_DIR }}
       # - name: Generate alation-install.yaml file
       #   run: ${{ github.workspace }}/.github/scripts/generate-alation-install-yaml.sh
       # - name: Download installer binary from build job
