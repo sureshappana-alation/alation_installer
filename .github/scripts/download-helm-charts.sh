@@ -1,11 +1,11 @@
 #!/bin/bash
 
+export HELM_EXPERIMENTAL_OCI=1
+
 aws ecr get-login-password \
      --region us-east-2 | helm registry login \
      --username AWS \
      --password-stdin $ECR_URL
-
-export HELM_EXPERIMENTAL_OCI=1
 
 for i in $modules; do
   module="${i}"
