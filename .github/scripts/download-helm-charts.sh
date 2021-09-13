@@ -5,6 +5,8 @@ aws ecr get-login-password \
      --username AWS \
      --password-stdin $ECR_URL
 
+export HELM_EXPERIMENTAL_OCI=1
+
 for i in $modules; do
   module="${i}"
 
@@ -19,6 +21,7 @@ for i in $modules; do
     echo "Pulling helm chart"
     # aws s3 cp $S3_DEV_BUCKET_URL/${moduleFullName,,} $MODULES_DIR/${module,,}/
     helm chart pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics:12.17.21-906
+    echo "Exporting helm chart"
     helm chart export 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics:12.17.21-906
   fi
 done
