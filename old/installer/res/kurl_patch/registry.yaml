@@ -1,0 +1,135 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registry-config
+  labels:
+    app: registry
+data:
+  config.yml: |-
+    health:
+      storagedriver:
+        enabled: true
+        interval: 10s
+        threshold: 3
+    http:
+      addr: :80
+    log:
+      fields:
+        service: registry
+      accesslog:
+        disabled: true
+    storage:
+      filesystem:
+        rootdirectory: /var/lib/registry
+      cache:
+        blobdescriptor: inmemory
+    version: 0.1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registry
+spec:
+  selector:
+    matchLabels:
+      app: registry
+  replicas: 1
+  strategy:
+    type:
+      Recreate
+  template:
+    metadata:
+      labels:
+        app: registry
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: registry
+          image: registry:2.7.1
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/registry
+            - serve
+            - /etc/docker/registry/config.yml
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: registry-data
+              mountPath: /var/lib/registry
+            - name: registry-config
+              mountPath: /etc/docker/registry
+            - name: registry-pki
+              mountPath: /etc/pki
+            - name: registry-htpasswd
+              mountPath: /auth
+          env:
+            - name: REGISTRY_HTTP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  key: haSharedSecret
+                  name: registry-session-secret
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: "true"
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 1
+            successThreshold: 2
+            timeoutSeconds: 1
+            httpGet:
+              path: /
+              port: 80
+              scheme: HTTP
+      volumes:
+        - name: registry-data
+          persistentVolumeClaim:
+            claimName: registry-pvc
+        - name: registry-config
+          configMap:
+            name: registry-config
+        - name: registry-pki
+          secret:
+            secretName: registry-pki
+        - name: registry-htpasswd
+          secret:
+            secretName: registry-htpasswd
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-registry
+spec:
+  capacity:
+    storage: 15Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /mnt/disks/registry
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-role.alation.com/registry
+              operator: In
+              values:
+                - labeled
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: registry
+  name: registry-pvc
+  namespace: kurl
+spec:
+  volumeName: pv-registry
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 15Gi
+  volumeMode: Filesystem

@@ -1,0 +1,16 @@
+apiVersion: skaffold/v2beta16
+kind: Config
+build:
+  artifacts:
+  - image: alation-helm-getting-started
+deploy:
+  helm:
+    releases:
+    - name: alation-helm-getting-started
+      chartPath: charts
+      artifactOverrides:
+        imageName: alation-helm-getting-started
+      setValues:
+        config.entries[0].data.enemies: "non-aliens" # An example to override values defined values.yaml file
+      valuesFiles:
+      - ./charts/values.yaml

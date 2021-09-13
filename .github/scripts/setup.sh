@@ -4,7 +4,6 @@ echo "Create required directories"
 
 mkdir -p $BASE_DIR
 mkdir -p $MODULES_DIR
-mkdir -p $KURL_PATCH_DIR
 
 echo "Copy res content from source code to archiving directory"
 cp -a $GITHUB_WORKSPACE/installer/res/. $RESOURCE_DIR/
@@ -12,6 +11,8 @@ cp -a $GITHUB_WORKSPACE/installer/res/. $RESOURCE_DIR/
 echo "Create versions and install config file"
 touch $VERSIONS_FILE $INSTALL_CONFIG_FILE
 
+# Creating modules entry in alation-install.yaml
+echo "modules:" >> $INSTALL_CONFIG_FILE
 
 # Get current date
 NOW=$(date +'%Y%m%d')

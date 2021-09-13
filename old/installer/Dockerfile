@@ -8,3 +8,4 @@ RUN go build -o /out/installer *.go
 
 FROM scratch AS export
 COPY --from=build /out/installer /
+

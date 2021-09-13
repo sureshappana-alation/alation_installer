@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "alation-helm-chart.fullname" . }}
+  labels:
+    {{- include "alation-helm-chart.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount | default 1}}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "alation-helm-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "alation-helm-chart.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "alation-helm-chart.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: {{ if .Values.imageName }}{{ .Values.imageName }}{{ else }}"{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"{{ end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          {{- if .Values.liveness.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.liveness.timeoutSeconds }}
+            periodSeconds: {{ .Values.liveness.periodSeconds }}
+            successThreshold: {{ .Values.liveness.successThreshold }}
+            failureThreshold: {{ .Values.liveness.failureThreshold }}
+            httpGet:
+              path: {{ .Values.liveness.endpoint }}
+              port: {{ .Values.service.port }}
+              scheme: {{ .Values.liveness.scheme }}
+          {{- end }}
+          {{- if .Values.readiness.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.readiness.timeoutSeconds }}
+            periodSeconds: {{ .Values.readiness.periodSeconds }}
+            successThreshold: {{ .Values.readiness.successThreshold }}
+            failureThreshold: {{ .Values.readiness.failureThreshold }}
+            httpGet:
+              path: {{ .Values.readiness.endpoint }}
+              port: {{ .Values.service.port }}
+              scheme: {{ .Values.readiness.scheme }}
+          {{- end }}
+          {{- if .Values.startup.enabled }}
+          startupProbe:
+            initialDelaySeconds: {{ .Values.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.startup.periodSeconds }}
+            timeoutSeconds: {{ .Values.startup.timeoutSeconds }}
+            periodSeconds: {{ .Values.startup.periodSeconds }}
+            successThreshold: {{ .Values.startup.successThreshold }}
+            failureThreshold: {{ .Values.startup.failureThreshold }}
+            httpGet:
+              path: {{ .Values.startup.endpoint }}
+              port: {{ .Values.service.port }}
+              scheme: {{ .Values.startup.scheme }}
+          {{- end }}          
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- if (or .Values.config.enabled .Values.secret.enabled) }}
+          envFrom:
+          {{- range .Values.config.entries }}
+            {{- if (not .isFile) }}
+            - configMapRef:
+                name: {{ printf "%s-%s"  .namePrefix  (include "alation-helm-chart.fullname" $) }}
+            {{- end }}
+          {{- end }}
+          {{- range .Values.secret.entries }}
+            {{- if (not .isFile) }}
+            - secretRef:
+                name: {{ printf "%s-%s"  .namePrefix  (include "alation-helm-chart.fullname" $) }}
+            {{- end }}
+          {{- end }}
+      volumes:
+      {{- range .Values.config.entries }}
+        {{- if  .isFile }}
+        - name: {{ printf "%s-%s"  .namePrefix  (include "alation-helm-chart.fullname" $) }}
+          configMap:
+            name: {{ printf "%s-%s"  .namePrefix  (include "alation-helm-chart.fullname" $) }}
+        {{- end }}
+      {{- end }}
+      {{- range .Values.secret.entries }}
+        {{- if .isFile }}
+        - name: {{ printf "%s-%s"  .namePrefix  (include "alation-helm-chart.fullname" $) }}
+          secret:
+            secretName: {{ printf "%s-%s"  .namePrefix  (include "alation-helm-chart.fullname" $) }}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

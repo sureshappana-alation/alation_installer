@@ -1,0 +1,12 @@
+apiVersion: skaffold/v2beta16
+kind: Config
+build:
+  artifacts:
+  - image: alation-getting-started
+deploy:
+  helm:
+    releases:
+    - name: alation-getting-started
+      chartPath: charts
+      artifactOverrides:
+        image: alation-getting-started

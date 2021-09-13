@@ -1,0 +1,153 @@
+name: unified-installer-build-pipeline-new
+
+on:
+  # Run the job when pull request closed
+  # This job will only run if the PR has been merged.
+  # This is commented for now to trigger the job manually only
+  # pull_request:
+  #   types: [ closed ]
+
+  # This section is to trigger the workflow manually
+  workflow_dispatch:
+    inputs:
+      ALATIONANALYTICS:
+        description: "Alation Analytics(ALATIONANALYTICS) version"
+        required: false
+      ALATIONFC:
+        description: "Alation Fat Container (ALATIONFC) version"
+        required: false
+      ACM:
+        description: "ACM (ACM) version"
+        required: false
+      EXCLUDE_MODULES:
+        description: "List of comma separated modules to be excluded(ex: ALATIONANALYTICS, ALATIONFC, ACM etc)"
+        required: false
+
+jobs:
+  # Build job builds the installer go module which generates and exports go binary
+  # build:
+  #   runs-on: ubuntu-latest
+  #   #   # This job will only run if the PR has been merged.
+  #   #   # This is commented for now to trigger the job manually only
+  #   #   # if: github.event.pull_request.merged == true
+  #   steps:
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v1
+
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+
+  #     - name: Build installer binary
+  #       id: docker_build
+  #       uses: docker/build-push-action@v2
+  #       with:
+  #         context: ./installer
+  #         push: false
+  #         tags: alation/installer:latest
+  #         outputs: type=local,dest=./out
+  #         cache-from: |
+  #           user/app:cache
+  #           type=local,src=./docker-cache
+
+  #     - name: Print list of files in ./out directory
+  #       run: find ./out
+
+  #     - name: Upload installer binary for package job
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: installer-binary
+  #         path: ./out/installer
+  #         retention-days: 1
+
+  # This job is for creating alation unified installer build
+  app-setup:
+    runs-on: ubuntu-latest
+    # This job will only run if the PR has been merged.
+    # This is commented for now to trigger the job manually only
+    # if: github.event.pull_request.merged == true
+    # needs: build
+    env:
+      ECR_URL: 248135293344.dkr.ecr.us-east-2.amazonaws.com
+      S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
+      BASE_DIR: ./alation
+      RESOURCE_DIR: ./alation/res
+      MODULES_DIR: ./alation/res/modules
+      KURL_PATCH_DIR: ./alation/res/kurl_patch
+      VERSIONS_FILE: ./alation/versions.txt
+      INSTALL_CONFIG_FILE: ./alation/alation-install.yaml
+      INPUT_KURL: ${{ github.event.inputs.KURL }}
+      EXCLUDE_MODULES_STRING: ${{ github.event.inputs.EXCLUDE_MODULES }}
+      INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_S3_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.4.0
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Make workflow scripts executable
+        run: chmod +x ${{ github.workspace }}/.github/scripts/*.sh
+
+      - name: Bootstrap environment
+        run: ${{ github.workspace }}/.github/scripts/setup.sh
+        env:
+          modules: ${{ steps.read_env.outputs.modulesList }}
+
+      - name: Get module versions from ./versions/*.env and apply overrides
+        id: read_env
+        run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
+
+      - name: Download modules helm charts from helm registry
+        run: ${{ github.workspace }}/.github/scripts/download-helm-charts.sh
+        env:
+          modules: ${{ steps.read_env.outputs.modulesList }}
+      # - name: Generate alation-install.yaml file
+      #   run: ${{ github.workspace }}/.github/scripts/generate-alation-install-yaml.sh
+      # - name: Download installer binary from build job
+      #   uses: actions/download-artifact@v2
+      #   with:
+      #     name: installer-binary
+      #     path: ${{ env.BASE_DIR }}
+      # - name: Set Kurl file name
+      #   run: |
+      #     echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
+      #     echo "KURL=${{ env.KURL }}" >> ${{ env.VERSIONS_FILE }}
+      # # Caching Kurl package
+      # - name: Importing kurl package from cache
+      #   id: kurl-cache
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: ${{ env.RESOURCE_DIR }}/kurl.tar.gz
+      #     key: ${{ env.KURL_FILE_NAME }}
+      # - name: In the case of cache miss get the Kurl package from S3
+      #   if: steps.kurl-cache.outputs.cache-hit != 'true'
+      #   run: |
+      #     echo "Downloading Kurl package ${{env.KURL_FILE_NAME}} from S3. "
+      #     aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }} ${{ env.RESOURCE_DIR }}/kurl.tar.gz
+      # - name: Print information
+      #   run: |
+      #     echo "List of files"
+      #     find ${{ env.BASE_DIR }}
+      # - name: Renaming base directory to alation version
+      #   run: mv ${{ env.BASE_DIR }} ${{ env.ALATION_OUTPUT_DIR }}
+      # - name: Compress the final bundle
+      #   run: tar -cvzf ${{ env.ALATION_OUTPUT }} ${{ env.ALATION_OUTPUT_DIR }}
+      # - name: Renaming alation version directory back to original for caching
+      #   run: mv ${{ env.ALATION_OUTPUT_DIR }} ${{ env.BASE_DIR }}
+      # - name: Upload the compressed build to S3
+      #   run: |
+      #     aws s3 cp ${{ env.ALATION_OUTPUT }} ${{ env.S3_RELEASE_BUCKET_URL }}/${{ env.ALATION_OUTPUT }}

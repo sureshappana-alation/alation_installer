@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}"
+  labels:
+    {{- include "alation-helm-chart.labels" . | nindent 4 }}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-1"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{ .Release.Name }}"
+      labels:
+        {{- include "alation-helm-chart.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "alation-helm-chart.serviceAccountName" . }}
+      restartPolicy: Never
+      containers:
+      - name: pre-install-job
+        image: "example-app:1.0.0"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["/bin/sh", "scripts/setup.sh", {{- printf "%s-%s" "pem-" .Release.Name }} ]

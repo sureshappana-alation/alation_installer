@@ -1,0 +1,19 @@
+{{- if .Values.config.enabled }}
+{{- range .Values.config.entries }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ printf "%s-%s"  .namePrefix  (include "alation-helm-chart.fullname" $) }}
+  labels:
+    {{- include "alation-helm-chart.labels" $ | nindent 4 }}
+data:
+  {{-  if .isFile }}
+  {{ .filename }}: |-
+    {{ toJson .data }}  
+  {{- else }}
+  {{- range $key, $val := .data }}
+  {{ $key }}:  !!str {{ $val }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
