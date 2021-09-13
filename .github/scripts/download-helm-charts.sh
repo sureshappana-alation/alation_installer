@@ -3,7 +3,7 @@
 aws ecr get-login-password \
      --region us-east-2 | helm registry login \
      --username AWS \
-     --password-stdin ${{env.ECR_URL}}
+     --password-stdin $ECR_URL
 
 for i in $modules; do
   module="${i}"
