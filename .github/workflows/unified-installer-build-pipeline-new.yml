@@ -111,7 +111,6 @@ jobs:
         run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
 
       - name: Download modules helm charts from helm registry
-        id: acr
         run: ${{ github.workspace }}/.github/scripts/download-helm-charts.sh
         env:
           modules: ${{ steps.read_env.outputs.modulesList }}
@@ -123,7 +122,7 @@ jobs:
           find ${{ env.BASE_DIR }}
       - name: Print information
         run: |
-          echo ${{ steps.acr.outputs.acronyms }}
+          echo ${{ steps.read_env.outputs.versions }}
       # - name: Generate alation-install.yaml file
       #   run: ${{ github.workspace }}/.github/scripts/generate-alation-install-yaml.sh
       # - name: Download installer binary from build job
