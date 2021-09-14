@@ -103,18 +103,16 @@ jobs:
 
       - name: Bootstrap environment
         run: ${{ github.workspace }}/.github/scripts/setup.sh
-        env:
-          modules: ${{ steps.read_env.outputs.modulesList }}
 
       - name: Get module versions from ./versions/*.env and apply overrides
         id: read_env
         run: ${{ github.workspace }}/.github/scripts/get-module-versions.sh
 
-      - name: Download modules helm charts from helm registry
-        run: ${{ github.workspace }}/.github/scripts/download-helm-charts.sh
-        env:
-          modules: ${{ steps.read_env.outputs.modulesList }}
-          ECR_URL: ${{ env.ECR_URL }}
+      # - name: Download modules helm charts from helm registry
+      #   run: ${{ github.workspace }}/.github/scripts/download-helm-charts.sh
+      #   env:
+      #     modules: ${{ steps.read_env.outputs.modulesList }}
+      #     ECR_URL: ${{ env.ECR_URL }}
 
       - name: Print information
         run: |
