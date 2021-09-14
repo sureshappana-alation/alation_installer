@@ -2,7 +2,7 @@
 
 echo "Printing env"
 # printenv
-bash -v
+bash --version
 
 # export HELM_EXPERIMENTAL_OCI=1
 
