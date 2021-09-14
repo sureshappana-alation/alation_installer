@@ -29,8 +29,8 @@
 # echo ::set-output name=modulesList::${modulesList[@]}
 
 
-export FORMATTED_EXCLUDE_MODULES_STRING=".\"${EXCLUDE_MODULES_STRING//,/\",.\"}\""
-export versions=$(jq -s add versions-json/*.json | jq 'del('$FORMATTED_EXCLUDE_STRING')' | jq @json)
+FORMATTED_EXCLUDE_MODULES_STRING=".\"${EXCLUDE_MODULES_STRING//,/\",.\"}\""
+versions=$(jq -s add versions-json/*.json | jq 'del('$FORMATTED_EXCLUDE_STRING')' | jq @json)
 echo $versions
 
 echo ::set-output name=versions::${versions[@]}
