@@ -10,16 +10,16 @@ echo $modules | jq -r 'fromjson | to_entries[] | .key +" " + .value' | while IFS
   module="${key}"
 
   # Add entry to versions file
-  echo "$key=$version" >> $VERSIONS_FILE
+  echo "$key=$value" >> $VERSIONS_FILE
 
   # Download files from S3 only if version is not null
-  if [[ -z $version ]]; then
+  if [[ -z $value ]]; then
     echo "Skipping $module"
   else
     echo "Pulling helm chart $module"
     # aws s3 cp $S3_DEV_BUCKET_URL/${moduleFullName,,} $MODULES_DIR/${module,,}/
-    helm chart pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/$module:${version}
+    helm chart pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/$module:${value}
     echo "Exporting helm chart $module"
-    helm chart export 248135293344.dkr.ecr.us-east-2.amazonaws.com/$module:${version}
+    helm chart export 248135293344.dkr.ecr.us-east-2.amazonaws.com/$module:${value}
   fi
 done
