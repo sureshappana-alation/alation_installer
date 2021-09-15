@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HELM_EXPERIMENTAL_OCI=1 
+export HELM_EXPERIMENTAL_OCI=1 
 
 aws ecr get-login-password \
      --region us-east-2 | helm registry login \
