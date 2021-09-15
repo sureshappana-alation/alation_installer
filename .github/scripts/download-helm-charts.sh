@@ -6,7 +6,7 @@ aws ecr get-login-password \
      --region us-east-2 | helm registry login \
      --username AWS \
      --password-stdin $ECR_URL
-echo $modules | jq -r 'to_entries[] | .key +" " + .value' | while IFS=' ' read -r key value; do 
+echo $modules | jq -r 'fromjson | to_entries[] | .key +" " + .value' | while IFS=' ' read -r key value; do 
   module="${key}"
 
   # Add entry to versions file
