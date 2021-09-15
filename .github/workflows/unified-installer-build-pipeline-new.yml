@@ -112,7 +112,7 @@ jobs:
         run: ${{ github.workspace }}/.github/scripts/download-helm-charts.sh
         env:
           modules: ${{ steps.read_env.outputs.versions }}
-          ECR_URL: ${{ env.ECR_URL }}
+          HELM_REGISTRY_URL: ${{ env.ECR_URL }}
 
       - name: Print information
         run: |
@@ -121,8 +121,8 @@ jobs:
       - name: Print information
         run: |
           echo ${{ steps.read_env.outputs.versions }}
-      # - name: Generate alation-install.yaml file
-      #   run: ${{ github.workspace }}/.github/scripts/generate-alation-install-yaml.sh
+      - name: Generate alation-install.yaml file
+        run: ${{ github.workspace }}/.github/scripts/generate-alation-install-yaml.sh
       # - name: Download installer binary from build job
       #   uses: actions/download-artifact@v2
       #   with:
