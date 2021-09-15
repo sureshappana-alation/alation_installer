@@ -18,8 +18,8 @@ echo $modules | jq -r 'fromjson | to_entries[] | .key +" " + .value' | while IFS
   else
     echo "Pulling helm chart $module"
     # aws s3 cp $S3_DEV_BUCKET_URL/${moduleFullName,,} $MODULES_DIR/${module,,}/
-    helm chart pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/$module:${value}
+    helm chart pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/$module:${value} -d $MODULES_DIR
     echo "Exporting helm chart $module"
-    helm chart export 248135293344.dkr.ecr.us-east-2.amazonaws.com/$module:${value}
+    helm chart export $MODULES_DIR/248135293344.dkr.ecr.us-east-2.amazonaws.com/$module:${value}
   fi
 done
