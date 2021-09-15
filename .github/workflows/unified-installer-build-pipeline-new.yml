@@ -25,39 +25,39 @@ on:
 
 jobs:
   # Build job builds the installer go module which generates and exports go binary
-  # build:
-  #   runs-on: ubuntu-latest
-  #   #   # This job will only run if the PR has been merged.
-  #   #   # This is commented for now to trigger the job manually only
-  #   #   # if: github.event.pull_request.merged == true
-  #   steps:
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v1
+  build:
+    runs-on: ubuntu-latest
+    #   # This job will only run if the PR has been merged.
+    #   # This is commented for now to trigger the job manually only
+    #   # if: github.event.pull_request.merged == true
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-  #     - name: Checkout code
-  #       uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-  #     - name: Build installer binary
-  #       id: docker_build
-  #       uses: docker/build-push-action@v2
-  #       with:
-  #         context: ./installer
-  #         push: false
-  #         tags: alation/installer:latest
-  #         outputs: type=local,dest=./out
-  #         cache-from: |
-  #           user/app:cache
-  #           type=local,src=./docker-cache
+      - name: Build installer binary
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./installer
+          push: false
+          tags: alation/installer:latest
+          outputs: type=local,dest=./out
+          cache-from: |
+            user/app:cache
+            type=local,src=./docker-cache
 
-  #     - name: Print list of files in ./out directory
-  #       run: find ./out
+      - name: Print list of files in ./out directory
+        run: find ./out
 
-  #     - name: Upload installer binary for package job
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: installer-binary
-  #         path: ./out/installer
-  #         retention-days: 1
+      - name: Upload installer binary for package job
+        uses: actions/upload-artifact@v2
+        with:
+          name: installer-binary
+          path: ./out/installer
+          retention-days: 1
 
   # This job is for creating alation unified installer build
   app-setup:
