@@ -114,46 +114,26 @@ jobs:
           modules: ${{ steps.read_env.outputs.versions }}
           HELM_REGISTRY_URL: ${{ env.ECR_URL }}
 
-      - name: Print information
+      - name: Generate alation-install.yaml file
+        run: ${{ github.workspace }}/.github/scripts/generate-alation-install-yaml.sh
+
+      - name: Download installer binary from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: installer-binary
+          path: ${{ env.BASE_DIR }}
+
+      - name: Print list of files
         run: |
           echo "List of files"
           find ${{ env.BASE_DIR }}
-      - name: Print information
+
+      - name: Renaming base directory to alation version
+        run: mv ${{ env.BASE_DIR }} ${{ env.ALATION_OUTPUT_DIR }}
+
+      - name: Compress the final bundle
+        run: tar -cvzf ${{ env.ALATION_OUTPUT }} ${{ env.ALATION_OUTPUT_DIR }}
+
+      - name: Upload the compressed build to S3
         run: |
-          echo ${{ steps.read_env.outputs.versions }}
-      - name: Generate alation-install.yaml file
-        run: ${{ github.workspace }}/.github/scripts/generate-alation-install-yaml.sh
-      # - name: Download installer binary from build job
-      #   uses: actions/download-artifact@v2
-      #   with:
-      #     name: installer-binary
-      #     path: ${{ env.BASE_DIR }}
-      # - name: Set Kurl file name
-      #   run: |
-      #     echo KURL_FILE_NAME=kurl-${{ env.KURL }}.tar.gz >> $GITHUB_ENV
-      #     echo "KURL=${{ env.KURL }}" >> ${{ env.VERSIONS_FILE }}
-      # # Caching Kurl package
-      # - name: Importing kurl package from cache
-      #   id: kurl-cache
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: ${{ env.RESOURCE_DIR }}/kurl.tar.gz
-      #     key: ${{ env.KURL_FILE_NAME }}
-      # - name: In the case of cache miss get the Kurl package from S3
-      #   if: steps.kurl-cache.outputs.cache-hit != 'true'
-      #   run: |
-      #     echo "Downloading Kurl package ${{env.KURL_FILE_NAME}} from S3. "
-      #     aws s3 cp ${{ env.S3_DEV_BUCKET_URL }}/${{ env.KURL_FILE_NAME }} ${{ env.RESOURCE_DIR }}/kurl.tar.gz
-      # - name: Print information
-      #   run: |
-      #     echo "List of files"
-      #     find ${{ env.BASE_DIR }}
-      # - name: Renaming base directory to alation version
-      #   run: mv ${{ env.BASE_DIR }} ${{ env.ALATION_OUTPUT_DIR }}
-      # - name: Compress the final bundle
-      #   run: tar -cvzf ${{ env.ALATION_OUTPUT }} ${{ env.ALATION_OUTPUT_DIR }}
-      # - name: Renaming alation version directory back to original for caching
-      #   run: mv ${{ env.ALATION_OUTPUT_DIR }} ${{ env.BASE_DIR }}
-      # - name: Upload the compressed build to S3
-      #   run: |
-      #     aws s3 cp ${{ env.ALATION_OUTPUT }} ${{ env.S3_RELEASE_BUCKET_URL }}/${{ env.ALATION_OUTPUT }}
+          aws s3 cp ${{ env.ALATION_OUTPUT }} ${{ env.S3_RELEASE_BUCKET_URL }}/${{ env.ALATION_OUTPUT }}
