@@ -10,17 +10,17 @@ on:
   # This section is to trigger the workflow manually
   workflow_dispatch:
     inputs:
-      ALATIONANALYTICS:
-        description: "Alation Analytics(ALATIONANALYTICS) version"
+      alation-analytics:
+        description: "Alation Analytics(alation-analytics) version"
         required: false
-      ALATIONFC:
-        description: "Alation Fat Container (ALATIONFC) version"
+      alationfc:
+        description: "Alation Fat Container (alationfc) version"
         required: false
-      ACM:
-        description: "ACM (ACM) version"
+      acm:
+        description: "ACM (acm) version"
         required: false
       EXCLUDE_MODULES:
-        description: "List of comma separated modules to be excluded(ex: ALATIONANALYTICS, ALATIONFC, ACM etc)"
+        description: "List of comma separated modules to be excluded(ex: alation-analytics,alationfc,acm etc)"
         required: false
 
 jobs:
