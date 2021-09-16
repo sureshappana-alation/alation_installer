@@ -31,9 +31,6 @@ jobs:
     #   # This is commented for now to trigger the job manually only
     #   # if: github.event.pull_request.merged == true
     steps:
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -44,6 +41,10 @@ jobs:
           path: |
             ./out/installer
           key: ${{ runner.os }}-${{ hashFiles('installer/src') }}-${{ hashFiles('installer/go.*') }}
+
+      - name: Set up Docker Buildx
+        if: steps.cache-installer.outputs.cache-hit != 'true'
+        uses: docker/setup-buildx-action@v1
 
       - name: Cache not found, building installer binary
         id: docker_build
