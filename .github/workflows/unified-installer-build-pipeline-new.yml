@@ -45,7 +45,7 @@ jobs:
             ./installer
           key: ${{ runner.os }}-${{ hashFiles('installer/src') }}-${{ hashFiles('installer/go.*') }}
 
-      - name: Build installer binary
+      - name: Cache not found, building installer binary
         id: docker_build
         if: steps.cache-installer.outputs.cache-hit != 'true'
         uses: docker/build-push-action@v2
