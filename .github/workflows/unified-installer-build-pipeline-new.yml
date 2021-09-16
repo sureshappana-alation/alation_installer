@@ -42,7 +42,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: |
-            ./installer
+            ./out
           key: ${{ runner.os }}-${{ hashFiles('installer/src') }}-${{ hashFiles('installer/go.*') }}
 
       - name: Cache not found, building installer binary
