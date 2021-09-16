@@ -29,6 +29,7 @@ echo $FORMATTED_EXCLUDE_STRING
 # versions=$(jq -s add versions-json/*.json | jq 'del('$FORMATTED_EXCLUDE_STRING')' | jq @json)
 versions=$(jq -s add versions-json/*.json)
 if [ ! -z "${FORMATTED_EXCLUDE_STRING}" ]
+then
   versions=$(echo $versions | jq 'del('$FORMATTED_EXCLUDE_STRING')')
 fi
 versions=$(echo $versions | jq -s add versions-json/*.json)
