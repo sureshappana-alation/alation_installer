@@ -37,8 +37,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Cache installer binary
+        id: cache-installer
+        uses: actions/cache@v2
+        with:
+          path: |
+            ./installer
+          key: ${{ runner.os }}-${{ hashFiles('installer/src') }}-${{ hashFiles('installer/go.*') }}
+
       - name: Build installer binary
         id: docker_build
+        if: steps.cache-installer.outputs.cache-hit != 'true'
         uses: docker/build-push-action@v2
         with:
           context: ./installer
