@@ -74,7 +74,7 @@ jobs:
     # This job will only run if the PR has been merged.
     # This is commented for now to trigger the job manually only
     # if: github.event.pull_request.merged == true
-    # needs: build
+    needs: build
     env:
       ECR_URL: 248135293344.dkr.ecr.us-east-2.amazonaws.com
       S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
