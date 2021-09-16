@@ -24,7 +24,7 @@ do
   module=`echo $module | xargs`
   FORMATTED_EXCLUDE_STRING+=".\""$module"\","
 done
-FORMATTED_EXCLUDE_STRING="${FORMATTED_EXCLUDE_STRING::-1}"
+FORMATTED_EXCLUDE_STRING="${FORMATTED_EXCLUDE_STRING%,}"
 # echo ${modulesList[@]}
 
 # echo ::set-output name=modulesList::${modulesList[@]}
