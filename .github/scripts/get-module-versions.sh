@@ -25,14 +25,14 @@ do
   FORMATTED_EXCLUDE_STRING+=".\""$module"\","
 done
 FORMATTED_EXCLUDE_STRING="${FORMATTED_EXCLUDE_STRING%,}"
-# echo ${modulesList[@]}
-
-# echo ::set-output name=modulesList::${modulesList[@]}
-
-
-# FORMATTED_EXCLUDE_MODULES_STRING=".\"${EXCLUDE_MODULES_STRING//,/\",.\"}\""
 echo $FORMATTED_EXCLUDE_STRING
-versions=$(jq -s add versions-json/*.json | jq 'del('$FORMATTED_EXCLUDE_STRING')' | jq @json)
+# versions=$(jq -s add versions-json/*.json | jq 'del('$FORMATTED_EXCLUDE_STRING')' | jq @json)
+versions=$(jq -s add versions-json/*.json)
+if [ ! -z "${FORMATTED_EXCLUDE_STRING}" ]
+  versions=$(echo $versions | jq 'del('$FORMATTED_EXCLUDE_STRING')')
+fi
+versions=$(echo $versions | jq -s add versions-json/*.json)
+
 echo $versions
 
 echo ::set-output name=versions::${versions[@]}
