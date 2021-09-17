@@ -7,6 +7,7 @@ aws ecr get-login-password \
      --username AWS \
      --password-stdin $ECR_URL
 
+HELM_REGISTRY_URL="oci://"$ECR_URL
 echo "helm reg: "$HELM_REGISTRY_URL
 echo $modules | jq -r 'fromjson | to_entries[] | .key +" " + .value' | while IFS=' ' read -r key value; do 
   module="${key}"

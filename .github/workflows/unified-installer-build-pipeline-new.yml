@@ -77,7 +77,7 @@ jobs:
     # if: github.event.pull_request.merged == true
     needs: build
     env:
-      ECR_URL: oci://248135293344.dkr.ecr.us-east-2.amazonaws.com
+      ECR_URL: 248135293344.dkr.ecr.us-east-2.amazonaws.com
       S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
       BASE_DIR: ./alation
       RESOURCE_DIR: ./alation/res
@@ -122,7 +122,6 @@ jobs:
         run: ${{ github.workspace }}/.github/scripts/download-helm-charts.sh
         env:
           modules: ${{ steps.read_env.outputs.versions }}
-          HELM_REGISTRY_URL: ${{ env.ECR_URL }}
 
       - name: Generate alation-install.yaml file
         run: ${{ github.workspace }}/.github/scripts/generate-alation-install-yaml.sh
