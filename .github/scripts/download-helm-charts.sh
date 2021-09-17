@@ -6,6 +6,8 @@ aws ecr get-login-password \
      --region us-east-2 | helm registry login \
      --username AWS \
      --password-stdin $ECR_URL
+
+echo "helm reg: "$HELM_REGISTRY_URL
 echo $modules | jq -r 'fromjson | to_entries[] | .key +" " + .value' | while IFS=' ' read -r key value; do 
   module="${key}"
   moduleVersion="${value}"
