@@ -19,9 +19,7 @@ echo $modules | jq -r 'fromjson | to_entries[] | .key +" " + .value' | while IFS
   else
     echo "Pulling helm chart $module"
     # aws s3 cp $S3_DEV_BUCKET_URL/${moduleFullName,,} $MODULES_DIR/${module,,}/
-    helm chart pull $HELM_REGISTRY_URL/$module:$moduleVersion
-    echo "Exporting helm chart $module"
-    helm chart export $HELM_REGISTRY_URL/$module:$moduleVersion -d $MODULES_DIR/$module/charts
+    helm pull $HELM_REGISTRY_URL/$module --version $moduleVersion --untar --untardir $MODULES_DIR/$module/charts
     # move helm chart files to parent and remove the module directory
     mv $MODULES_DIR/$module/charts/$module/*  $MODULES_DIR/$module/charts && rm -rf $MODULES_DIR/$module/charts/$module
   fi
