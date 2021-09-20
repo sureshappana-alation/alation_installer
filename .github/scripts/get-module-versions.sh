@@ -16,14 +16,11 @@ done
 
 FORMATTED_EXCLUDE_MODULES="${FORMATTED_EXCLUDE_MODULES%,}"
 
-
-INPUT_CONTEXT_JSON=$(echo $INPUT_CONTEXT | jq .)
-
 # Merge version files and override versions
-VERSIONS=$(jq -s add versions-json/*.json $INPUT_CONTEXT_JSON)
+VERSIONS=$(jq -s add versions-json/*.json)
 
-# # Override versions
-# VERSIONS=$(echo $VERSIONS $INPUT_CONTEXT | jq -s add)
+# Override versions
+VERSIONS=$(echo $VERSIONS $INPUT_CONTEXT | jq -s add)
 
 # Remove the excluded modules from final version list
 VERSIONS=$(echo $VERSIONS | jq 'del('$FORMATTED_EXCLUDE_MODULES')')
