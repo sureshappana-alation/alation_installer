@@ -15,6 +15,10 @@
 # # Override versions information
 # echo ${INPUT_CONTEXT} | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
+echo "input context:"
+echo ${INPUT_CONTEXT} | jq .
+
+
 IFS=',' read -r -a excludeModulesList <<< "$EXCLUDE_MODULES_STRING"
 
 FORMATTED_EXCLUDE_STRING=""
