@@ -6,7 +6,7 @@ IFS=',' read -r -a excludeModulesList <<< "$EXCLUDE_MODULES"
 
 FORMATTED_EXCLUDE_MODULES=".EXCLUDE_MODULES,"
 
-# Remove the modules in exclude list from modules list
+# Generate the module list to be excluded
 for module in ${excludeModulesList[@]}
 do
   module=`echo $module | xargs`
@@ -15,29 +15,18 @@ done
 
 FORMATTED_EXCLUDE_MODULES="${FORMATTED_EXCLUDE_MODULES%,}"
 
-echo $FORMATTED_EXCLUDE_MODULES
 
-# Merge version files
-versions=$(jq -s add versions-json/*.json)
+# Merge version files and override versions
+VERSIONS=$(jq -s add versions-json/*.json $INPUT_CONTEXT)
 
-echo "base versions from versions/*.json: $versions"
+# # Override versions
+# VERSIONS=$(echo $VERSIONS $INPUT_CONTEXT | jq -s add)
 
-# Override versions
-versions=$(echo $versions $INPUT_CONTEXT | jq -s add)
+# Remove the excluded modules from final version list
+VERSIONS=$(echo $VERSIONS | jq 'del('$FORMATTED_EXCLUDE_MODULES')')
 
-echo "versions after overriding: $versions"
+echo "Final versions: $VERSIONS"
 
-if [ ! -z "${FORMATTED_EXCLUDE_MODULES}" ]
-then
-  versions=$(echo $versions | jq 'del('$FORMATTED_EXCLUDE_MODULES')')
-fi
+VERSIONS=$(echo $VERSIONS | jq @json)
 
-# Final versions
-echo "final versions: $versions"
-
-versions=$(echo $versions | jq @json)
-
-
-echo $versions
-
-echo ::set-output name=versions::${versions[@]}
+echo ::set-output name=versions::${VERSIONS[@]}
