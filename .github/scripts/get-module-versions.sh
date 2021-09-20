@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 
 EXCLUDE_MODULES=$(echo $INPUT_CONTEXT | jq '.EXCLUDE_MODULES')
 
