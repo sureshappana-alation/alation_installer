@@ -85,7 +85,6 @@ jobs:
       KURL_PATCH_DIR: ./alation/res/kurl_patch
       VERSIONS_FILE: ./alation/versions.txt
       INSTALL_CONFIG_FILE: ./alation/alation-install.yaml
-      EXCLUDE_MODULES_STRING: ${{ github.event.inputs.EXCLUDE_MODULES }}
       INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
 
     steps:
