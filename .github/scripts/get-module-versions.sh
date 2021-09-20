@@ -17,16 +17,17 @@ done
 FORMATTED_EXCLUDE_MODULES="${FORMATTED_EXCLUDE_MODULES%,}"
 
 # Merge version files and override versions
-VERSIONS=$(jq -s add versions-json/*.json)
+MODULE_VERSIONS=$(jq -s add versions-json/*.json)
+echo "Merged version json files: $MODULE_VERSIONS"
 
 # Override versions
-VERSIONS=$(echo $VERSIONS $INPUT_CONTEXT | jq -s add)
+MODULE_VERSIONS=$(echo $MODULE_VERSIONS $INPUT_CONTEXT | jq -s add)
+echo "Override versions applied: $MODULE_VERSIONS"
 
 # Remove the excluded modules from final version list
-VERSIONS=$(echo $VERSIONS | jq 'del('$FORMATTED_EXCLUDE_MODULES')')
+MODULE_VERSIONS=$(echo $MODULE_VERSIONS | jq 'del('$FORMATTED_EXCLUDE_MODULES')')
+echo "Excluded modules from EXCLUDE_MODULES: $MODULE_VERSIONS"
 
-echo "Final versions: $VERSIONS"
+MODULE_VERSIONS=$(echo $MODULE_VERSIONS | jq @json)
 
-VERSIONS=$(echo $VERSIONS | jq @json)
-
-echo ::set-output name=versions::${VERSIONS[@]}
+echo ::set-output name=modules::${MODULE_VERSIONS[@]}

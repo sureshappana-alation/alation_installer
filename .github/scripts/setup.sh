@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit on error
+set -e
+
 echo "Create required directories"
 
 mkdir -p $BASE_DIR
