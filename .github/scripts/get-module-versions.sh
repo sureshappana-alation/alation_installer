@@ -15,8 +15,6 @@
 # # Override versions information
 # echo ${INPUT_CONTEXT} | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
-echo "input context:"
-echo ${INPUT_CONTEXT} | jq .
 
 
 IFS=',' read -r -a excludeModulesList <<< "$EXCLUDE_MODULES_STRING"
@@ -32,6 +30,14 @@ FORMATTED_EXCLUDE_STRING="${FORMATTED_EXCLUDE_STRING%,}"
 echo $FORMATTED_EXCLUDE_STRING
 # versions=$(jq -s add versions-json/*.json | jq 'del('$FORMATTED_EXCLUDE_STRING')' | jq @json)
 versions=$(jq -s add versions-json/*.json)
+
+echo "base versions from versions/*.json: $versions"
+
+# Override versions
+versions=$(echo $versions $INPUT_CONTEXT | jq -s add)
+
+echo "versions after overriding: $versions"
+
 if [ ! -z "${FORMATTED_EXCLUDE_STRING}" ]
 then
   versions=$(echo $versions | jq 'del('$FORMATTED_EXCLUDE_STRING')')
