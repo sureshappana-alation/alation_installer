@@ -1,6 +1,7 @@
 #!/bin/bash
 
-EXCLUDE_MODULES=$(echo ${INPUT_CONTEXT} | jq '.EXCLUDE_MODULES')
+
+EXCLUDE_MODULES=$(echo $INPUT_CONTEXT | jq '.EXCLUDE_MODULES')
 
 IFS=',' read -r -a excludeModulesList <<< "$EXCLUDE_MODULES"
 
@@ -16,8 +17,10 @@ done
 FORMATTED_EXCLUDE_MODULES="${FORMATTED_EXCLUDE_MODULES%,}"
 
 
+INPUT_CONTEXT_JSON=$(echo $INPUT_CONTEXT | jq .)
+
 # Merge version files and override versions
-VERSIONS=$(jq -s add versions-json/*.json $INPUT_CONTEXT)
+VERSIONS=$(jq -s add versions-json/*.json $INPUT_CONTEXT_JSON)
 
 # # Override versions
 # VERSIONS=$(echo $VERSIONS $INPUT_CONTEXT | jq -s add)
