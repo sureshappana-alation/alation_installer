@@ -19,7 +19,7 @@
 
 IFS=',' read -r -a excludeModulesList <<< "$EXCLUDE_MODULES_STRING"
 
-FORMATTED_EXCLUDE_STRING=""
+FORMATTED_EXCLUDE_STRING=".EXCLUDE_MODULES_STRING,"
 # Remove the modules in exclude list for processing
 for module in ${excludeModulesList[@]}
 do
@@ -42,7 +42,12 @@ if [ ! -z "${FORMATTED_EXCLUDE_STRING}" ]
 then
   versions=$(echo $versions | jq 'del('$FORMATTED_EXCLUDE_STRING')')
 fi
+
+# Final versions
+echo "final versions: $versions"
+
 versions=$(echo $versions | jq @json)
+
 
 echo $versions
 

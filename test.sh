@@ -9,4 +9,5 @@ overridejson=$(echo $override | jq .)
 
 echo $overridejson
 
-echo $merged $overridejson | jq -s add
+echo $merged $overridejson | jq -s add | jq 'del(.sds)' 
+
