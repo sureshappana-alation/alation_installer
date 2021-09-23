@@ -4,8 +4,8 @@ on:
   # Run the job when pull request closed
   # This job will only run if the PR has been merged.
   # This is commented for now to trigger the job manually only
-  # pull_request:
-  #   types: [ closed ]
+  pull_request:
+    types: [closed]
   push:
     branches:
       - master
@@ -29,9 +29,8 @@ jobs:
   # Build job builds the installer go module which generates and exports go binary
   build:
     runs-on: ubuntu-latest
-    #   # This job will only run if the PR has been merged.
-    #   # This is commented for now to trigger the job manually only
-    #   # if: github.event.pull_request.merged == true
+    # This job will only run if the PR has been merged.
+    if: github.event.pull_request.merged == true
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -74,10 +73,9 @@ jobs:
   # This job is for creating alation unified installer build
   app-setup:
     runs-on: ubuntu-latest
-    # This job will only run if the PR has been merged.
-    # This is commented for now to trigger the job manually only
-    # if: github.event.pull_request.merged == true
     needs: build
+    # This job will only run if the PR has been merged.
+    if: github.event.pull_request.merged == true
     env:
       ECR_URL: 248135293344.dkr.ecr.us-east-2.amazonaws.com
       S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
@@ -87,7 +85,7 @@ jobs:
       VERSIONS_FILE: ./alation/versions.txt
       INSTALL_CONFIG_FILE: ./alation/alation-install.yaml
       INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
-      TAG_GITHUB: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      TAG_GITHUB: ${{ github.event.action == 'closed' && github.event.pull_request.merged == true }}
 
     steps:
       - name: Configure AWS Credentials
