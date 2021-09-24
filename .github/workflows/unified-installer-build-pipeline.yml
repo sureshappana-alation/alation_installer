@@ -26,13 +26,13 @@ on:
         required: false
 
 # env:
-#   SHOULD_RUN: ${{github.event.action == 'closed' && github.event.pull_request.merged == true || }}
+#   SHOULD_RUN: ${{ (github.event.action == 'closed' && github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch' }}
 jobs:
   # Build job builds the installer go module which generates and exports go binary
   build:
     runs-on: ubuntu-latest
     # This job will only run if the PR has been merged.
-    # if: github.event.pull_request.merged == true
+    if: ${{ env.SHOULD_RUN }}
     env:
       EVENT: ${{ toJSON(github.event) }}
       ACTION: ${{ github.event.action }}
@@ -81,7 +81,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     # This job will only run if the PR has been merged.
-    if: github.event.pull_request.merged == true
+    if: ${{ env.SHOULD_RUN }}
     env:
       ECR_URL: 248135293344.dkr.ecr.us-east-2.amazonaws.com
       S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
