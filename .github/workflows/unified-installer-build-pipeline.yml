@@ -35,8 +35,8 @@ jobs:
     # if: github.event.pull_request.merged == true
     env:
       EVENT: ${{ toJSON(github.event) }}
-      ACTION: ${{ toJSON(github.event.action) }}
-      MERGED: ${{ toJSON(github.event.merged) }}
+      ACTION: ${{ github.event.action }}
+      MERGED: ${{ github.event.merged }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
