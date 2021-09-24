@@ -25,12 +25,18 @@ on:
         description: "List of comma separated modules to be excluded(ex: alation-analytics,alationfc,acm etc)"
         required: false
 
+# env:
+#   SHOULD_RUN: ${{github.event.action == 'closed' && github.event.pull_request.merged == true || }}
 jobs:
   # Build job builds the installer go module which generates and exports go binary
   build:
     runs-on: ubuntu-latest
     # This job will only run if the PR has been merged.
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
+    env:
+      EVENT: ${{ toJSON(github.event) }}
+      ACTION: ${{ toJSON(github.event.action) }}
+      MERGED: ${{ toJSON(github.event.merged) }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
