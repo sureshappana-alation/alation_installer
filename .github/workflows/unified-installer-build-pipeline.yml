@@ -8,7 +8,7 @@ on:
   #   types: [closed]
   push:
     branches:
-      - master
+      - main
   # This section is to trigger the workflow manually
   workflow_dispatch:
     inputs:
@@ -148,7 +148,7 @@ jobs:
           aws s3 cp ${{ env.BUILD_OUTPUT }} ${{ env.S3_RELEASE_BUCKET_URL }}/$MAJOR/$MINOR/$PATCH/$GITHUB_RUN_NUMBER/${{ env.BUILD_OUTPUT }}
 
       - name: Tag git
-        if: github.ref == 'refs/heads/master'
+        if: github.ref == 'refs/heads/main'
         run: |
           git tag $BUILD_VERSION
           git push origin $BUILD_VERSION
