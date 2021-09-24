@@ -25,8 +25,9 @@ on:
         description: "List of comma separated modules to be excluded(ex: alation-analytics,alationfc,acm etc)"
         required: false
 
-# env:
-#   SHOULD_RUN: ${{ (github.event.action == 'closed' && github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch' }}
+env:
+  SHOULD_RUN: ${{ (github.event.action == 'closed' && github.event.pull_request.merged == true) || github.event_name == 'workflow_dispatch' }}
+
 jobs:
   # Build job builds the installer go module which generates and exports go binary
   build:
