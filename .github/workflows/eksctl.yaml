@@ -27,8 +27,8 @@ jobs:
       - name: Setup kubectl
         uses: azure/setup-kubectl@v1
 
-      - name: Setup EKSctl
-        uses: moia-oss/setup-eksctl@v1
+      # - name: Setup EKSctl
+      #   uses: moia-oss/setup-eksctl@v1
 
       - name: Generate eksctl config file
         run: |
