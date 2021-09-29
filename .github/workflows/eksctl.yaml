@@ -40,11 +40,12 @@ jobs:
 
       - name: Generate eksctl config file
         run: |
-          envsubst < ${{ github.workspace }}/.github/templates/eksctl-config.yaml.tmpl > eksctl-config.yaml
+          envsubst < ${{ github.workspace }}/.github/templates/eksctl-config.yaml.tmpl > ${{ github.workspace }}/.github/templates/eksctl-config.yaml
+          cat ${{ github.workspace }}/.github/templates/eksctl-config.yaml
 
       - name: Create cluster
         run: |
-          eksctl create cluster -f eksctl-config.yaml
+          eksctl create cluster -f ${{ github.workspace }}/.github/templates/eksctl-config.yaml
 
       - name: Print content
         run: |
