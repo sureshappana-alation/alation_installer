@@ -4,8 +4,7 @@ on:
   # Run the job when pull request closed
   # This job will only run if the PR has been merged.
   # This is commented for now to trigger the job manually only
-  # pull_request:
-  #   types: [closed]
+  pull_request:
   push:
     branches:
       - main
