@@ -42,11 +42,14 @@ jobs:
         run: |
           envsubst < ${{ github.workspace }}/.github/templates/eksctl-config.yaml.tmpl > eksctl-config.yaml
 
+      - name: Create cluster
+        run: |
+          eksctl create cluster -f eksctl-config.yaml
+
       - name: Print content
         run: |
-          export CLUSTERNAME=mycluster
+          export CLUSTERNAME=${{ github.event.inputs.EKS_CLUSTER_NAME }}
           envsubst < ${{ github.workspace }}/.github/templates/eksctl-config.yaml.tmpl > eksctl-config.yaml
-          cat eksctl-config.yaml
 
       - name: Get kubectx
         run: aws eks --region us-east-2 update-kubeconfig --name ${{ github.event.inputs.EKS_CLUSTER_NAME }}
