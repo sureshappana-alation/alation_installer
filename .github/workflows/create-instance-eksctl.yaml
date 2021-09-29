@@ -8,21 +8,11 @@ on:
         required: true
 jobs:
   terraform:
-    name: "Terraform"
+    name: "setup"
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        ami: [ami-0443305dabd4be2bc]
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      TERRAFORM_STRING: '-var="image_id=${{ matrix.ami }}"
-        -var="alation_version=${{ github.event.inputs.ALATION_VERSION }}"
-        -var="aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}"
-        -var="aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-        -var="instanceName=alation-test-k8s-$GITHUB_RUN_NUMBER-${{ matrix.ami }}"
-        '
 
     steps:
       - name: Setup helm
