@@ -41,5 +41,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Make workflow scripts executable
-        run: chmod +x ${{ github.workspace }}/.github/scripts/configure.sh
+      - name: Run the configure scripts
+        run: |
+          chmod +x ${{ github.workspace }}/.github/scripts/configure.sh
+          ${{ github.workspace }}/.github/scripts/configure.sh
