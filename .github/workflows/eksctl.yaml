@@ -27,6 +27,19 @@ jobs:
       - name: Setup kubectl
         uses: azure/setup-kubectl@v1
 
+      - name: Setup EKSctl
+        uses: moia-oss/setup-eksctl@v1
+
+      - name: Generate eksctl config file
+        run: |
+          envsubst < ${{ github.workspace }}/.github/templates/eksctl-config.yaml.tmpl > eksctl-config.yaml
+
+      - name: Print content
+        run: |
+          export CLUSTERNAME=mycluster
+          envsubst < ${{ github.workspace }}/.github/templates/eksctl-config.yaml.tmpl > eksctl-config.yaml
+          cat eksctl-config.yaml
+
       - name: Get kubectx
         run: aws eks --region us-east-2 update-kubeconfig --name ${{ github.event.inputs.EKS_CLUSTER_NAME }}
 
@@ -36,6 +49,7 @@ jobs:
           tar -xvzf 1.0.0.137.tar.gz
           cd 1.0.0.137
           chmod +x installer
+          ./installer -platform=eks
 
       - name: Checkout code
         uses: actions/checkout@v2
