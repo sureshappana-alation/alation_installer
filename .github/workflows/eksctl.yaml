@@ -47,6 +47,8 @@ jobs:
         run: |
           eksctl create cluster -f ${{ github.workspace }}/.github/templates/eksctl-config.yaml
 
+      - name: Cluster name
+        run: echo "cluster name is ${{ github.event.inputs.EKS_CLUSTER_NAME }}"
       - name: Print content
         run: |
           export CLUSTERNAME=${{ github.event.inputs.EKS_CLUSTER_NAME }}
