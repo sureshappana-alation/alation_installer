@@ -1,0 +1,40 @@
+name: "Create Instance Eksctl"
+
+on:
+  workflow_dispatch:
+    inputs:
+      ALATION_VERSION:
+        description: "Alation build version to install"
+        required: true
+jobs:
+  terraform:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ami: [ami-0443305dabd4be2bc]
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      TERRAFORM_STRING: '-var="image_id=${{ matrix.ami }}"
+        -var="alation_version=${{ github.event.inputs.ALATION_VERSION }}"
+        -var="aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}"
+        -var="aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+        -var="instanceName=alation-test-k8s-$GITHUB_RUN_NUMBER-${{ matrix.ami }}"
+        '
+
+    steps:
+      - name: Setup helm
+        uses: azure/setup-helm@v1
+        id: install
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v1
+        id: install
+
+      - name: Get kubectx
+        run: aws eks --region us-east-2 update-kubeconfig --name CloudInfraQAEKS
+
+      - name: Print kubectx
+        run: cat ~/.kube/config
