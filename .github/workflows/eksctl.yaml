@@ -6,6 +6,9 @@ on:
       ALATION_VERSION:
         description: "Alation build version to install"
         required: true
+      EKS_CLUSTER_NAME:
+        description: "EKS Cluster Name"
+        required: true
 jobs:
   terraform:
     name: "setup"
@@ -25,7 +28,7 @@ jobs:
         uses: azure/setup-kubectl@v1
 
       - name: Get kubectx
-        run: aws eks --region us-east-2 update-kubeconfig --name CloudInfraQAEKS
+        run: aws eks --region us-east-2 update-kubeconfig --name ${{ github.event.inputs.EKS_CLUSTER_NAME }}
 
       - name: Get Alation installer
         run: |
