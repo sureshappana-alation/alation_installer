@@ -40,6 +40,7 @@ jobs:
 
       - name: Generate eksctl config file
         run: |
+          export  CLUSTERNAME=${{ github.event.inputs.EKS_CLUSTER_NAME }}
           envsubst < ${{ github.workspace }}/.github/templates/eksctl-config.yaml.tmpl > ${{ github.workspace }}/.github/templates/eksctl-config.yaml
           cat ${{ github.workspace }}/.github/templates/eksctl-config.yaml
 
@@ -47,15 +48,8 @@ jobs:
         run: |
           eksctl create cluster -f ${{ github.workspace }}/.github/templates/eksctl-config.yaml
 
-      - name: Cluster name
-        run: echo "cluster name is ${{ github.event.inputs.EKS_CLUSTER_NAME }}"
-      - name: Print content
-        run: |
-          CLUSTERNAME=${{ github.event.inputs.EKS_CLUSTER_NAME }}
-          envsubst < ${{ github.workspace }}/.github/templates/eksctl-config.yaml.tmpl > eksctl-config.yaml
-
-      - name: Get kubectx
-        run: aws eks --region us-east-2 update-kubeconfig --name ${{ github.event.inputs.EKS_CLUSTER_NAME }}
+      # - name: Get kubectx
+      #   run: aws eks --region us-east-2 update-kubeconfig --name ${{ github.event.inputs.EKS_CLUSTER_NAME }}
 
       - name: Get Alation installer
         run: |
