@@ -17,11 +17,9 @@ jobs:
     steps:
       - name: Setup helm
         uses: azure/setup-helm@v1
-        id: install
 
       - name: Setup kubectl
         uses: azure/setup-kubectl@v1
-        id: install
 
       - name: Get kubectx
         run: aws eks --region us-east-2 update-kubeconfig --name CloudInfraQAEKS
