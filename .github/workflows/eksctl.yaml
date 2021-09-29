@@ -35,7 +35,7 @@ jobs:
         run: |
           aws s3 cp s3://unified-installer-build-pipeline-release/1/0/0/137/1.0.0.137.tar.gz .
           tar -xvzf 1.0.0.137.tar.gz
-          cd 1.0.0.137.tar.gz
+          cd 1.0.0.137
           chmod +x installer
 
       - name: Checkout code
