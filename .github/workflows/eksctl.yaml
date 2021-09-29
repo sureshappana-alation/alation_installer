@@ -51,7 +51,7 @@ jobs:
         run: echo "cluster name is ${{ github.event.inputs.EKS_CLUSTER_NAME }}"
       - name: Print content
         run: |
-          export CLUSTERNAME=${{ github.event.inputs.EKS_CLUSTER_NAME }}
+          CLUSTERNAME=${{ github.event.inputs.EKS_CLUSTER_NAME }}
           envsubst < ${{ github.workspace }}/.github/templates/eksctl-config.yaml.tmpl > eksctl-config.yaml
 
       - name: Get kubectx
