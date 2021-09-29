@@ -24,5 +24,15 @@ jobs:
       - name: Get kubectx
         run: aws eks --region us-east-2 update-kubeconfig --name CloudInfraQAEKS
 
-      - name: Print kubectx
-        run: cat ~/.kube/config
+      - name: Get Alation installer
+        run: |
+          aws s3 cp s3://unified-installer-build-pipeline-release/1/0/0/137/1.0.0.137.tar.gz .
+          tar -xvzf 1.0.0.137.tar.gz
+          cd 1.0.0.137.tar.gz
+          chmod +x installer
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Make workflow scripts executable
+        run: chmod +x ${{ github.workspace }}/.github/scripts/configure.sh
