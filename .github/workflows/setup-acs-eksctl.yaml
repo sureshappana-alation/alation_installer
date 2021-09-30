@@ -1,4 +1,4 @@
-name: "Eksctl"
+name: "Setup ACS instance (Eksctl + unified installer)"
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
         description: "EKS Cluster Name"
         required: true
       CREATE_CLUSTER:
-        description: "EKS Cluster to be created? (Valid values are True or False)"
+        description: "Setup Alation services only (valid values: True or False). If true: it assumes cluster already exists with the provided name"
         required: true
 jobs:
   terraform:
