@@ -3,9 +3,9 @@ name: "Eksctl"
 on:
   workflow_dispatch:
     inputs:
-      ALATION_VERSION:
-        description: "Alation build version to install"
-        required: true
+      # ALATION_VERSION:
+      #   description: "Alation build version to install"
+      #   required: true
       EKS_CLUSTER_NAME:
         description: "EKS Cluster Name"
         required: true
@@ -16,6 +16,8 @@ jobs:
   terraform:
     name: "setup"
     runs-on: ubuntu-latest
+    env:
+      DATADOG_DATADOG_APIKEY: ${{ secrets.DATADOG_DATADOG_APIKEY }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -60,7 +62,7 @@ jobs:
 
       - name: Get Alation installer
         run: |
-          aws s3 cp s3://unified-installer-build-pipeline-release/1/0/0/137/1.0.0.137.tar.gz .
+          aws s3 cp s3://unified-installer-build-pipeline-release/1/0/0/137/1.0.0.137_updated.tar.gz .
           tar -xvzf 1.0.0.137.tar.gz
           cd 1.0.0.137
           chmod +x installer
