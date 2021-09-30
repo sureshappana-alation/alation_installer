@@ -9,7 +9,7 @@ on:
       EKS_CLUSTER_NAME:
         description: "EKS Cluster Name"
         required: true
-      CREATE_CLUSTER:
+      EXISTING_CLUSTER:
         description: "Setup Alation on Existing Cluster (valid value: Yes or No). Default: creates the cluster first"
         required: false
         default: "No"
@@ -37,26 +37,26 @@ jobs:
         uses: azure/setup-kubectl@v1
 
       - name: Eksctl setup
-        if: ${{ github.event.inputs.CREATE_CLUSTER != 'Yes' }}
+        if: ${{ github.event.inputs.EXISTING_CLUSTER == 'No' }}
         run: |
           curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
           sudo mv /tmp/eksctl /usr/local/bin
           eksctl version
 
       - name: Generate eksctl config file
-        if: ${{ github.event.inputs.CREATE_CLUSTER != 'Yes' }}
+        if: ${{ github.event.inputs.EXISTING_CLUSTER == 'No' }}
         run: |
           export  CLUSTERNAME=${{ github.event.inputs.EKS_CLUSTER_NAME }}
           envsubst < ${{ github.workspace }}/.github/templates/eksctl-config.yaml.tmpl > ${{ github.workspace }}/.github/templates/eksctl-config.yaml
           cat ${{ github.workspace }}/.github/templates/eksctl-config.yaml
 
       - name: Create cluster
-        if: ${{ github.event.inputs.CREATE_CLUSTER != 'Yes' }}
+        if: ${{ github.event.inputs.EXISTING_CLUSTER == 'No' }}
         run: |
           eksctl create cluster -f ${{ github.workspace }}/.github/templates/eksctl-config.yaml
 
       - name: Get kubectx
-        if: ${{ github.event.inputs.CREATE_CLUSTER == 'Yes' }}
+        if: ${{ github.event.inputs.EXISTING_CLUSTER != 'No' }}
         run: aws eks --region us-east-2 update-kubeconfig --name ${{ github.event.inputs.EKS_CLUSTER_NAME }}
 
       - name: Get Alation installer
