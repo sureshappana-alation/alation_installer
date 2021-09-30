@@ -9,6 +9,9 @@ on:
       EKS_CLUSTER_NAME:
         description: "EKS Cluster Name"
         required: true
+      CREATE_CLUSTER:
+        description: "EKS Cluster to be created? (Valid values are True or False)"
+        required: true
 jobs:
   terraform:
     name: "setup"
@@ -33,23 +36,27 @@ jobs:
       # - name: Setup EKSctl
       #   uses: moia-oss/setup-eksctl@v1
       - name: Eksctl setup
+        if: ${{ github.event.inputs.CREATE_CLUSTER }} == 'True'
         run: |
           curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
           sudo mv /tmp/eksctl /usr/local/bin
           eksctl version
 
       - name: Generate eksctl config file
+        if: ${{ github.event.inputs.CREATE_CLUSTER }} == 'True'
         run: |
           export  CLUSTERNAME=${{ github.event.inputs.EKS_CLUSTER_NAME }}
           envsubst < ${{ github.workspace }}/.github/templates/eksctl-config.yaml.tmpl > ${{ github.workspace }}/.github/templates/eksctl-config.yaml
           cat ${{ github.workspace }}/.github/templates/eksctl-config.yaml
 
       - name: Create cluster
+        if: ${{ github.event.inputs.CREATE_CLUSTER }} == 'True'
         run: |
           eksctl create cluster -f ${{ github.workspace }}/.github/templates/eksctl-config.yaml
 
-      # - name: Get kubectx
-      #   run: aws eks --region us-east-2 update-kubeconfig --name ${{ github.event.inputs.EKS_CLUSTER_NAME }}
+      - name: Get kubectx
+        if: ${{ github.event.inputs.CREATE_CLUSTER }} != 'True'
+        run: aws eks --region us-east-2 update-kubeconfig --name ${{ github.event.inputs.EKS_CLUSTER_NAME }}
 
       - name: Get Alation installer
         run: |
