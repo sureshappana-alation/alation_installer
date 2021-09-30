@@ -72,3 +72,6 @@ jobs:
         run: |
           chmod +x ${{ github.workspace }}/.github/scripts/configure.sh
           ${{ github.workspace }}/.github/scripts/configure.sh
+
+      - name: Catalog URL
+        run: kubectl get svc -l app.kubernetes.io/name=alationfc -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}'
