@@ -10,7 +10,7 @@ on:
         description: "EKS Cluster Name"
         required: true
       CREATE_CLUSTER:
-        description: "Setup Alation on Existing Cluster (valid value: Yes ). Default: creates the cluster first"
+        description: "Setup Alation on Existing Cluster (valid value: Yes or No). Default: creates the cluster first"
         required: false
         default: "No"
 jobs:
