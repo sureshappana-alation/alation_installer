@@ -132,6 +132,9 @@ jobs:
           name: installer-binary
           path: ${{ env.BASE_DIR }}
 
+      - name: Get branch name
+        run: echo BRANCH_NAME=${GITHUB_REF##*/} >> $GITHUB_ENV
+
       - name: Print list of files
         run: |
           echo "List of files"
