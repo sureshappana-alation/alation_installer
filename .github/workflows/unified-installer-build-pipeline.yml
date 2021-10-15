@@ -133,7 +133,16 @@ jobs:
           path: ${{ env.BASE_DIR }}
 
       - name: Get branch name
-        run: echo BRANCH_NAME=${GITHUB_REF##*/} >> $GITHUB_ENV
+        run: |
+          echo isProductionBranch=false >> $GITHUB_ENV
+          echo BRANCH_NAME=${GITHUB_REF##*/} >> $GITHUB_ENV
+          if [[ ${{ github.event.ref }} =~ ^refs/heads/production_alation*$ ]]; then
+              echo isProductionBranch=true >> $GITHUB_ENV
+          fi
+
+      - name: Find image names
+        if: env.isProductionBranch == 'true'
+        run: echo 'This is production branch'
 
       - name: Print list of files
         run: |
