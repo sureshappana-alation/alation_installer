@@ -136,7 +136,7 @@ jobs:
         run: |
           echo isProductionBranch=false >> $GITHUB_ENV
           echo BRANCH_NAME=${GITHUB_REF##*/} >> $GITHUB_ENV
-          if [[ ${{ github.event.ref }} =~ ^refs/heads/production_alation*$ ]]; then
+          if [[ ${{ github.event.ref }} =~ ^refs/heads/production_alation* ]]; then
               echo isProductionBranch=true >> $GITHUB_ENV
           fi
 
