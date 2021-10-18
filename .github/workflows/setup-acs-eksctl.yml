@@ -95,7 +95,6 @@ jobs:
       - name: Extract and run unified installer
         run: |
           tar -xvzf ${{ github.workspace }}/pkg/${{ env.ALATION_VERSION }}.tar.gz
-          cd ${{ github.workspace }}/pkg/${{ env.ALATION_VERSION }}
           find ${{ github.workspace }}/pkg/${{ env.ALATION_VERSION }}
           chmod +x ${{ github.workspace }}/pkg/${{ env.ALATION_VERSION }}/installer
           ${{ github.workspace }}/pkg/${{ env.ALATION_VERSION }}/installer -platform=eks
