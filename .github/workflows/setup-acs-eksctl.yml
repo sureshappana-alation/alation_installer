@@ -95,8 +95,8 @@ jobs:
       - name: Extract and run unified installer
         run: |
           tar -xvzf ${{ env.ALATION_VERSION }}.tar.gz
-          cd ${{ env.ALATION_VERSION }}
           ls
+          cd ${{ env.ALATION_VERSION }}
           chmod +x installer
           ./installer -platform=eks
 
