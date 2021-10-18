@@ -1,0 +1,40 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: ${CLUSTERNAME}
+  region: us-east-2
+  version: "1.21"
+  tags: { Owner: Cloud Infra }
+
+iam:
+  withOIDC: true
+
+managedNodeGroups:
+  - name: ${CLUSTERNAME}-ng-1
+    labels:
+      {
+        role: workers,
+        node-role.alation.com/catalog: labeled,
+        node-role.alation.com/ocf: labeled,
+      }
+    instanceType: m5.2xlarge
+    desiredCapacity: 1
+    volumeSize: 250
+    amiFamily: AmazonLinux2
+    ssh:
+      allow: true
+      publicKeyName: qa-eks-key
+  - name: ${CLUSTERNAME}-ng-2
+    labels:
+      {
+        role: workers,
+        node-role.alation.com/analytics: labeled,
+      }
+    instanceType: m5.2xlarge
+    desiredCapacity: 1
+    volumeSize: 250
+    amiFamily: AmazonLinux2
+    ssh:
+      allow: true
+      publicKeyName: qa-eks-key

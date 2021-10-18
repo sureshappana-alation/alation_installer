@@ -7,8 +7,18 @@ on:
       #   description: "Alation build version to install"
       #   required: true
       EKS_CLUSTER_NAME:
-        description: "EKS Cluster Name"
+        description:
+          "EKS Cluster Name. Set a unique cluster name to allow scoping hosts and Cluster Checks easily
+          ## The name must be unique and must be dot-separated tokens with the following restrictions:
+          ## * Lowercase letters, numbers, and hyphens only.
+          ## * Must start with a letter.
+          ## * Must end with a number or a letter.
+          ## * Overall length should not be higher than 80 characters."
         required: true
+      CONFIGURATION:
+        description: "EKS Node configuration (valid values: 1 or 2. Default: 1)"
+        required: false
+        default: "1"
       EXISTING_CLUSTER:
         description: "Setup Alation on Existing Cluster (valid values: Yes or No). Default: creates the cluster first"
         required: false
@@ -19,6 +29,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DATADOG_DATADOG_APIKEY: ${{ secrets.DATADOG_DATADOG_APIKEY }}
+      ACM_REGISTRY_REGISTRY: 248135293344.dkr.ecr.us-east-2.amazonaws.com
+      ACM_REGISTRY_REPOSITORY: ocf-qa
+      ACM_AWS_REGION: us-east-2
+      ACM_AWS_AWS_ACCESS_KEY_ID: ${{ secrets.QA_AWS_ACCESS_KEY_ID }}
+      ACM_AWS_AWS_SECRET_ACCESS_KEY: ${{ secrets.QA_AWS_SECRET_ACCESS_KEY }}
+      ALATION_ANALYTICS_CATALOGIP: 127.0.0.1
+      ALATION_ANALYTICS_POSTGRESPASSWORD: password@123
+      DATADOG_DATADOG_CLUSTERNAME: ${{ github.event.inputs.EKS_CLUSTER_NAME }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -46,8 +64,12 @@ jobs:
       - name: Generate eksctl config file
         if: ${{ github.event.inputs.EXISTING_CLUSTER == 'No' }}
         run: |
-          export  CLUSTERNAME=${{ github.event.inputs.EKS_CLUSTER_NAME }}
-          envsubst < ${{ github.workspace }}/.github/templates/eksctl-config.yaml.tmpl > ${{ github.workspace }}/.github/templates/eksctl-config.yaml
+          export CLUSTERNAME=${{ github.event.inputs.EKS_CLUSTER_NAME }}
+          if [[ ${{ github.event.inputs.EKS_CLUSTER_NAME }} == '2']]; then
+            envsubst < ${{ github.workspace }}/.github/templates/eksctl-config-2node.yaml.tmpl > ${{ github.workspace }}/.github/templates/eksctl-config.yaml
+          else
+            envsubst < ${{ github.workspace }}/.github/templates/eksctl-config-1node.yaml.tmpl > ${{ github.workspace }}/.github/templates/eksctl-config.yaml
+          fi
           cat ${{ github.workspace }}/.github/templates/eksctl-config.yaml
 
       - name: Create cluster
@@ -71,6 +93,5 @@ jobs:
         run: |
           chmod +x ${{ github.workspace }}/.github/scripts/alationconf_setup.sh
           ${{ github.workspace }}/.github/scripts/alationconf_setup.sh
-
-      - name: Catalog URL
-        run: kubectl get svc -l app.kubernetes.io/name=alationfc -o jsonpath='{.items[0].status.loadBalancer.ingress[0].hostname}'
+        env:
+          cluster: ${{ github.event.inputs.EKS_CLUSTER_NAME }}
