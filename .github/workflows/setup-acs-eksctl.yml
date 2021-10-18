@@ -65,7 +65,7 @@ jobs:
         if: ${{ github.event.inputs.EXISTING_CLUSTER == 'No' }}
         run: |
           export CLUSTERNAME=${{ github.event.inputs.EKS_CLUSTER_NAME }}
-          if [[ ${{ github.event.inputs.EKS_CLUSTER_NAME }} == '2']]; then
+          if [[ ${{ github.event.inputs.EKS_CLUSTER_NAME }} == '2']] then
             envsubst < ${{ github.workspace }}/.github/templates/eksctl-config-2node.yaml.tmpl > ${{ github.workspace }}/.github/templates/eksctl-config.yaml
           else
             envsubst < ${{ github.workspace }}/.github/templates/eksctl-config-1node.yaml.tmpl > ${{ github.workspace }}/.github/templates/eksctl-config.yaml
