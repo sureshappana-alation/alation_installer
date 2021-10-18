@@ -90,6 +90,9 @@ jobs:
           patch=`echo $patch_and_build | cut -d- -f1`
           build=`echo $patch_and_build | cut -d- -f2`
           aws s3 cp s3://unified-installer-build-pipeline-release/$major/$minor/$patch/$build/${{ github.event.inputs.ALATION_VERSION }}.tar.gz .
+
+      - name: Extract and run unified installer
+        run: |
           tar -xvzf ${{ github.event.inputs.ALATION_VERSION }}
           cd ${{ github.event.inputs.ALATION_VERSION }}
           chmod +x installer
