@@ -6,6 +6,10 @@ on:
       ALATION_VERSION:
         description: "Alation build version to install"
         required: true
+      EXISTING_CLUSTER:
+        description: "Setup Alation on Existing Cluster (valid values: Yes or No). Default: creates the cluster first"
+        required: false
+        default: "No"
       EKS_CLUSTER_NAME:
         description:
           "EKS Cluster Name. Set a unique cluster name to allow scoping hosts and Cluster Checks easily
@@ -16,13 +20,9 @@ on:
           ## * Overall length should not be higher than 80 characters."
         required: true
       CONFIGURATION:
-        description: "EKS Node configuration (valid values: 1 or 2. Default: 1)"
+        description: "EKS Node configuration (valid values: 1 or 2. Default: 1). Applicable for new cluster creation only"
         required: false
         default: "1"
-      EXISTING_CLUSTER:
-        description: "Setup Alation on Existing Cluster (valid values: Yes or No). Default: creates the cluster first"
-        required: false
-        default: "No"
 jobs:
   terraform:
     name: "setup"
@@ -93,7 +93,7 @@ jobs:
 
       - name: Extract and run unified installer
         run: |
-          tar -xvzf ${{ github.event.inputs.ALATION_VERSION }}
+          tar -xvzf ${{ github.event.inputs.ALATION_VERSION }}.tar.gz
           cd ${{ github.event.inputs.ALATION_VERSION }}
           chmod +x installer
           ./installer -platform=eks
