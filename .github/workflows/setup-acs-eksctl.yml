@@ -90,13 +90,12 @@ jobs:
           patch_and_build=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3`
           patch=`echo $patch_and_build | cut -d- -f1`
           build=`echo $patch_and_build | cut -d- -f2`
-          aws s3 cp s3://unified-installer-build-pipeline-release/$major/$minor/$patch/$build/${{ env.ALATION_VERSION }}.tar.gz .
+          aws s3 cp s3://unified-installer-build-pipeline-release/$major/$minor/$patch/$build/${{ env.ALATION_VERSION }}.tar.gz ${{ github.workspace }}/pkg/
 
       - name: Extract and run unified installer
         run: |
-          tar -xvzf ${{ env.ALATION_VERSION }}.tar.gz
-          ls
-          cd ${{ env.ALATION_VERSION }}
+          tar -xvzf ${{ github.workspace }}/pkg/${{ env.ALATION_VERSION }}.tar.gz
+          cd ${{ github.workspace }}/pkg/${{ env.ALATION_VERSION }}
           chmod +x installer
           ./installer -platform=eks
 
