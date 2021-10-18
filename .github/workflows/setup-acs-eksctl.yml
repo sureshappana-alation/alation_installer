@@ -37,6 +37,7 @@ jobs:
       ALATION_ANALYTICS_CATALOGIP: 127.0.0.1
       ALATION_ANALYTICS_POSTGRESPASSWORD: password@123
       DATADOG_DATADOG_CLUSTERNAME: ${{ github.event.inputs.EKS_CLUSTER_NAME }}
+      ALATION_VERSION: ${{ github.event.inputs.ALATION_VERSION }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -84,17 +85,18 @@ jobs:
 
       - name: Get Alation installer
         run: |
-          major=`echo ${{ github.event.inputs.ALATION_VERSION }} | cut -d. -f1`
-          minor=`echo ${{ github.event.inputs.ALATION_VERSION }} | cut -d. -f2`
-          patch_and_build=`echo ${{ github.event.inputs.ALATION_VERSION }} | cut -d. -f3`
+          major=`echo ${{ env.ALATION_VERSION }} | cut -d. -f1`
+          minor=`echo ${{ env.ALATION_VERSION }} | cut -d. -f2`
+          patch_and_build=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3`
           patch=`echo $patch_and_build | cut -d- -f1`
           build=`echo $patch_and_build | cut -d- -f2`
-          aws s3 cp s3://unified-installer-build-pipeline-release/$major/$minor/$patch/$build/${{ github.event.inputs.ALATION_VERSION }}.tar.gz .
+          aws s3 cp s3://unified-installer-build-pipeline-release/$major/$minor/$patch/$build/${{ env.ALATION_VERSION }}.tar.gz .
 
       - name: Extract and run unified installer
         run: |
-          tar -xvzf ${{ github.event.inputs.ALATION_VERSION }}.tar.gz
-          cd ${{ github.event.inputs.ALATION_VERSION }}
+          tar -xvzf ${{ env.ALATION_VERSION }}.tar.gz
+          cd ${{ env.ALATION_VERSION }}
+          ls
           chmod +x installer
           ./installer -platform=eks
 
