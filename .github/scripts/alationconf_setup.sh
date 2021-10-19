@@ -11,6 +11,9 @@ echo "Waiting for Alation fat container pod "$alationfc_pod_name " to become rea
 
 kubectl wait --for=condition=ready pod $alationfc_pod_name --timeout 7m
 
+# Currently there is an issue in alationfc, pod becomes ready but the services are not up, to avoid that situation
+# manually setting some wait period
+sleep 1m
 
 aa_postgres_pwd_alation_conf_cmd="alation_conf alation_analytics-v2.pgsql.password -s 'password@123'"
 
