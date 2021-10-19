@@ -87,9 +87,15 @@ jobs:
         run: |
           major=`echo ${{ env.ALATION_VERSION }} | cut -d. -f1`
           minor=`echo ${{ env.ALATION_VERSION }} | cut -d. -f2`
-          patch_and_build=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3`
-          patch=`echo $patch_and_build | cut -d- -f1`
-          build=`echo $patch_and_build | cut -d- -f2`
+          if [[ ${{ env.ALATION_VERSION }} == *"-"* ]]
+          then
+            patch_and_build=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3`
+            patch=`echo $patch_and_build | cut -d- -f1`
+            build=`echo $patch_and_build | cut -d- -f2`
+          else
+            patch=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3`
+            build=`echo ${{ env.ALATION_VERSION }} | cut -d. -f4`
+          fi
           aws s3 cp s3://unified-installer-build-pipeline-release/$major/$minor/$patch/$build/${{ env.ALATION_VERSION }}.tar.gz ${{ github.workspace }}/pkg/
 
       - name: Extract and run unified installer
@@ -97,7 +103,7 @@ jobs:
           tar -xvzf ${{ github.workspace }}/pkg/${{ env.ALATION_VERSION }}.tar.gz -C ${{ github.workspace }}/pkg
           find ${{ github.workspace }}/pkg
           cd ${{ github.workspace }}/pkg/${{ env.ALATION_VERSION }}
-          chmod +x installer
+          chmod +x ${{ github.workspace }}/pkg/${{ env.ALATION_VERSION }}/installer
           ./installer -platform=eks
 
       - name: Run the configure scripts
