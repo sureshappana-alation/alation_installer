@@ -16,7 +16,7 @@ on:
     outputs:
       version:
         description: "Unified installer version"
-        value: "${{ job.module-setup.outputs.version }}"
+        value: "${{ jobs.module-setup.outputs.version }}"
       # modules:
       #   description: "Modules"
       #   value: "${{ job.module-setup.outputs.modules }}"
