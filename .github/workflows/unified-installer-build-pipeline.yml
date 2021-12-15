@@ -13,13 +13,15 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
+      S3_RELEASE_BUCKET_NAME:
+        required: true
     outputs:
       version:
         description: "Unified installer version"
         value: "${{ jobs.module-setup.outputs.version }}"
-      # modules:
-      #   description: "Modules"
-      #   value: "${{ job.module-setup.outputs.modules }}"
+      modules:
+        description: "Modules"
+        value: "${{ job.module-setup.outputs.modules }}"
   push:
     branches:
       - master

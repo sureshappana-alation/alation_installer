@@ -20,6 +20,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
+      S3_RELEASE_BUCKET_NAME: ${{ secrets.S3_RELEASE_BUCKET_NAME }}
   tag:
     runs-on: ubuntu-latest
     needs: unified-installer-build
@@ -33,4 +34,4 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ needs.unified-installer-build.outputs.version }}
-          # body: ${{ needs.unified-installer-build.outputs.modules }}
+          body: ${{ needs.unified-installer-build.outputs.modules }}
