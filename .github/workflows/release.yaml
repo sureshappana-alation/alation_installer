@@ -32,5 +32,5 @@ jobs:
           echo ${{ needs.unified-installer-build.outputs.version }} ${{ needs.unified-installer-build.outputs.modules }}
       - uses: ncipollo/release-action@v1
         with:
-          tag: ${{ needs.unified-installer-build.outputs.version }}
-          body: ${{ needs.unified-installer-build.outputs.modules }}
+          tag: ${{ needs.unified-installer-build.outputs.alation-version }}
+          body: ${{ needs.unified-installer-build.outputs.module-versions }}

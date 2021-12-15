@@ -16,12 +16,12 @@ on:
       S3_RELEASE_BUCKET_NAME:
         required: true
     outputs:
-      version:
-        description: "Unified installer version"
-        value: "${{ jobs.module-setup.outputs.version }}"
-      modules:
-        description: "Modules"
-        value: "${{ jobs.module-setup.outputs.modules }}"
+      alation-version:
+        description: "Unified installer build version"
+        value: "${{ jobs.module-setup.outputs.alation-version }}"
+      module-versions:
+        description: "Module versions"
+        value: "${{ jobs.module-setup.outputs.module-versions }}"
   push:
     branches:
       - master
@@ -107,8 +107,8 @@ jobs:
       INSTALL_CONFIG_FILE: ./alation/alation-install.yaml
       INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
     outputs:
-      version: ${{ steps.results.outputs.version }}
-      modules: ${{ steps.read_env.outputs.modules }}
+      version: ${{ steps.results.outputs.alation-version }}
+      modules: ${{ steps.read_env.outputs.module-versions }}
 
     steps:
       - name: Configure AWS Credentials
@@ -176,4 +176,5 @@ jobs:
           git push origin $BUILD_VERSION
       - name: results
         run: |
-          echo "::set-output name=version::${{ env.BUILD_OUTPUT }}"
+          echo ::set-output name=alation-version::${{ env.BUILD_OUTPUT }}
+          echo ::set-output name=module-versions::$(cat $VERSIONS_FILE)
