@@ -176,4 +176,4 @@ jobs:
           git push origin $BUILD_VERSION
       - name: results
         run: |
-          echo "::set-output name=version:${{ env.BUILD_OUTPUT }}"
+          echo "::set-output name=version::${{ env.BUILD_OUTPUT }}"
