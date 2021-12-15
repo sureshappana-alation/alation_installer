@@ -15,8 +15,7 @@ on:
       - complete
 jobs:
   oldwork:
-    uses: ./.github/workflows/unified-installer-build-pipeline.yml@main
-
+    uses: sureshappana-alation/alation_installer/.github/workflows/unified-installer-build-pipeline.yml@main
   build:
     runs-on: ubuntu-latest
     steps:
