@@ -15,6 +15,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      - name: Print list of files
+        run: |
+          echo "List of files"
+          find .
       - uses: ./.github/workflows/unified-installer-build-pipeline.yml@main
       - uses: ncipollo/release-action@v1
         with:
