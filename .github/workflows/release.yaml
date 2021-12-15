@@ -17,11 +17,12 @@ jobs:
   unified-installer-build:
     uses: sureshappana-alation/alation_installer/.github/workflows/unified-installer-build-pipeline.yml@main
     secrets:
-      # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
   tag:
     runs-on: ubuntu-latest
+    needs: unified-installer-build
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -31,8 +32,5 @@ jobs:
           find .
       - uses: ncipollo/release-action@v1
         with:
-          tag: ${{ github.event.inputs.tag }}
-          body: versions file is created
-#        artifacts: "release.tar.gz,foo/*.txt"
-#        bodyFile: "body.md"
-#        token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ needs.unified-installer-build.outputs.version }}
+          body: ${{ needs.unified-installer-build.outputs.modules }}

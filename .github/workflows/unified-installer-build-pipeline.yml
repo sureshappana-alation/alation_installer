@@ -9,6 +9,17 @@ on:
     secrets:
       AWS_S3_REGION:
         required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+    outputs:
+      version:
+        description: "Unified installer version"
+        value: "${{ job.module-setup.outputs.version }}"
+      modules:
+        description: "Modules"
+        value: "${{ job.module-setup.outputs.modules }}"
   push:
     branches:
       - master
@@ -93,6 +104,9 @@ jobs:
       VERSIONS_FILE: ./alation/versions.txt
       INSTALL_CONFIG_FILE: ./alation/alation-install.yaml
       INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
+    outputs:
+      version: ${{ steps.results.outputs.version }}
+      modules: ${{ steps.read_env.outputs.modules }}
 
     steps:
       - name: Configure AWS Credentials
@@ -158,6 +172,6 @@ jobs:
         run: |
           git tag $BUILD_VERSION
           git push origin $BUILD_VERSION
-      - name: Output information
+      - name: results
         run: |
-          echo "Version is: ${{ env.BUILD_OUTPUT }}"
+          echo "::set-output name=version:${{ env.BUILD_OUTPUT }}"
