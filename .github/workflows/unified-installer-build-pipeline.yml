@@ -21,7 +21,7 @@ on:
         value: "${{ jobs.module-setup.outputs.version }}"
       modules:
         description: "Modules"
-        value: "${{ job.module-setup.outputs.modules }}"
+        value: "${{ jobs.module-setup.outputs.modules }}"
   push:
     branches:
       - master
