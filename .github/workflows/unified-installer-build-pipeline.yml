@@ -6,6 +6,9 @@ on:
   # This is commented for now to trigger the job manually only
   pull_request:
   workflow_call:
+    secrets:
+      AWS_S3_REGION:
+        required: true
   push:
     branches:
       - master
