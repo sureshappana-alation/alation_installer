@@ -9,6 +9,10 @@ on:
       tag:
         description: "Optional Tag"
         required: false
+  workflow_run:
+    workflows: ["unified-installer-build-pipeline"]
+    type:
+      - complete
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,7 +23,7 @@ jobs:
         run: |
           echo "List of files"
           find .
-      - uses: ./.github/workflows/unified-installer-build-pipeline.yml@main
+      - uses: alation_installer/.github/workflows/unified-installer-build-pipeline.yml@main
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.event.inputs.tag }}
