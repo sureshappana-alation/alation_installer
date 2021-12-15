@@ -4,11 +4,11 @@ on:
   # Run the job when pull request closed
   # This job will only run if the PR has been merged.
   # This is commented for now to trigger the job manually only
-  # pull_request:
-  #   types: [closed]
+  pull_request:
+  workflow_call:
   push:
     branches:
-      - main
+      - master
   # This section is to trigger the workflow manually
   workflow_dispatch:
     inputs:
@@ -18,11 +18,14 @@ on:
       alationfc:
         description: "Alation Fat Container (alationfc) version"
         required: false
+      alationfc-ha:
+        description: "Alation Fat Container HA (alationfc-ha) version"
+        required: false
       acm:
         description: "ACM (acm) version"
         required: false
       EXCLUDE_MODULES:
-        description: "List of comma separated modules to be excluded(ex: alation-analytics,alationfc,acm etc)"
+        description: "List of comma separated modules to be excluded(ex: alation-analytics,alationfc,alationfc-ha,acm etc)"
         required: false
 
 jobs:
@@ -75,7 +78,7 @@ jobs:
           retention-days: 1
 
   # This job is for creating alation unified installer build
-  app-setup:
+  module-setup:
     runs-on: ubuntu-latest
     needs: build
     env:
@@ -132,18 +135,6 @@ jobs:
           name: installer-binary
           path: ${{ env.BASE_DIR }}
 
-      - name: Get branch name
-        run: |
-          echo isProductionBranch=false >> $GITHUB_ENV
-          echo BRANCH_NAME=${GITHUB_REF##*/} >> $GITHUB_ENV
-          if [[ ${{ github.event.ref }} =~ ^refs/heads/production_alation* ]]; then
-              echo isProductionBranch=true >> $GITHUB_ENV
-          fi
-
-      - name: Find image names
-        if: env.isProductionBranch == 'true'
-        run: echo 'This is production branch'
-
       - name: Print list of files
         run: |
           echo "List of files"
@@ -160,7 +151,7 @@ jobs:
           aws s3 cp ${{ env.BUILD_OUTPUT }} ${{ env.S3_RELEASE_BUCKET_URL }}/$MAJOR/$MINOR/$PATCH/$GITHUB_RUN_NUMBER/${{ env.BUILD_OUTPUT }}
 
       - name: Tag git
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/master'
         run: |
           git tag $BUILD_VERSION
           git push origin $BUILD_VERSION
