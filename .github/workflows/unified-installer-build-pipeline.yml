@@ -17,9 +17,9 @@ on:
       version:
         description: "Unified installer version"
         value: "${{ job.module-setup.outputs.version }}"
-      modules:
-        description: "Modules"
-        value: "${{ job.module-setup.outputs.modules }}"
+      # modules:
+      #   description: "Modules"
+      #   value: "${{ job.module-setup.outputs.modules }}"
   push:
     branches:
       - master
@@ -106,7 +106,7 @@ jobs:
       INPUT_CONTEXT: ${{ toJSON(github.event.inputs) }}
     outputs:
       version: ${{ steps.results.outputs.version }}
-      modules: ${{ steps.read_env.outputs.modules }}
+      # modules: ${{ steps.read_env.outputs.modules }}
 
     steps:
       - name: Configure AWS Credentials

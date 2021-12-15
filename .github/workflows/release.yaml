@@ -33,4 +33,4 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ needs.unified-installer-build.outputs.version }}
-          body: ${{ needs.unified-installer-build.outputs.modules }}
+          # body: ${{ needs.unified-installer-build.outputs.modules }}
