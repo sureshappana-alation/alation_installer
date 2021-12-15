@@ -159,6 +159,11 @@ jobs:
           echo "List of files"
           find ${{ env.BASE_DIR }}
 
+      - name: set output variables
+        run: |
+          echo ::set-output name=alation-version::${{ env.BUILD_OUTPUT }}
+          echo ::set-output name=module-versions::$(cat $VERSIONS_FILE)
+
       - name: Renaming base directory to alation version
         run: mv ${{ env.BASE_DIR }} ${{ env.BUILD_VERSION }}
 
@@ -174,7 +179,7 @@ jobs:
         run: |
           git tag $BUILD_VERSION
           git push origin $BUILD_VERSION
-      - name: results
+
+      - name: Print build version
         run: |
-          echo ::set-output name=alation-version::${{ env.BUILD_OUTPUT }}
-          echo ::set-output name=module-versions::$(cat $VERSIONS_FILE)
+          echo "Build version is: ${{ env.BUILD_OUTPUT }}"
