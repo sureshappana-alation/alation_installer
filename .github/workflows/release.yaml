@@ -23,7 +23,7 @@ jobs:
         run: |
           echo "List of files"
           find .
-      - uses: sureshappana-alation/alation_installer/.github/workflows/unified-installer-build-pipeline.yml@main
+      - uses: .github/workflows/unified-installer-build-pipeline.yml@main
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.event.inputs.tag }}
