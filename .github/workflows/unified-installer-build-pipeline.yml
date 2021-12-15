@@ -155,3 +155,6 @@ jobs:
         run: |
           git tag $BUILD_VERSION
           git push origin $BUILD_VERSION
+      - name: Output information
+        run: |
+          echo "Version is: ${{ env.BUILD_OUTPUT }}"
