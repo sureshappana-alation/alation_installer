@@ -1,24 +1,25 @@
 name: Releases
 
-on: 
+on:
   push:
     tags:
-    - '*'
-  workflow_dispatch:    
+      - "*"
+  workflow_dispatch:
     inputs:
       tag:
         description: "Optional Tag"
         required: false
 jobs:
-
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: ./.github/workflows/unified-installer-build-pipeline.yml@main
-    - uses: ncipollo/release-action@v1
-      with:
-        tag: ${{ github.event.inputs.tag }}
-        body: versions file is created
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: ./.github/workflows/unified-installer-build-pipeline.yml@main
+      - uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.event.inputs.tag }}
+          body: versions file is created
 #        artifacts: "release.tar.gz,foo/*.txt"
 #        bodyFile: "body.md"
 #        token: ${{ secrets.GITHUB_TOKEN }}
