@@ -29,8 +29,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Print list of files
         run: |
-          echo "List of files"
-          find .
+          echo ${{ needs.unified-installer-build.outputs.version }} ${{ needs.unified-installer-build.outputs.modules }}
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ needs.unified-installer-build.outputs.version }}
