@@ -14,7 +14,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: ./.github/workflows/unified-installer-build-pipeline@1ab0d5baa01a4757fded6575a91a6c8e06833004
+    - uses: ./.github/workflows/unified-installer-build-pipeline.yml@main
     - uses: ncipollo/release-action@v1
       with:
         tag: ${{ github.event.inputs.tag }}
