@@ -14,6 +14,9 @@ on:
     type:
       - complete
 jobs:
+  oldwork:
+    uses: ./.github/workflows/unified-installer-build-pipeline.yml@main
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -23,7 +26,6 @@ jobs:
         run: |
           echo "List of files"
           find .
-      - uses: sureshappana-alation/alation_installer/.github/workflows/unified-installer-build-pipeline.yml@main
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ github.event.inputs.tag }}
