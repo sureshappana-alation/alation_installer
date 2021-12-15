@@ -14,10 +14,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: ./.github/actions/unified-installer-build-pipeline@v1
     - uses: ncipollo/release-action@v1
       with:
         tag: ${{ github.event.inputs.tag }}
+        body: versions file is created
 #        artifacts: "release.tar.gz,foo/*.txt"
 #        bodyFile: "body.md"
 #        token: ${{ secrets.GITHUB_TOKEN }}
