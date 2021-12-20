@@ -46,7 +46,7 @@ jobs:
 
       - name: Upload build to production S3 bucket
         run: |
-          aws s3 cp ${{ env.ALATION_BUILD }} ${{ env.S3_PROD_RELEASE_BUCKET_URL }}/${{ env.MAJOR }}/${{ env.MINOR }}/${{ env.PATCH }}/${{ env.BUILD }}/${{ env.ALATION_BUILD }}
+          aws s3 cp ${{ env.ALATION_BUILD }} ${{ env.S3_PROD_RELEASE_BUCKET_URL }}/${{ env.MAJOR }}/${{ env.MINOR }}/${{ env.PATCH }}/${{ env.BUILD }}/${{ env.ALATION_BUILD }} --sse=aws:kms
 
       - uses: ncipollo/release-action@v1
         with:
