@@ -22,10 +22,10 @@ jobs:
 
       - name: Extract version information
         run: |
-          MAJOR=`echo ${{ env.ALATION_VERSION }} | cut -d. -f1` >> $GITHUB_ENV
-          MINOR=`echo ${{ env.ALATION_VERSION }} | cut -d. -f2` >> $GITHUB_ENV
-          PATCH=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3` >> $GITHUB_ENV
-          BUILD=`echo ${{ env.ALATION_VERSION }} | cut -d. -f4` >> $GITHUB_ENV
+          echo MAJOR=`echo ${{ env.ALATION_VERSION }} | cut -d. -f1` >> $GITHUB_ENV
+          echo MINOR=`echo ${{ env.ALATION_VERSION }} | cut -d. -f2` >> $GITHUB_ENV
+          echo PATCH=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3` >> $GITHUB_ENV
+          echo BUILD=`echo ${{ env.ALATION_VERSION }} | cut -d. -f4` >> $GITHUB_ENV
 
       - name: Download the Alation unified installer from engineering aws account
         run: |
