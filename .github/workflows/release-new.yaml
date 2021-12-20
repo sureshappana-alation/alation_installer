@@ -15,22 +15,22 @@ jobs:
       S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
       S3_PROD_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_PROD_RELEASE_BUCKET_NAME }}"
     steps:
-      - name: Configure AWS Credentials
+      - name: Configure AWS Credentials for engineering account
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          # aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          # aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_S3_REGION }} #default region
 
-      - name: Add profile credentials to ~/.aws/credentials
-        run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile engineering
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile engineering
-          aws configure set region ${{ secrets.AWS_REGION }} --profile engineering
+      # - name: Add profile credentials to ~/.aws/credentials
+      #   run: |
+      #     aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile engineering
+      #     aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile engineering
+      #     aws configure set region ${{ secrets.AWS_REGION }} --profile engineering
 
-          aws configure set aws_access_key_id ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --profile production
-          aws configure set aws_secret_access_key ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --profile production
-          aws configure set region ${{ secrets.AWS_REGION }} --profile production
+      #     aws configure set aws_access_key_id ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --profile production
+      #     aws configure set aws_secret_access_key ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --profile production
+      #     aws configure set region ${{ secrets.PROD_AWS_S3_REGION }} --profile production
 
       - name: Extract version information
         run: |
@@ -41,23 +41,21 @@ jobs:
 
       - name: Download the Alation unified installer from engineering aws account
         run: |
-          export AWS_PROFILE=engineering
           aws s3 cp ${{ env.S3_RELEASE_BUCKET_URL }}/${{ env.MAJOR }}/${{ env.MINOR }}/${{ env.PATCH }}/${{ env.BUILD }}/${{ env.ALATION_BUILD }} .
 
       - name: Extract the build
         run: |
           tar -xvzf ${{ env.ALATION_BUILD }}
 
-      # - name: Configure AWS credentials for Production account
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: ${{ secrets.PROD_AWS_S3_REGION }}
+      - name: Configure AWS credentials for Production account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.PROD_AWS_S3_REGION }}
 
       - name: Upload build to production S3 bucket
         run: |
-          export AWS_PROFILE=production
           aws s3 cp ${{ env.ALATION_BUILD }} ${{ env.S3_PROD_RELEASE_BUCKET_URL }}/${{ env.MAJOR }}/${{ env.MINOR }}/${{ env.PATCH }}/${{ env.BUILD }}/${{ env.ALATION_BUILD }} --sse=aws:kms
 
       - uses: ncipollo/release-action@v1
