@@ -22,16 +22,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_S3_REGION }}
 
-      # - name: Add profile credentials to ~/.aws/credentials
-      #   run: |
-      #     aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile engineering
-      #     aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile engineering
-      #     aws configure set region ${{ secrets.AWS_REGION }} --profile engineering
-
-      #     aws configure set aws_access_key_id ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --profile production
-      #     aws configure set aws_secret_access_key ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --profile production
-      #     aws configure set region ${{ secrets.PROD_AWS_S3_REGION }} --profile production
-
       - name: Extract version information
         run: |
           echo MAJOR=`echo ${{ env.ALATION_VERSION }} | cut -d. -f1` >> $GITHUB_ENV
@@ -47,16 +37,16 @@ jobs:
         run: |
           tar -xvzf ${{ env.ALATION_BUILD }}
 
-      - name: Configure AWS Credentials for production account
-        uses: aws-actions/configure-aws-credentials@v1
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-          AWS_S3_REGION: ${{ secrets.PROD_AWS_S3_REGION }}
-        with:
-          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.PROD_AWS_S3_REGION }}
+      # - name: Configure AWS Credentials for production account
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+      #     AWS_S3_REGION: ${{ secrets.PROD_AWS_S3_REGION }}
+      #   with:
+      #     aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ secrets.PROD_AWS_S3_REGION }}
 
       - name: Upload build to production S3 bucket
         env:
