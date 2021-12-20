@@ -47,6 +47,10 @@ jobs:
         run: |
           tar -xvzf ${{ env.ALATION_BUILD }}
 
+      - name: print information
+        run: |
+          export var=`aws configure get aws_access_key_id` >> $GITHUB_ENV
+
       - name: Configure AWS credentials for Production account
         uses: aws-actions/configure-aws-credentials@v1
         with:
