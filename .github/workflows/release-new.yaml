@@ -50,6 +50,5 @@ jobs:
 
       - uses: ncipollo/release-action@v1
         with:
-          tag: ${{ needs.unified-installer-build.outputs.alation-version }}
-          body: ${{ needs.unified-installer-build.outputs.module-versions }}
+          tag: ${{ env.ALATION_VERSION }}
           bodyFile: ${{ env.ALATION_VERSION }}/versions.txt
