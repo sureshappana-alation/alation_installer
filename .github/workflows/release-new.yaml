@@ -22,12 +22,12 @@ jobs:
 
       - name: Get Alation installer
         run: |
-          major=`echo ${{ env.ALATION_VERSION }} | cut -d. -f1`
-          minor=`echo ${{ env.ALATION_VERSION }} | cut -d. -f2`
-          patch=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3`
-          build=`echo ${{ env.ALATION_VERSION }} | cut -d. -f4`
+          major=`echo ${{ env.ALATION_VERSION }} | cut -d. -f1` >> $GITHUB_ENV
+          minor=`echo ${{ env.ALATION_VERSION }} | cut -d. -f2` >> $GITHUB_ENV
+          patch=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3` >> $GITHUB_ENV
+          build=`echo ${{ env.ALATION_VERSION }} | cut -d. -f4` >> $GITHUB_ENV
           printenv
-          aws s3 cp ${{ env.S3_RELEASE_BUCKET_URL }}/$major/$minor/$patch/$build/${{ env.ALATION_BUILD }} .
+          aws s3 cp ${{ env.S3_RELEASE_BUCKET_URL }}/$major/${{ env.minor }}/$patch/$build/${{ env.ALATION_BUILD }} .
 
       - name: Extract the build
         run: |
