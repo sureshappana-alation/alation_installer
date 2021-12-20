@@ -3,7 +3,7 @@ name: Release-new
 on:
   workflow_dispatch:
     inputs:
-      tag:
+      ALATION_VERSION:
         description: "Alation Build version"
         required: true
 jobs:
