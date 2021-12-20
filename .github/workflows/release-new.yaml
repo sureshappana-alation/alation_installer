@@ -23,6 +23,7 @@ jobs:
               echo "Branch name matched with the pattern production_alation-****.*"
           else
               echo "Branch name not matched with the pattern production_alation-****.*"
+              echo "ERROR: Please note that this workflow runs only on production branches matching with pattern production_alation-****.*"
               exit 1
           fi
 
