@@ -26,6 +26,7 @@ jobs:
           minor=`echo ${{ env.ALATION_VERSION }} | cut -d. -f2`
           patch=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3`
           build=`echo ${{ env.ALATION_VERSION }} | cut -d. -f4`
+          printenv
           aws s3 cp ${{ env.S3_RELEASE_BUCKET_URL }}/$major/$minor/$patch/$build/${{ env.ALATION_BUILD }} .
 
       - name: Extract the build
