@@ -37,17 +37,6 @@ jobs:
         run: |
           tar -xvzf ${{ env.ALATION_BUILD }}
 
-      # - name: Configure AWS Credentials for production account
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-      #     AWS_S3_REGION: ${{ secrets.PROD_AWS_S3_REGION }}
-      #   with:
-      #     aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: ${{ secrets.PROD_AWS_S3_REGION }}
-
       - name: Upload build to production S3 bucket
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
