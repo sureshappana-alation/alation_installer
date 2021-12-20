@@ -9,7 +9,6 @@ on:
 jobs:
   upload-and-tag:
     runs-on: ubuntu-latest
-    needs: unified-installer-build
     steps:
       - name: Configure AWS Credentials for Engineering account
         uses: aws-actions/configure-aws-credentials@v1
