@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Check the branch name
         run: |
-          if [[ $BRANCH =~ ^production_alation-[0-9]{4}.[0-9]$ ]]
+          if [[ $BRANCH =~ ^refs/heads/production_alation-[0-9]{4}.[0-9]$ ]]
           then
               echo "Branch name matched with the pattern production_alation-****.*"
           else
