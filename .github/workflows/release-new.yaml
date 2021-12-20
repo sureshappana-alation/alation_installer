@@ -1,4 +1,4 @@
-name: Release-new
+name: Create New Release
 
 on:
   workflow_dispatch:
@@ -14,7 +14,18 @@ jobs:
       ALATION_BUILD: ${{ github.event.inputs.ALATION_VERSION }}.tar.gz
       S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
       S3_PROD_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_PROD_RELEASE_BUCKET_NAME }}"
+      BRANCH: ${{ github.ref }}
     steps:
+      - name: Check the branch name
+        run: |
+          if [[ $BRANCH =~ ^production_alation-[0-9]{4}.[0-9]$ ]]
+          then
+              echo "Branch name matched with the pattern production_alation-****.*"
+          else
+              echo "Branch name not matched with the pattern production_alation-****.*"
+              exit 1
+          fi
+
       - name: Configure AWS Credentials for engineering account
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -45,7 +56,8 @@ jobs:
         run: |
           aws s3 cp ${{ env.ALATION_BUILD }} ${{ env.S3_PROD_RELEASE_BUCKET_URL }}/${{ env.MAJOR }}/${{ env.MINOR }}/${{ env.PATCH }}/${{ env.BUILD }}/${{ env.ALATION_BUILD }} --sse=aws:kms
 
-      - uses: ncipollo/release-action@v1
+      - name: Tag and create new release
+        uses: ncipollo/release-action@v1
         with:
           tag: ${{ env.ALATION_VERSION }}
           bodyFile: ${{ env.ALATION_VERSION }}/versions.txt
