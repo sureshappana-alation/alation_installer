@@ -15,20 +15,22 @@ jobs:
       S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
       S3_PROD_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_PROD_RELEASE_BUCKET_NAME }}"
     steps:
-      - name: Configure AWS Credentials for Engineering account
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
-        # with:
-        #   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        #   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        #   aws-region: ${{ secrets.AWS_S3_REGION }}
+        with:
+          # aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          # aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_S3_REGION }} #default region
 
       - name: Add profile credentials to ~/.aws/credentials
         run: |
           aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile engineering
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile engineering
+          aws configure set region ${{ secrets.AWS_REGION }} --profile engineering
 
           aws configure set aws_access_key_id ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --profile production
           aws configure set aws_secret_access_key ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --profile production
+          aws configure set region ${{ secrets.AWS_REGION }} --profile production
 
       - name: Extract version information
         run: |
