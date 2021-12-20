@@ -44,12 +44,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.PROD_AWS_S3_REGION }}
 
-      # - name: Upload build to production S3 bucket
-      #   run: |
-      #     aws s3 cp ${{ env.ALATION_BUILD }} ${{ env.S3_PROD_RELEASE_BUCKET_URL }}/$major/$minor/$patch/$build/${{ env.ALATION_BUILD }}
+      - name: Upload build to production S3 bucket
+        run: |
+          aws s3 cp ${{ env.ALATION_BUILD }} ${{ env.S3_PROD_RELEASE_BUCKET_URL }}/$major/$minor/$patch/$build/${{ env.ALATION_BUILD }}
 
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ env.ALATION_VERSION }}
-          body: "version file information is here"
-          # bodyFile: ${{ env.ALATION_VERSION }}/versions.txt
+          bodyFile: ${{ env.ALATION_VERSION }}/versions.txt
