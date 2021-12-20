@@ -20,14 +20,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_S3_REGION }}
 
-      - name: Get Alation installer
+      - name: Extract version information
         run: |
-          major=`echo ${{ env.ALATION_VERSION }} | cut -d. -f1` >> $GITHUB_ENV
-          minor=`echo ${{ env.ALATION_VERSION }} | cut -d. -f2` >> $GITHUB_ENV
-          patch=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3` >> $GITHUB_ENV
-          build=`echo ${{ env.ALATION_VERSION }} | cut -d. -f4` >> $GITHUB_ENV
-          printenv
-          aws s3 cp ${{ env.S3_RELEASE_BUCKET_URL }}/$major/${{ env.minor }}/$patch/$build/${{ env.ALATION_BUILD }} .
+          MAJOR=`echo ${{ env.ALATION_VERSION }} | cut -d. -f1` >> $GITHUB_ENV
+          MINOR=`echo ${{ env.ALATION_VERSION }} | cut -d. -f2` >> $GITHUB_ENV
+          PATCH=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3` >> $GITHUB_ENV
+          BUILD=`echo ${{ env.ALATION_VERSION }} | cut -d. -f4` >> $GITHUB_ENV
+
+      - name: Download the Alation unified installer from engineering aws account
+        run: |
+          aws s3 cp ${{ env.S3_RELEASE_BUCKET_URL }}/${{ env.MAJOR }}/${{ env.MINOR }}/${{ env.PATCH }}/${{ env.BUILD }}/${{ env.ALATION_BUILD }} .
 
       - name: Extract the build
         run: |
