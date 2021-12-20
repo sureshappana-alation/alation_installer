@@ -12,6 +12,8 @@ jobs:
     env:
       ALATION_VERSION: ${{ github.event.inputs.ALATION_VERSION }}
       ALATION_BUILD: ${{ github.event.inputs.ALATION_VERSION }}.tar.gz
+      S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
+      S3_PROD_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_PROD_RELEASE_BUCKET_NAME }}"
     steps:
       - name: Configure AWS Credentials for Engineering account
         uses: aws-actions/configure-aws-credentials@v1
