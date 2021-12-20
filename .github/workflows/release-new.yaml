@@ -51,4 +51,5 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           tag: ${{ env.ALATION_VERSION }}
-          bodyFile: ${{ env.ALATION_VERSION }}/versions.txt
+          body: "version file information is here"
+          # bodyFile: ${{ env.ALATION_VERSION }}/versions.txt
