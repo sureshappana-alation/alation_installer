@@ -1,0 +1,45 @@
+name: Release-new
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Alation Build version"
+        required: true
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    needs: unified-installer-build
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_S3_REGION }}
+
+      - name: Set environment variables
+        run: |
+          export ALATION_BUILD=${{ env.ALATION_VERSION }}.tar.gz >> $GITHUB_ENV
+
+      - name: Get Alation installer
+        run: |
+          major=`echo ${{ env.ALATION_VERSION }} | cut -d. -f1`
+          minor=`echo ${{ env.ALATION_VERSION }} | cut -d. -f2`
+          patch=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3`
+          build=`echo ${{ env.ALATION_VERSION }} | cut -d. -f4`
+          aws s3 cp ${{ env.S3_RELEASE_BUCKET_URL }}/$major/$minor/$patch/$build/${{ env.ALATION_BUILD }} .
+
+      - name: Extract the build
+        run: |
+          tar -xvzf ${{ env.ALATION_BUILD }}
+
+      # - name: Upload build to production S3 bucket
+      #   run: |
+      #     aws s3 cp ${{ env.ALATION_BUILD }} ${{ env.S3_PROD_RELEASE_BUCKET_URL }}/$major/$minor/$patch/$build/${{ env.ALATION_BUILD }}
+
+      - uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ needs.unified-installer-build.outputs.alation-version }}
+          body: ${{ needs.unified-installer-build.outputs.module-versions }}
+          bodyFile: ${{ env.ALATION_VERSION }}/versions.txt
