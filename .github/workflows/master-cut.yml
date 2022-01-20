@@ -1,0 +1,12 @@
+# name: Master cut
+
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       NEW_BRANCH_NAME:
+#         description: "New Branch Name"
+#         required: true
+# jobs:
+#   upload-and-tag:
+#     runs-on: ubuntu-latest
+#     steps:

@@ -1,0 +1,64 @@
+name: Create New Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      ALATION_VERSION:
+        description: "Alation Build version"
+        required: true
+jobs:
+  upload-and-tag:
+    runs-on: ubuntu-latest
+    env:
+      ALATION_VERSION: ${{ github.event.inputs.ALATION_VERSION }}
+      ALATION_BUILD: ${{ github.event.inputs.ALATION_VERSION }}.tar.gz
+      S3_RELEASE_BUCKET_URL: "s3://${{ secrets.S3_RELEASE_BUCKET_NAME }}"
+      PROD_S3_RELEASE_BUCKET_URL: "s3://${{ secrets.PROD_S3_RELEASE_BUCKET_NAME }}"
+      BRANCH: ${{ github.ref }}
+    steps:
+      - name: Check the branch name
+        run: |
+          if [[ $BRANCH =~ ^refs/heads/production_alation-[0-9]{4}.[0-9]$ ]]
+          then
+              echo "Branch name matched with the pattern production_alation-****.*"
+          else
+              echo "Branch name not matched with the pattern production_alation-****.*"
+              echo "ERROR: Please note that this workflow runs only on production branches matching with pattern production_alation-****.*"
+              exit 1
+          fi
+
+      - name: Configure AWS Credentials for engineering account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_S3_REGION }}
+
+      - name: Extract version information
+        run: |
+          echo MAJOR=`echo ${{ env.ALATION_VERSION }} | cut -d. -f1` >> $GITHUB_ENV
+          echo MINOR=`echo ${{ env.ALATION_VERSION }} | cut -d. -f2` >> $GITHUB_ENV
+          echo PATCH=`echo ${{ env.ALATION_VERSION }} | cut -d. -f3` >> $GITHUB_ENV
+          echo BUILD=`echo ${{ env.ALATION_VERSION }} | cut -d. -f4` >> $GITHUB_ENV
+
+      - name: Download the Alation unified installer from engineering aws account
+        run: |
+          aws s3 cp ${{ env.S3_RELEASE_BUCKET_URL }}/${{ env.MAJOR }}/${{ env.MINOR }}/${{ env.PATCH }}/${{ env.BUILD }}/${{ env.ALATION_BUILD }} .
+
+      - name: Extract the build
+        run: |
+          tar -xvzf ${{ env.ALATION_BUILD }}
+
+      - name: Upload build to production S3 bucket
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          AWS_S3_REGION: ${{ secrets.PROD_AWS_S3_REGION }}
+        run: |
+          aws s3 cp ${{ env.ALATION_BUILD }} ${{ env.PROD_S3_RELEASE_BUCKET_URL }}/${{ env.MAJOR }}/${{ env.MINOR }}/${{ env.PATCH }}/${{ env.BUILD }}/${{ env.ALATION_BUILD }} --sse=aws:kms
+
+      - name: Tag and create new release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ env.ALATION_VERSION }}
+          bodyFile: ${{ env.ALATION_VERSION }}/versions.txt
