@@ -1,6 +1,11 @@
 name: Publish Docker images
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      ALATION_VERSION:
+        description: "Alation Build version"
+        required: true
 
 jobs:
   publish:
@@ -58,6 +63,7 @@ jobs:
           docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/alationfc:10.2.8-158918 118618885326.dkr.ecr.us-east-2.amazonaws.com/alationfc:10.2.8-158918
           docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/alationfc:10.2.8-158918 118618885326.dkr.ecr.us-east-2.amazonaws.com/alationfc:10.2.8-158918
       - name: Publish docker images
+        run: |
           docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/ocf-system/acm:0.1.0-126.production-alation-2021.4
           docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/ocf-system/aim:0.1.0-126.production-alation-2021.4
           docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/ocf-system/containerd:0.1.0-126.production-alation-2021.4
