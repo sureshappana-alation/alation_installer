@@ -24,7 +24,7 @@ jobs:
           aws-region: us-east-2
 
       - name: Login to Amazon ECR
-        id: login-ecr
+        id: login-ecr1
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Configure AWS credentials
@@ -35,7 +35,7 @@ jobs:
           aws-region: us-east-2
 
       - name: Login to Amazon ECR
-        id: login-ecr
+        id: login-ecr2
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Pull docker images
