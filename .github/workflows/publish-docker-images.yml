@@ -11,10 +11,10 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      ECR_SRC_ACCESS_KEY_ID: ${{ github.event.inputs.ECR_SRC_ACCESS_KEY_ID }}
-      ECR_SRC_SECRET_ACCESS_KEY: ${{ github.event.inputs.ECR_SRC_SECRET_ACCESS_KEY }}
-      ECR_DEST_ACCESS_KEY_ID: ${{ github.event.inputs.ECR_DEST_ACCESS_KEY_ID }}
-      ECR_DEST_SECRET_ACCESS_KEY: ${{ github.event.inputs.ECR_DEST_ACCESS_KEY_ID }}
+      ECR_SRC_ACCESS_KEY_ID: ${{ secrets.ECR_SRC_ACCESS_KEY_ID }}
+      ECR_SRC_SECRET_ACCESS_KEY: ${{ secrets.ECR_SRC_SECRET_ACCESS_KEY }}
+      ECR_DEST_ACCESS_KEY_ID: ${{ secrets.ECR_DEST_ACCESS_KEY_ID }}
+      ECR_DEST_SECRET_ACCESS_KEY: ${{ secrets.ECR_DEST_ACCESS_KEY_ID }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
