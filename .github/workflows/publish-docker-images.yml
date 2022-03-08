@@ -42,9 +42,9 @@ jobs:
 
       - name: Push, tag and pull images
         run: |
-          array=("model-server/sentence-bert-encoder:0.2.0-1830545655" \
-          "model-server/universal-sentence-encoder:0.2.0-1830545655" \
-          "model-server:0.2.0-1830545655")
+          array=(model-server/sentence-bert-encoder:0.2.0-1830545655 \
+          model-server/universal-sentence-encoder:0.2.0-1830545655 \
+          model-server:0.2.0-1830545655)
 
           for image in “${array[@]}”
           do
