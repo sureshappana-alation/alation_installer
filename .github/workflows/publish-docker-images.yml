@@ -48,7 +48,7 @@ jobs:
           docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/model-server:0.2.0-1830545655
       - name: Tag docker images
         run: |
-          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/model-server/sentence-bert-encoder:0.2.0-1830545655   118618885326.dkr.ecr.us-east-2.amazonaws.com/sentence-bert-encoder:0.2.0-1830545655
+          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/model-server/sentence-bert-encoder:0.2.0-1830545655   118618885326.dkr.ecr.us-east-2.amazonaws.com/model-server/sentence-bert-encoder:0.2.0-1830545655
           docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/model-server/universal-sentence-encoder:0.2.0-1830545655  118618885326.dkr.ecr.us-east-2.amazonaws.com/model-server/universal-sentence-encoder:0.2.0-1830545655
           docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/model-server:0.2.0-1830545655 118618885326.dkr.ecr.us-east-2.amazonaws.com/model-server:0.2.0-1830545655
 
