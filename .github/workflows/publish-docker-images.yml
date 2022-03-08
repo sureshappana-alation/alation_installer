@@ -50,6 +50,7 @@ jobs:
           do
             echo "*********[$image]: Processing started*********"
             echo "[$image]: Pulling image from source ECR repo"
+            echo ${{ env.SRC_ECR_URL }}/$image
             docker pull ${{ env.SRC_ECR_URL }}/$image
             echo "[$image]: Tagging image with destination ECR repo"
             docker tag ${{ env.SRC_ECR_URL }}/$image ${{ env.DEST_ECR_URL }}/$image
