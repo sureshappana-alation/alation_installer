@@ -38,39 +38,20 @@ jobs:
         id: login-ecr2
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Pull docker images
+      - name: Push, tag and pull images
         run: |
-          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/ocf-system/acm:0.1.0-126.production-alation-2021.4
-          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/ocf-system/aim:0.1.0-126.production-alation-2021.4
-          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/ocf-system/containerd:0.1.0-126.production-alation-2021.4
-          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/aamanager:1.14.0-1495867875
-          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/base-transform:1.14.0-1495867875
-          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/install-hook:1.14.0-1495867875
-          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/postgres:1.14.0-1495867875
-          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/rabbitmq:1.14.0-1495867875
-          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/alationfc:10.2.8-158918
-          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/alationfc:10.2.8-158918
-      - name: Tag docker images
-        run: |
-          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/ocf-system/acm:0.1.0-126.production-alation-2021.4   118618885326.dkr.ecr.us-east-2.amazonaws.com/ocf-system/acm:0.1.0-126.production-alation-2021.4
-          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/ocf-system/aim:0.1.0-126.production-alation-2021.4  118618885326.dkr.ecr.us-east-2.amazonaws.com/ocf-system/aim:0.1.0-126.production-alation-2021.4
-          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/ocf-system/containerd:0.1.0-126.production-alation-2021.4 118618885326.dkr.ecr.us-east-2.amazonaws.com/ocf-system/containerd:0.1.0-126.production-alation-2021.4
-          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/aamanager:1.14.0-1495867875 118618885326.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/aamanager:1.14.0-1495867875
-          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/base-transform:1.14.0-1495867875 118618885326.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/base-transform:1.14.0-1495867875
-          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/install-hook:1.14.0-1495867875 118618885326.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/install-hook:1.14.0-1495867875
-          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/postgres:1.14.0-1495867875 118618885326.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/postgres:1.14.0-1495867875
-          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/rabbitmq:1.14.0-1495867875 118618885326.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/rabbitmq:1.14.0-1495867875
-          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/alationfc:10.2.8-158918 118618885326.dkr.ecr.us-east-2.amazonaws.com/alationfc:10.2.8-158918
-          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/alationfc:10.2.8-158918 118618885326.dkr.ecr.us-east-2.amazonaws.com/alationfc:10.2.8-158918
-      - name: Publish docker images
-        run: |
-          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/ocf-system/acm:0.1.0-126.production-alation-2021.4
-          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/ocf-system/aim:0.1.0-126.production-alation-2021.4
-          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/ocf-system/containerd:0.1.0-126.production-alation-2021.4
-          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/aamanager:1.14.0-1495867875
-          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/base-transform:1.14.0-1495867875
-          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/install-hook:1.14.0-1495867875
-          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/postgres:1.14.0-1495867875
-          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/alation-analytics/rabbitmq:1.14.0-1495867875
-          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/alationfc:10.2.8-158918
-          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/alationfc:10.2.8-158918
+          array=("model-server/sentence-bert-encoder:0.2.0-1830545655" \
+          "model-server/universal-sentence-encoder:0.2.0-1830545655" \
+          "model-server:0.2.0-1830545655")
+
+          for image in “${array[@]}”
+          do
+            echo "*********[$image]: Processing started*********"
+            echo "[$image]: Pulling image from source ECR repo"
+            docker pull $SRC_ECR_URL/$image
+            echo "[$image]: Tagging image with destination ECR repo"
+            docker tag $SRC_ECR_URL/$image $DEST_ECR_URL/$image
+            echo "[$image]: Pushing image to destination ECR repo"
+            docker push $DEST_ECR_URL/$image
+            echo "*********[$image]: Processing completed*********\n\n"	
+          done
