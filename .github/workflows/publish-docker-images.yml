@@ -40,21 +40,39 @@ jobs:
         id: login-ecr2
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Push, tag and pull images
+      - name: Pull docker images
         run: |
-          array=(model-server/sentence-bert-encoder:0.2.0-1830545655 \
-          model-server/universal-sentence-encoder:0.2.0-1830545655 \
-          model-server:0.2.0-1830545655)
 
-          for image in “${array[@]}”
-          do
-            echo "*********[$image]: Processing started*********"
-            echo "[$image]: Pulling image from source ECR repo"
-            echo ${{ env.SRC_ECR_URL }}/$image
-            docker pull ${{ env.SRC_ECR_URL }}/$image
-            echo "[$image]: Tagging image with destination ECR repo"
-            docker tag ${{ env.SRC_ECR_URL }}/$image ${{ env.DEST_ECR_URL }}/$image
-            echo "[$image]: Pushing image to destination ECR repo"
-            docker push ${{ env.DEST_ECR_URL }}/$image
-            echo "*********[$image]: Processing completed*********\n\n"	
-          done
+          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/model-server/sentence-bert-encoder:0.2.0-1830545655
+          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/model-server/universal-sentence-encoder:0.2.0-1830545655
+          docker pull 248135293344.dkr.ecr.us-east-2.amazonaws.com/model-server:0.2.0-1830545655
+      - name: Tag docker images
+        run: |
+          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/model-server/sentence-bert-encoder:0.2.0-1830545655   118618885326.dkr.ecr.us-east-2.amazonaws.com/sentence-bert-encoder:0.2.0-1830545655
+          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/model-server/universal-sentence-encoder:0.2.0-1830545655  118618885326.dkr.ecr.us-east-2.amazonaws.com/model-server/universal-sentence-encoder:0.2.0-1830545655
+          docker tag 248135293344.dkr.ecr.us-east-2.amazonaws.com/model-server:0.2.0-1830545655 118618885326.dkr.ecr.us-east-2.amazonaws.com/model-server:0.2.0-1830545655
+
+      - name: Publish docker images
+        run: |
+          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/model-server/sentence-bert-encoder:0.2.0-1830545655
+          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/model-server/universal-sentence-encoder:0.2.0-1830545655
+          docker push 118618885326.dkr.ecr.us-east-2.amazonaws.com/model-server:0.2.0-1830545655
+
+      # - name: Push, tag and pull images
+      #   run: |
+      #     array=(model-server/sentence-bert-encoder:0.2.0-1830545655 \
+      #     model-server/universal-sentence-encoder:0.2.0-1830545655 \
+      #     model-server:0.2.0-1830545655)
+
+      #     for image in “${array[@]}”
+      #     do
+      #       echo "*********[$image]: Processing started*********"
+      #       echo "[$image]: Pulling image from source ECR repo"
+      #       echo ${{ env.SRC_ECR_URL }}/$image
+      #       docker pull ${{ env.SRC_ECR_URL }}/$image
+      #       echo "[$image]: Tagging image with destination ECR repo"
+      #       docker tag ${{ env.SRC_ECR_URL }}/$image ${{ env.DEST_ECR_URL }}/$image
+      #       echo "[$image]: Pushing image to destination ECR repo"
+      #       docker push ${{ env.DEST_ECR_URL }}/$image
+      #       echo "*********[$image]: Processing completed*********\n\n"
+      #     done
